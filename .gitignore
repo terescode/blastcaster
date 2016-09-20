@@ -1,0 +1,17 @@
+# MacOS
+.DS_Store
+
+# Composer
+composer
+composer.phar
+composer.lock
+vendor/*
+
+# NodeJS
+
+node_modules/*
+reports/*
+
+# Logs
+
+*.log

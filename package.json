@@ -1,0 +1,17 @@
+{
+  "name": "blastcaster-wp",
+  "version": "1.0.0",
+  "description": "BlastCaster WordPress plugin",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Terescode, LLC",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-phpcs": "^0.4.0",
+    "grunt-po2mo": "^0.1.2",
+    "grunt-wp-i18n": "^0.5.4"
+  }
+}
