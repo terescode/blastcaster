@@ -1,32 +1,61 @@
-module.exports = function (grunt) { //The wrapper function
+/**
+ * Grunt wrapper
+ */
+module.exports = function (grunt) {
+  'use strict';
 
-  // Project configuration & task configuration
+  /**
+   * Grunt task configurations
+   */
   grunt.initConfig({
+    
+    // load the package.json metadata
     pkg: grunt.file.readJSON('package.json'),
 
+    // Configure clean task
+    clean: {
+      build: {
+        src: [
+          'build/',
+          'reports/'
+        ]
+      }
+    },
+    
+    // Configure grunt-phpcs (PHP_CodeSniffer) task
     phpcs: {
       application: {
         src: ['*.php', 'includes/*.php', 'admin/*.php', 'public/*.php']
       },
       options: {
-		bin: 'vendor/bin/phpcs',
+        bin: 'vendor/bin/phpcs',
         standard: 'WordPress-Core'
       }
     },
-    
+
+    // Configure grunt-phpunit task
     phpunit: {
-	  default: {
-        cmd: 'vendor/bin/phpunit',
-		args: ['-c', 'phpunit.xml.dist']
-	  }
+      build: {
+        options: {
+          cmd: 'vendor/bin/phpunit',
+          args: [
+            '-c',
+            'phpunit.xml.dist',
+            '--testdox-html',
+            'reports/testdox.html',
+            '--coverage-html',
+            'reports/coverage'
+          ]
+        }
+      }
     },
 
-    //The jshint task and its configurations
+    // Configure grunt-contrib-jshint task
     jshint: {
       all: ['js/*.js', '!js/*.min.js']
     },
 
-    //The uglify task and its configurations
+    // Configure grunt-contrib-uglify task
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -40,6 +69,7 @@ module.exports = function (grunt) { //The wrapper function
       }
     },
 
+    // Configure the WordPress i18n makepot task
     makepot: {
       target: {
         options: {
@@ -59,13 +89,7 @@ module.exports = function (grunt) { //The wrapper function
       }
     },
 
-    po2mo: {
-      files: {
-        src: 'languages/*.po',
-        expand: true
-      }
-    },
-
+    // Configure the WordPress i18n addtextdomain task
     addtextdomain: {
       options: {
         textdomain: 'blastcaster' // Project text domain.
@@ -79,28 +103,83 @@ module.exports = function (grunt) { //The wrapper function
           ]
         }
       }
+    },
+    
+    // Configure the grunt-po2mo task for converting .po files to binary .mo files
+    po2mo: {
+      files: {
+        src: 'languages/*.po',
+        expand: true
+      }
+    },
+    
+    // Configure the compress task
+    compress: {
+      main: {
+        options: {
+          archive: 'build/blastcaster.zip'
+        },
+        src: [
+          'admin/**',
+          'includes/**',
+          'languages/**',
+          'blastcaster.php',
+          'index.php',
+          'readme.txt',
+          'uninstall.php'
+        ]
+      }
     }
   });
 
-  //Loading the plug-ins
+  /**
+   * Load Grunt plugins and tasks
+   */
+  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-phpcs');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-wp-i18n');
   grunt.loadNpmTasks('grunt-po2mo');
 
-  grunt.registerMultiTask('phpunit', "Runs PHPUnit tests.", function() { 
-    grunt.util.spawn({ 
-      cmd: this.data.cmd, 
-      args: this.data.args, 
-      opts: {stdio: 'inherit'} 
-    }, this.async()); 
+  /**
+   * Custom tasks
+   */
+  
+  /**
+   * clean
+   * Cleans all the generated files
+   */
+  grunt.registerMultiTask('clean', 'Clean all generated files', function () {
+    var files = this.filesSrc;
+    files.forEach(function (filepath) {
+      grunt.log.writeln('Removing ' + filepath + '...');
+      grunt.file.delete(filepath);
+    });
   });
-	
-  // Default task(s), executed when you run 'grunt'
-  grunt.registerTask('default', ['build']);
-
-  //Creating a custom task
+  
+  /**
+   * phpunit
+   * Run phpunit task using the task configuration to spawn a command with
+   * specified arguments.
+   */
+  grunt.registerMultiTask('phpunit', "Runs PHPUnit tests.", function () {
+    var options = this.options({});
+    grunt.util.spawn({
+      cmd: options.cmd,
+      args: options.args,
+      opts: {
+        stdio: 'inherit'
+      }
+    }, this.async());
+  });
+  
+  // Test task - run phpcs and phpunit
   grunt.registerTask('test', ['phpcs', 'phpunit']);
-
+  
+  // Build task aliases
+  grunt.registerTask('build', ['test', 'compress']);
+  
+  // Alias the default task to build
+  grunt.registerTask('default', ['build']);
 };

@@ -8,6 +8,7 @@
   "author": "Terescode, LLC",
   "devDependencies": {
     "grunt": "^1.0.1",
+    "grunt-contrib-compress": "^1.3.0",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-phpcs": "^0.4.0",

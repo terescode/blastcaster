@@ -1,4 +1,17 @@
 {
   "useTabChar": true,
-  "spaceUnits": 4
+  "spaceUnits": 4,
+  "highlightMatches": true,
+  "path": {
+    "**.js": {
+      "useTabChar": false,
+      "spaceUnits": 2,
+	  "linting.enabled": true
+    },
+    "**.json": {
+      "useTabChar": false,
+      "spaceUnits": 2,
+	  "linting.enabled": true
+    }
+  }
 }
