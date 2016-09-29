@@ -2,7 +2,7 @@
 
 require_once 'admin/class-admin-plugin.php';
 
-if ( ! class_exists( BcAdminPluginStub ) ) {
+if ( ! class_exists( 'BcAdminPluginStub' ) ) {
 
 	class BcAdminPluginStub extends BcAdminPlugin {
 		public $menu_hooknames = array();

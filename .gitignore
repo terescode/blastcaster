@@ -2,9 +2,7 @@
 .DS_Store
 
 # Composer
-composer
 composer.phar
-composer.lock
 vendor/*
 
 # NodeJS

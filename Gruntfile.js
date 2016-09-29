@@ -4,6 +4,8 @@
 module.exports = function (grunt) {
   'use strict';
 
+  var multitasker = require('grunt-multitasker')(grunt);
+  
   /**
    * Grunt task configurations
    */
@@ -12,13 +14,35 @@ module.exports = function (grunt) {
     // load the package.json metadata
     pkg: grunt.file.readJSON('package.json'),
 
-    // Configure clean task
+    // Clean task configuration
     clean: {
       build: {
         src: [
+          'composer-setup.php',
           'build/',
           'reports/'
         ]
+      },
+      all: {
+        src: [
+          'composer.phar',
+          'vendor/',
+          'node_modules/'
+        ]
+      }
+    },
+    
+    // Composer task
+    composer: {
+      options: {
+        usePhp: true,
+        composerLocation: 'composer.phar'
+      },
+      install: {
+        
+      },
+      update: {
+        
       }
     },
     
@@ -40,7 +64,7 @@ module.exports = function (grunt) {
           cmd: 'vendor/bin/phpunit',
           args: [
             '-c',
-            'phpunit.xml.dist',
+            'phpunit.xml',
             '--testdox-html',
             'reports/testdox.html',
             '--coverage-html',
@@ -135,6 +159,7 @@ module.exports = function (grunt) {
   /**
    * Load Grunt plugins and tasks
    */
+  grunt.loadNpmTasks('grunt-composer');
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-phpcs');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -146,16 +171,30 @@ module.exports = function (grunt) {
    * Custom tasks
    */
   
+  function clean(files) {
+    files.forEach(function (filepath) {
+      grunt.log.writeln('Removing ' + filepath + '...');
+      grunt.file.delete(filepath);
+    });
+  }
+  
   /**
    * clean
    * Cleans all the generated files
    */
   grunt.registerMultiTask('clean', 'Clean all generated files', function () {
-    var files = this.filesSrc;
-    files.forEach(function (filepath) {
-      grunt.log.writeln('Removing ' + filepath + '...');
-      grunt.file.delete(filepath);
-    });
+    clean(this.filesSrc);
+  });
+
+  // Set the default clean to be just 'build'
+  multitasker.setDefaultTargets('clean', 'build');
+  
+  /**
+   * teardown
+   * Tear down the working directory back to a git checkout state.
+   */
+  grunt.registerMultiTask('teardown', 'Restore checkout state', function () {
+    clean(this.filesSrc);
   });
   
   /**

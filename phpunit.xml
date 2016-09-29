@@ -5,10 +5,21 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	verbose="true"
 	>
 	<testsuites>
 		<testsuite>
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
+	<filter>
+	  <whitelist>
+		<directory suffix=".php">./</directory>
+		<exclude>
+		  <directory suffix=".php">./node_modules/</directory>
+		  <directory suffix=".php">./vendor/</directory>
+		  <directory suffix=".php">./tests/</directory>
+		</exclude>
+	  </whitelist>
+	</filter>
 </phpunit>

@@ -2,7 +2,7 @@
 
 require_once 'includes/class-controller.php';
 
-if ( ! class_exists( BcControllerStub ) ) {
+if ( ! class_exists( 'BcControllerStub' ) ) {
 
 	class BcRendererStub extends BcRenderer {
 		/**
