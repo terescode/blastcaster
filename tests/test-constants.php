@@ -9,7 +9,9 @@
 class ConstantsTest extends BcPhpUnitTestCase {
 
 	/**
-	 * Test including the main plugin file
+	 * Test including the constants file
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 
 	public function test_constants_defined() {

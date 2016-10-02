@@ -25,7 +25,7 @@ if ( ! class_exists( 'BcAdminController' ) ) {
 				$json_error = json_last_error();
 				$json_error_msg = '';
 
-				if ( ! function_exists( 'json_last_error_msg' ) ) {
+				if ( function_exists( 'json_last_error_msg' ) ) {
 					$json_error_msg = json_last_error_msg();
 				}
 

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'includes/constants.php';
+
 /**
  * Class BcRendererTest
  *

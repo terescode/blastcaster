@@ -17,6 +17,7 @@
     "grunt-multitasker": "0.0.2",
     "grunt-phpcs": "^0.4.0",
     "grunt-po2mo": "^0.1.2",
-    "grunt-wp-i18n": "^0.5.4"
+    "grunt-wp-i18n": "^0.5.4",
+    "xml2js": "^0.4.17"
   }
 }

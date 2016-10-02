@@ -19,13 +19,23 @@ if ( ! class_exists( 'BcAdminPlugin' ) ) {
 			add_action( 'admin_menu', array( $this, 'install_admin_menus' ) );
 		}
 
+		protected function create_load_pagenow_hook( $hookname ) {
+			return function () use ( $hookname ) {
+				$this->add_screen_meta_boxes( $hookname );
+			};
+		}
+
+		protected function create_admin_notices_hook( $notice, $type, $dismissable ) {
+			return function () use ( $notice, $type, $dismissable ) {
+				$this->render_admin_notice( $notice, $type, $dismissable );
+			};
+		}
+
 		public function install_admin_menus() {
 			$hooknames = $this->register_admin_menus();
 			foreach ( $hooknames as $hookname ) {
 				// do_action( 'load-{$pagenow}' )
-				add_action( 'load-' . $hookname, function () use ( $hookname ) {
-					$this->add_screen_meta_boxes( $hookname );
-				});
+				add_action( 'load-' . $hookname, $this->create_load_pagenow_hook( $hookname ) );
 				// do_action( 'admin_footer-{$hookname}' )
 				add_action( 'admin_footer-' . $hookname, array( $this, 'add_script_in_footer' ) );
 			}
@@ -57,9 +67,7 @@ if ( ! class_exists( 'BcAdminPlugin' ) ) {
 		}
 
 		public function add_admin_notice( $notice, $type = self::NOTICE_TYPE_ERROR, $dismissable = true ) {
-			add_action( 'admin_notices', function () {
-				$this->render_admin_notice( $notice, $type, $dismissable );
-			} );
+			add_action( 'admin_notices', $this->create_admin_notices_hook( $notice, $type, $dismissable ) );
 		}
 
 		public function get_plugin_id() {

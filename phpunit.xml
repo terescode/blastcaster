@@ -8,7 +8,7 @@
 	verbose="true"
 	>
 	<testsuites>
-		<testsuite>
+		<testsuite name="unit">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
@@ -22,4 +22,9 @@
 		</exclude>
 	  </whitelist>
 	</filter>
+	<logging>
+	  <log type="coverage-html" target="./reports/coverage/" lowUpperBound="95" highLowerBound="100"/>
+	  <log type="coverage-clover" target="./reports/coverage.xml"/>
+	  <log type="testdox-html" target="./reports/testdox.html"/>
+	</logging>
 </phpunit>

@@ -11,7 +11,9 @@
  * @package BlastCaster
  */
 
-defined( 'WPINC' ) || die;
+if ( ! defined( 'WPINC' ) ) {
+	return -1;
+}
 
 require_once( 'includes/constants.php' );
 require_once( BC_PLUGIN_DIR . 'admin/class-blastcaster-plugin.php' );

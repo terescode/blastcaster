@@ -14,8 +14,6 @@ if ( ! function_exists( 'plugin_dir_path' ) ) {
 	}
 }
 
-require_once 'includes/constants.php';
-
 if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 
 	abstract class BcPhpUnitTestCase extends PHPUnit_Framework_TestCase {

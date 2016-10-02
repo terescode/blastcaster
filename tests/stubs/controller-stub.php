@@ -10,7 +10,7 @@ if ( ! class_exists( 'BcControllerStub' ) ) {
 		}
 
 		function do_action() {
-			$this->render( 'tests/view.php' );
+			$this->render( 'tests/fixtures/view.php' );
 		}
 
 		function print_message( $string ) {

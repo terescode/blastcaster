@@ -1,5 +1,6 @@
 <?php
 
+require_once 'includes/constants.php';
 require_once 'tests/stubs/admin-plugin-stub.php';
 
 /**
@@ -116,6 +117,28 @@ class WpAdminPluginTest extends BcPhpUnitTestCase {
 	}
 
 	/**
+	 * Test anonymous function for load-{$pagenow} hook
+	 */
+	function test_load_pagenow_hook_should_call_add_screen_meta_boxes_given_hookname() {
+		// @sut
+		$plugin = new BcAdminPluginStub( 'admin-plugin-stub' );
+
+		// @setup
+		$hookname = 'hookname_1';
+
+		\WP_Mock::expectAction( 'add_meta_boxes_' . $hookname, array( null ) );
+		\WP_Mock::expectAction( 'add_meta_boxes', $hookname, array( null ) );
+		\WP_Mock::wpFunction( 'wp_enqueue_script', array(
+			'times' => 1,
+			'args' => array( 'postbox' ),
+		) );
+
+		// @test
+		$lambda = $plugin->create_load_pagenow_hook_proxy( $hookname );
+		$lambda();
+	}
+
+	/**
 	 * Test add_script_in_footer
 	 */
 
@@ -166,6 +189,33 @@ class WpAdminPluginTest extends BcPhpUnitTestCase {
 		$this->expectOutputRegex( '/class="error notice is-dismissable/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
 		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_ERROR, true );
+	}
+
+	/**
+	 * Test anonymous function for admin_notices hook
+	 */
+
+	function test_admin_notices_hook_should_call_render_admin_notice() {
+		// @sut
+		$plugin = new BcAdminPluginStub( 'admin-plugin-stub' );
+
+		// @setup
+		\WP_Mock::wpFunction( 'esc_html', array(
+			'times' => 1,
+			'args' => array( \WP_Mock\Functions::type( 'string' ) ),
+			'return_arg' => 0,
+		) );
+		\WP_Mock::wpFunction( 'esc_attr', array(
+			'times' => 1,
+			'args' => array( \WP_Mock\Functions::type( 'string' ) ),
+			'return_arg' => 0,
+		) );
+		$this->expectOutputRegex( '/class="error/' );
+		$this->expectOutputRegex( '/That is mangatsika cool/' );
+
+		// @tests
+		$lambda = $plugin->create_admin_notices_hook_proxy( 'That is mangatsika cool' );
+		$lambda();
 	}
 
 	/**

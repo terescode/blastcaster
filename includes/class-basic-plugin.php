@@ -24,10 +24,20 @@ if ( ! class_exists( 'BcBasicPlugin' ) ) {
 			add_action( 'plugins_loaded', array( $this, 'load' ) );
 		}
 
+		/**
+		 * We can ignore this block since it is a no-op for sub-classes to override.
+		 *
+		 * @codeCoverageIgnore
+		 */
 		public function activate() {
 			// no-op
 		}
 
+		/**
+		 * We can ignore this block since it is a no-op for sub-classes to override.
+		 *
+		 * @codeCoverageIgnore
+		 */
 		public function deactivate() {
 			// no-op
 		}

@@ -4,7 +4,67 @@
 module.exports = function (grunt) {
   'use strict';
 
-  var multitasker = require('grunt-multitasker')(grunt);
+  /**
+   * Custom Code
+   */
+  
+  var fs = require('fs'),
+    util = require('util'),
+    multitasker = require('grunt-multitasker')(grunt),
+    xml2js = require('xml2js');
+
+  function phpUnitCompleted(done) {
+    return function (error, result, code) {
+      if (error) {
+        done(error);
+      } else {
+        if (0 === code) {
+          var parser = new xml2js.Parser();
+          fs.readFile('./reports/coverage.xml', function (err, data) {
+            if (err) {
+              done(err);
+            } else {
+              parser.parseString(data, function (err, result) {
+                if (err) {
+                  done(err);
+                } else {
+                  if (result.coverage &&
+                      result.coverage.project &&
+                      0 < result.coverage.project.length &&
+                      result.coverage.project[0].metrics &&
+                      0 < result.coverage.project[0].metrics.length &&
+                      result.coverage.project[0].metrics[0].$) {
+                    var metrics = result.coverage.project[0].metrics[0].$,
+                      methods = metrics.methods,
+                      coveredMethods = metrics.coveredmethods,
+                      statements = metrics.statements,
+                      coveredStatements = metrics.coveredstatements,
+                      elements = metrics.elements,
+                      coveredElements = metrics.coveredelements;
+                    if (methods !== coveredMethods &&
+                        statements !== coveredStatements &&
+                        elements !== coveredElements) {
+                      grunt.log.writeln('Code coverage is not within acceptable tolerances.');
+                      done(false);
+                    } else {
+                      done();
+                    }
+                  } else {
+                    grunt.log.writeln('Unexpected coverage data.');
+                    grunt.log.writeln(util.inspect(result, false, null));
+                    done(false);
+                  }
+                }
+              });
+            }
+          });
+        } else {
+          grunt.log.writeln('phpunit returned non-zero result: ' + result + ' (' + code + ')');
+          done(false);
+        }
+      }
+    };
+  }
   
   /**
    * Grunt task configurations
@@ -64,11 +124,7 @@ module.exports = function (grunt) {
           cmd: 'vendor/bin/phpunit',
           args: [
             '-c',
-            'phpunit.xml',
-            '--testdox-html',
-            'reports/testdox.html',
-            '--coverage-html',
-            'reports/coverage'
+            'phpunit.xml'
           ]
         }
       }
@@ -210,7 +266,7 @@ module.exports = function (grunt) {
       opts: {
         stdio: 'inherit'
       }
-    }, this.async());
+    }, phpUnitCompleted(this.async()));
   });
   
   // Test task - run phpcs and phpunit

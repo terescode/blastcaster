@@ -1,5 +1,6 @@
 <?php
 
+require_once 'includes/constants.php';
 require_once 'tests/stubs/basic-plugin-stub.php';
 require_once 'tests/stubs/controller-stub.php';
 
@@ -25,6 +26,6 @@ class BcRendererTest extends BcPhpUnitTestCase {
 		$this->expectOutputRegex( '/Hello, world[!]/' );
 
 		// @test
-		$renderer->render( $controller, 'tests/view.php' );
+		$renderer->render( $controller, 'tests/fixtures/view.php' );
 	}
 }
