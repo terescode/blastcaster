@@ -20,16 +20,21 @@ if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 			parent::__construct( self::BC_PLUGIN_ID );
 		}
 
-		function register_admin_menus() {
-			$hooknames = array();
+		function add_posts_page() {
 			$this->admin_controller = new BcAdminController( $this );
-			$hooknames[] = add_posts_page(
+			$hookname = add_posts_page(
 				__( 'Add a blast', 'blastcaster' ),
 				__( 'Add a blast', 'blastcaster' ),
 				'edit_posts',
 				self::BC_ADD_BLAST_SCREEN_ID,
 				array( $this->admin_controller, 'do_add_blast' )
 			);
+			return $hookname;
+		}
+
+		function register_admin_menus() {
+			$hooknames = array();
+			$hooknames[] = $this->add_posts_page();
 			return $hooknames;
 		}
 

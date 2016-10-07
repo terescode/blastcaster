@@ -60,12 +60,15 @@ if ( ! class_exists( 'BcAdminPlugin' ) ) {
 			echo $this->get_script_for_footer();
 		}
 
-		public function render_admin_notice( $notice, $type = self::NOTICE_TYPE_ERROR, $dismissable = true ) {
+		public function render_admin_notice( $notice, $type, $dismissable ) {
 			echo '<div class="' . esc_attr( $type ) . ' notice' . ( $dismissable ? ' is-dismissable' : '' ) . '"><p>';
 			echo esc_html( $notice );
 			echo '</p></div>';
 		}
 
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
 		public function add_admin_notice( $notice, $type = self::NOTICE_TYPE_ERROR, $dismissable = true ) {
 			add_action( 'admin_notices', $this->create_admin_notices_hook( $notice, $type, $dismissable ) );
 		}

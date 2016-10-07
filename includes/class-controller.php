@@ -23,11 +23,7 @@ if ( ! class_exists( 'BcController' ) ) {
 
 		function __construct( $plugin, $renderer = null ) {
 			$this->plugin = $plugin;
-			if ( null == $renderer ) {
-				$this->renderer = new BcRenderer();
-			} else {
-				$this->renderer = $renderer;
-			}
+			$this->renderer = ( null == $renderer ? new BcRenderer() : $renderer );
 		}
 
 		protected function render( $view ) {

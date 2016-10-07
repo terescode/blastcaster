@@ -10,58 +10,86 @@ module.exports = function (grunt) {
   
   var fs = require('fs'),
     util = require('util'),
+    chalk = require('chalk'),
     multitasker = require('grunt-multitasker')(grunt),
     xml2js = require('xml2js');
 
+  function runFn(callback) {
+    return function () {
+      var options = this.options({});
+      grunt.util.spawn({
+        cmd: options.cmd,
+        args: options.args,
+        opts: {
+          stdio: 'inherit'
+        }
+      }, callback(this.async()));
+    };
+  }
+  
+  function phpmdCompleted(done) {
+    return function (error, result, code) {
+      if (error || 0 !== code) {
+        grunt.log.writeln(chalk.red('What a mess! Please review the following issues (reports/md.xml).'));
+        fs.readFile('./reports/md.xml', function (err, data) {
+          if (err) {
+            done(err);
+          } else {
+            grunt.log.writeln(data);
+            done(false);
+          }
+        });
+      } else {
+        done();
+      }
+    };
+  }
+  
   function phpUnitCompleted(done) {
     return function (error, result, code) {
-      if (error) {
-        done(error);
+      if (error || 0 !== code) {
+        grunt.log.writeln(chalk.red('phpunit returned non-zero result: ' + result + ' (' + code + ')'));
+        done(error || new Error('phpunit returned non-zero result: ' + result + ' (' + code + ')'));
       } else {
-        if (0 === code) {
-          var parser = new xml2js.Parser();
-          fs.readFile('./reports/coverage.xml', function (err, data) {
-            if (err) {
-              done(err);
-            } else {
-              parser.parseString(data, function (err, result) {
-                if (err) {
-                  done(err);
-                } else {
-                  if (result.coverage &&
-                      result.coverage.project &&
-                      0 < result.coverage.project.length &&
-                      result.coverage.project[0].metrics &&
-                      0 < result.coverage.project[0].metrics.length &&
-                      result.coverage.project[0].metrics[0].$) {
-                    var metrics = result.coverage.project[0].metrics[0].$,
-                      methods = metrics.methods,
-                      coveredMethods = metrics.coveredmethods,
-                      statements = metrics.statements,
-                      coveredStatements = metrics.coveredstatements,
-                      elements = metrics.elements,
-                      coveredElements = metrics.coveredelements;
-                    if (methods !== coveredMethods &&
-                        statements !== coveredStatements &&
-                        elements !== coveredElements) {
-                      grunt.log.writeln('Code coverage is not within acceptable tolerances.');
-                      done(false);
-                    } else {
-                      done();
-                    }
-                  } else {
-                    grunt.log.writeln('Unexpected coverage data.');
-                    grunt.log.writeln(util.inspect(result, false, null));
+        var parser = new xml2js.Parser();
+        fs.readFile('./reports/coverage.xml', function (err, data) {
+          if (err) {
+            done(err);
+          } else {
+            parser.parseString(data, function (err, result) {
+              if (err) {
+                done(err);
+              } else {
+                if (result.coverage &&
+                    result.coverage.project &&
+                    0 < result.coverage.project.length &&
+                    result.coverage.project[0].metrics &&
+                    0 < result.coverage.project[0].metrics.length &&
+                    result.coverage.project[0].metrics[0].$) {
+                  var metrics = result.coverage.project[0].metrics[0].$,
+                    methods = metrics.methods,
+                    coveredMethods = metrics.coveredmethods,
+                    statements = metrics.statements,
+                    coveredStatements = metrics.coveredstatements,
+                    elements = metrics.elements,
+                    coveredElements = metrics.coveredelements;
+                  if (methods !== coveredMethods &&
+                      statements !== coveredStatements &&
+                      elements !== coveredElements) {
+                    grunt.log.writeln('Code coverage is not within acceptable tolerances.');
                     done(false);
+                  } else {
+                    done();
                   }
+                } else {
+                  grunt.log.writeln('Unexpected coverage data.');
+                  grunt.log.writeln(util.inspect(result, false, null));
+                  done(false);
                 }
-              });
-            }
-          });
-        } else {
-          grunt.log.writeln('phpunit returned non-zero result: ' + result + ' (' + code + ')');
-          done(false);
-        }
+              }
+            });
+          }
+        });
       }
     };
   }
@@ -106,7 +134,7 @@ module.exports = function (grunt) {
       }
     },
     
-    // Configure grunt-phpcs (PHP_CodeSniffer) task
+    // Configure phpcs task
     phpcs: {
       application: {
         src: ['*.php', 'includes/*.php', 'admin/*.php', 'public/*.php']
@@ -117,9 +145,27 @@ module.exports = function (grunt) {
       }
     },
 
+    // Configure phpmd task
+    'phpmd': {
+      application: {
+        options: {
+          cmd: 'vendor/bin/phpmd',
+          args: [
+            './',
+            'xml',
+            'cleancode,codesize,design,naming,unusedcode',
+            '--exclude',
+            'node_modules,vendor,tests',
+            '--reportfile',
+            'reports/md.xml'
+          ]
+        }
+      }
+    },
+    
     // Configure grunt-phpunit task
     phpunit: {
-      build: {
+      application: {
         options: {
           cmd: 'vendor/bin/phpunit',
           args: [
@@ -222,55 +268,47 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-wp-i18n');
   grunt.loadNpmTasks('grunt-po2mo');
-
-  /**
-   * Custom tasks
-   */
   
-  function clean(files) {
-    files.forEach(function (filepath) {
-      grunt.log.writeln('Removing ' + filepath + '...');
-      grunt.file.delete(filepath);
-    });
-  }
+  /**
+   * init
+   * Build initialization
+   */
+  grunt.registerTask('init', 'Build initialization', function() {
+    if (!grunt.file.isDir('./reports')) {
+      grunt.file.mkdir('./reports');
+    }
+  });
   
   /**
    * clean
    * Cleans all the generated files
    */
   grunt.registerMultiTask('clean', 'Clean all generated files', function () {
-    clean(this.filesSrc);
+    this.filesSrc.forEach(function (filepath) {
+      grunt.log.writeln('Removing ' + filepath + '...');
+      grunt.file.delete(filepath);
+    });
   });
 
   // Set the default clean to be just 'build'
   multitasker.setDefaultTargets('clean', 'build');
-  
+
   /**
-   * teardown
-   * Tear down the working directory back to a git checkout state.
+   * phpmd
+   * Run phpmd task using the task configuration to spawn a command with
+   * specified arguments.
    */
-  grunt.registerMultiTask('teardown', 'Restore checkout state', function () {
-    clean(this.filesSrc);
-  });
+  grunt.registerMultiTask('phpmd', 'Runs PHP Mess Detector analysis.', runFn(phpmdCompleted));
   
   /**
    * phpunit
    * Run phpunit task using the task configuration to spawn a command with
    * specified arguments.
    */
-  grunt.registerMultiTask('phpunit', "Runs PHPUnit tests.", function () {
-    var options = this.options({});
-    grunt.util.spawn({
-      cmd: options.cmd,
-      args: options.args,
-      opts: {
-        stdio: 'inherit'
-      }
-    }, phpUnitCompleted(this.async()));
-  });
+  grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests.', runFn(phpUnitCompleted));
   
   // Test task - run phpcs and phpunit
-  grunt.registerTask('test', ['phpcs', 'phpunit']);
+  grunt.registerTask('test', ['init', 'phpcs', 'phpmd', 'phpunit']);
   
   // Build task aliases
   grunt.registerTask('build', ['test', 'compress']);

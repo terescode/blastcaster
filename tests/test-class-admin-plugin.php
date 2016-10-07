@@ -176,15 +176,15 @@ class WpAdminPluginTest extends BcPhpUnitTestCase {
 		// @tests
 		$this->expectOutputRegex( '/class="error/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
-		$plugin->render_admin_notice( 'That is mangatsika cool' );
+		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_ERROR, false );
 
 		$this->expectOutputRegex( '/class="updated/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
-		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_UPDATED );
+		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_UPDATED, false );
 
 		$this->expectOutputRegex( '/class="update-nag/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
-		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_NAG );
+		$plugin->render_admin_notice( 'That is mangatsika cool', BcAdminPlugin::NOTICE_TYPE_NAG, false );
 
 		$this->expectOutputRegex( '/class="error notice is-dismissable/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
