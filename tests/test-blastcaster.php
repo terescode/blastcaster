@@ -1,6 +1,7 @@
 <?php
 
 require_once 'includes/constants.php';
+require_once 'includes/class-plugin-helper.php';
 
 /**
  * Class WpAdminPluginTest
@@ -9,19 +10,6 @@ require_once 'includes/constants.php';
  */
 
 class BlastCasterTest extends BcPhpUnitTestCase {
-
-	/**
-	 * Test setup
-	 */
-	public function setUp() {
-	}
-
-	/**
-	 * Teardown
-	 */
-
-	public function tearDown() {
-	}
 
 	/**
 	 * Test including the main plugin file should fail if WPINC is not set
@@ -33,7 +21,7 @@ class BlastCasterTest extends BcPhpUnitTestCase {
 		$ret = include_once( 'blastcaster.php' );
 		$this->assertEquals( -1, $ret );
 	}
-	
+
 	/**
 	 * Test including the main plugin file should succeed
 	 * @runInSeparateProcess
@@ -41,27 +29,18 @@ class BlastCasterTest extends BcPhpUnitTestCase {
 	 */
 
 	public function test_include_plugin_file_should_succeed_given_WPINC_is_set() {
-		\WP_Mock::setUp();
+		define( 'WPINC', 1 );
 
-		\WP_Mock::wpFunction( 'register_activation_hook', array(
-			'times' => 1,
-			'args' => array(
-				\WP_Mock\Functions::type( 'string' ),
-				\WP_Mock\Functions::type( 'array' ),
-			),
-		) );
+		global $helper;
+		$helper = $this->mock( 'TcPluginHelper' );
 
-		\WP_Mock::wpFunction( 'register_deactivation_hook', array(
-			'times' => 1,
-			'args' => array(
-				\WP_Mock\Functions::type( 'string' ),
-				\WP_Mock\Functions::type( 'array' ),
-			),
-		) );
+		function com_terescode_create_blastcaster() {
+			$mock_gen = new \PHPUnit_Framework_MockObject_Generator();
+			$mock = $mock_gen->getMock( 'TcPluginHelper', array(), array(), '', false );
+			return new BlastCasterPlugin( $mock );
+		}
 
 		$ret = include_once( 'blastcaster.php' );
 		$this->assertEquals( 1, $ret );
-
-		\WP_Mock::tearDown();
 	}
 }

@@ -1,2 +1,1 @@
-<?php
-$bc_controller->print_message( 'Hello, world!' );
+<h1>Hello, world!</h1>

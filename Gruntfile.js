@@ -1,3 +1,4 @@
+/*global module, require */
 /**
  * Grunt wrapper
  */
@@ -7,7 +8,7 @@ module.exports = function (grunt) {
   /**
    * Custom Code
    */
-  
+
   var fs = require('fs'),
     util = require('util'),
     chalk = require('chalk'),
@@ -19,86 +20,122 @@ module.exports = function (grunt) {
       var options = this.options({});
       grunt.util.spawn({
         cmd: options.cmd,
-        args: options.args,
+        args: options.args.concat(this.args),
         opts: {
           stdio: 'inherit'
         }
       }, callback(this.async()));
     };
   }
-  
+
   function phpmdCompleted(done) {
     return function (error, result, code) {
       if (error || 0 !== code) {
-        grunt.log.writeln(chalk.red('What a mess! Please review the following issues (reports/md.xml).'));
+        grunt.log.error('\u2714 FAILED: What a mess! Please review the following issues (reports/md.xml).');
+        grunt.log.writeln();
         fs.readFile('./reports/md.xml', function (err, data) {
           if (err) {
             done(err);
           } else {
-            grunt.log.writeln(data);
+            grunt.log.writeln();
+            grunt.log.errorlns(data);
+            grunt.log.writeln();
             done(false);
           }
         });
       } else {
+        grunt.log.ok('\u2714 PASSED: Good job, no mess detected!');
         done();
       }
     };
   }
-  
+
   function phpUnitCompleted(done) {
     return function (error, result, code) {
       if (error || 0 !== code) {
-        grunt.log.writeln(chalk.red('phpunit returned non-zero result: ' + result + ' (' + code + ')'));
-        done(error || new Error('phpunit returned non-zero result: ' + result + ' (' + code + ')'));
+        grunt.log.writeln();
+        grunt.log.error('\n\u2714 FAILED: phpunit returned non-zero result: ' + result + ' (' + code + ')');
+        grunt.log.writeln();
+        done(false);
       } else {
-        var parser = new xml2js.Parser();
-        fs.readFile('./reports/coverage.xml', function (err, data) {
-          if (err) {
-            done(err);
-          } else {
-            parser.parseString(data, function (err, result) {
-              if (err) {
-                done(err);
-              } else {
-                if (result.coverage &&
-                    result.coverage.project &&
-                    0 < result.coverage.project.length &&
-                    result.coverage.project[0].metrics &&
-                    0 < result.coverage.project[0].metrics.length &&
-                    result.coverage.project[0].metrics[0].$) {
-                  var metrics = result.coverage.project[0].metrics[0].$,
-                    methods = metrics.methods,
-                    coveredMethods = metrics.coveredmethods,
-                    statements = metrics.statements,
-                    coveredStatements = metrics.coveredstatements,
-                    elements = metrics.elements,
-                    coveredElements = metrics.coveredelements;
-                  if (methods !== coveredMethods &&
-                      statements !== coveredStatements &&
-                      elements !== coveredElements) {
-                    grunt.log.writeln('Code coverage is not within acceptable tolerances.');
-                    done(false);
-                  } else {
-                    done();
-                  }
-                } else {
-                  grunt.log.writeln('Unexpected coverage data.');
-                  grunt.log.writeln(util.inspect(result, false, null));
-                  done(false);
-                }
-              }
-            });
-          }
-        });
+        grunt.log.ok('\u2714 PASSED: Good job, all tests passed!');
+        grunt.log.writeln();
+        done();
       }
     };
   }
-  
+
+  function checkCoverage(done) {
+    var parser = new xml2js.Parser();
+    grunt.log.writeln('\nAnalyzing code coverage in ./reports/coverage.xml...');
+    fs.readFile('./reports/coverage.xml', function (err, data) {
+      if (err) {
+        done(err);
+      } else {
+        parser.parseString(data, function (err, result) {
+          if (err) {
+            done(err);
+          } else {
+            if (result.coverage &&
+                result.coverage.project &&
+                0 < result.coverage.project.length &&
+                result.coverage.project[0].metrics &&
+                0 < result.coverage.project[0].metrics.length &&
+                result.coverage.project[0].metrics[0].$) {
+              var metrics = result.coverage.project[0].metrics[0].$,
+                methods = metrics.methods,
+                coveredMethods = metrics.coveredmethods,
+                statements = metrics.statements,
+                coveredStatements = metrics.coveredstatements,
+                elements = metrics.elements,
+                coveredElements = metrics.coveredelements;
+              if (methods !== coveredMethods &&
+                  statements !== coveredStatements &&
+                  elements !== coveredElements) {
+                grunt.log.error('\u2714 FAILED: Code coverage is not within acceptable tolerances.');
+                grunt.log.writeln();
+                grunt.log.writeln(grunt.log.table(
+                  [20, 10, 10, 10],
+                  ['TYPE', 'FOUND', 'COVERED', 'PERCENTAGE']
+                ));
+                grunt.log.writeln(grunt.log.table(
+                  [20, 10, 10, 10],
+                  ['METHODS', methods, coveredMethods, Math.round((coveredMethods / methods) * 100) + '%']
+                ));
+                grunt.log.writeln(grunt.log.table(
+                  [20, 10, 10, 10],
+                  ['STATEMENTS', statements, coveredStatements, Math.round((coveredStatements / statements) * 100) + '%']
+                ));
+                grunt.log.writeln(grunt.log.table(
+                  [20, 10, 10, 10],
+                  ['ELEMENTS', elements, coveredElements, Math.round((coveredElements / elements) * 100) + '%']
+                ));
+                grunt.log.writeln();
+                grunt.log.error('See ./reports/coverage.xml for details.');
+                grunt.log.writeln();
+                done(false);
+              } else {
+                grunt.log.ok('\u2714 PASSED: Good job, 100% code covered!');
+                grunt.log.writeln();
+                done();
+              }
+            } else {
+              grunt.log.error('\u2714 FAILED: Unexpected coverage data.');
+              grunt.log.errorlns(util.inspect(result, false, null));
+              grunt.log.writeln();
+              done(false);
+            }
+          }
+        });
+      }
+    });
+  }
+
   /**
    * Grunt task configurations
    */
   grunt.initConfig({
-    
+
     // load the package.json metadata
     pkg: grunt.file.readJSON('package.json'),
 
@@ -119,7 +156,7 @@ module.exports = function (grunt) {
         ]
       }
     },
-    
+
     // Composer task
     composer: {
       options: {
@@ -127,13 +164,13 @@ module.exports = function (grunt) {
         composerLocation: 'composer.phar'
       },
       install: {
-        
+
       },
       update: {
-        
+
       }
     },
-    
+
     // Configure phpcs task
     phpcs: {
       application: {
@@ -162,7 +199,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    
+
     // Configure grunt-phpunit task
     phpunit: {
       application: {
@@ -230,7 +267,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    
+
     // Configure the grunt-po2mo task for converting .po files to binary .mo files
     po2mo: {
       files: {
@@ -238,7 +275,7 @@ module.exports = function (grunt) {
         expand: true
       }
     },
-    
+
     // Configure the compress task
     compress: {
       main: {
@@ -268,17 +305,17 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-wp-i18n');
   grunt.loadNpmTasks('grunt-po2mo');
-  
+
   /**
    * init
    * Build initialization
    */
-  grunt.registerTask('init', 'Build initialization', function() {
+  grunt.registerTask('init', 'Build initialization', function () {
     if (!grunt.file.isDir('./reports')) {
       grunt.file.mkdir('./reports');
     }
   });
-  
+
   /**
    * clean
    * Cleans all the generated files
@@ -290,6 +327,15 @@ module.exports = function (grunt) {
     });
   });
 
+  /**
+   * check
+   * Check coverage
+   */
+  grunt.registerTask('check', 'Check code coverage', function () {
+    this.requires('test');
+    checkCoverage(this.async());
+  });
+
   // Set the default clean to be just 'build'
   multitasker.setDefaultTargets('clean', 'build');
 
@@ -299,20 +345,20 @@ module.exports = function (grunt) {
    * specified arguments.
    */
   grunt.registerMultiTask('phpmd', 'Runs PHP Mess Detector analysis.', runFn(phpmdCompleted));
-  
+
   /**
    * phpunit
    * Run phpunit task using the task configuration to spawn a command with
    * specified arguments.
    */
   grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests.', runFn(phpUnitCompleted));
-  
+
   // Test task - run phpcs and phpunit
   grunt.registerTask('test', ['init', 'phpcs', 'phpmd', 'phpunit']);
-  
+
   // Build task aliases
-  grunt.registerTask('build', ['test', 'compress']);
-  
+  grunt.registerTask('build', ['test', 'check', 'compress']);
+
   // Alias the default task to build
   grunt.registerTask('default', ['build']);
 };
