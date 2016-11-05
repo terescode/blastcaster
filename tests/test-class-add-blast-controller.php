@@ -1,9 +1,11 @@
 <?php
 
+require_once 'tests/stub-translate.php';
 require_once 'includes/constants.php';
 require_once 'includes/class-wp-helper.php';
 require_once 'includes/class-plugin-helper.php';
 require_once 'includes/interface-admin-plugin.php';
+require_once 'admin/class-add-blast-form-helper.php';
 require_once 'admin/controllers/class-add-blast-controller.php';
 
 /**
@@ -22,6 +24,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
@@ -31,7 +34,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( false );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$hook_suffix = $controller->init();
 		$this->assertFalse( $hook_suffix );
 		$this->assertFalse( $controller->get_screen_id() );
@@ -45,6 +48,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 		// @sut
 		$controller = null;
 
@@ -62,7 +66,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$hook_suffix = $controller->init();
 
 		// @verify
@@ -78,6 +82,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
@@ -85,7 +90,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->do_add_blast();
 
 		// @verify
@@ -100,6 +105,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$_POST['pageData'] = '';
 		$m_helper->method( 'get_wp_helper' )
@@ -108,7 +114,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->do_add_blast();
 
 		// @verify
@@ -123,6 +129,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$_POST['pageData'] = "\t\t\t\r\n\n\t     \t\t\r\n";
 		$m_helper->method( 'get_wp_helper' )
@@ -131,7 +138,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->do_add_blast();
 
 		// @verify
@@ -146,6 +153,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
 		$_POST['pageData'] = $json_file;
@@ -155,7 +163,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @test
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->do_add_blast();
 
 		// @verify
@@ -178,6 +186,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample-invalid.json', true );
 		$_POST['pageData'] = $json_file;
@@ -195,7 +204,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->do_add_blast();
 
 		// @verify
@@ -250,6 +259,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
 		$m_plugin = $this->mock( 'TcAdminPlugin' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 		// @sut
 		$controller = null;
 
@@ -260,140 +270,15 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		$m_wph->expects( $this->exactly( 5 ) )
 			->method( 'add_meta_box' )
 			->withConsecutive(
-				[ $this->equalTo( 'bc-add-title-meta-box' ), $this->equalTo( 'test' ), $this->equalTo( array( &$controller, 'render_add_title_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ) ],
-				[ $this->equalTo( 'bc-add-category-meta-box' ), $this->equalTo( 'test' ), $this->equalTo( array( &$controller, 'render_add_category_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ) ],
-				[ $this->equalTo( 'bc-add-image-meta-box' ), $this->equalTo( 'test' ), $this->equalTo( array( &$controller, 'render_add_image_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ) ],
-				[ $this->equalTo( 'bc-add-description-meta-box' ), $this->equalTo( 'test' ), $this->equalTo( array( &$controller, 'render_add_description_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ) ],
-				[ $this->equalTo( 'bc-add-tag-meta-box' ), $this->equalTo( 'test' ), $this->equalTo( array( &$controller, 'render_add_tag_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ) ]
+				[ $this->equalTo( 'bc-add-title-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_form_helper, 'render_add_title_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$controller ) ) ],
+				[ $this->equalTo( 'bc-add-category-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_form_helper, 'render_add_category_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$controller ) ) ],
+				[ $this->equalTo( 'bc-add-image-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_form_helper, 'render_add_image_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$controller ) ) ],
+				[ $this->equalTo( 'bc-add-description-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_form_helper, 'render_add_description_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$controller ) ) ],
+				[ $this->equalTo( 'bc-add-tag-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_form_helper, 'render_add_tag_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$controller ) ) ]
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
 		$controller->add_blast_form_meta_boxes();
-	}
-
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_title_meta_box_should_output_textarea() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
-		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-			}
-		);
-
-		// @exercise
-		$controller->render_add_title_meta_box();
-	}
-
-	/**
-	 * Test render category picker
-	 */
-	function test_render_add_category_meta_box_should_output_picker() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
-		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-category-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find category picker div' );
-			}
-		);
-
-		// @exercise
-		$controller->render_add_category_meta_box();
-	}
-
-	/**
-	 * Test render image picker
-	 */
-	function test_render_add_image_meta_box_should_output_image() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
-		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
-			}
-		);
-
-		// @exercise
-		$controller->render_add_image_meta_box();
-	}
-
-	/**
-	 * Test render description input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
-		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-			}
-		);
-
-		// @exercise
-		$controller->render_add_description_meta_box();
-	}
-
-	/**
-	 * Test render tag picker
-	 */
-	function test_render_add_tag_meta_box_should_output_picker() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
-		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-tag-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find tag picker div' );
-			}
-		);
-
-		// @exercise
-		$controller->render_add_tag_meta_box();
 	}
 }

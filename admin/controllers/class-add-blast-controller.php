@@ -1,9 +1,11 @@
 <?php
 require_once BC_PLUGIN_DIR . 'includes/interface-controller.php';
+require_once BC_PLUGIN_DIR . 'admin/class-add-blast-form-helper.php';
+
 
 if ( ! class_exists( 'BcAddBlastController' ) ) {
 
-	final class BcAddBlastController implements TcController {
+	class BcAddBlastController implements TcController {
 		const BC_ADD_BLAST_SCREEN_ID = 'bc_add_blast';
 
 		/**
@@ -39,6 +41,14 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 		private $add_blast_screen_id;
 
 		/**
+		 * Add Blast Form helper
+		 *
+		 * @var string
+		 * @access private
+		 */
+		private $blast_form_helper;
+
+		/**
 		 * The page data received from the POST or null decoded as a stdClass object.
 		 *
 		 * @var object
@@ -46,16 +56,17 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 		 */
 		private $page_data;
 
-		function __construct( $plugin, $plugin_helper ) {
+		function __construct( $plugin, $plugin_helper, $blast_form_helper ) {
 			$this->plugin = $plugin;
 			$this->wph = $plugin_helper->get_wp_helper();
 			$this->plugin_helper = $plugin_helper;
+			$this->blast_form_helper = $blast_form_helper;
 		}
 
 		function init() {
 			$this->add_blast_screen_id = $this->wph->add_posts_page(
-				$this->wph->__( 'Add a blast', 'blastcaster' ),
-				$this->wph->__( 'Add a blast', 'blastcaster' ),
+				__( 'Add a blast', 'blastcaster' ),
+				__( 'Add a blast', 'blastcaster' ),
 				'edit_posts',
 				self::BC_ADD_BLAST_SCREEN_ID,
 				array( $this, 'do_add_blast' )
@@ -83,7 +94,7 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			}
 
 			$json_error_msg = sprintf(
-				$this->wph->__( 'The page data received from the original source could not be decoded. (%1$d - %2$s)', 'blastcaster' ),
+				__( 'The page data received from the original source could not be decoded. (%1$d - %2$s)', 'blastcaster' ),
 				$json_error,
 				$json_error_msg
 			);
@@ -101,65 +112,55 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 				}
 			}
 
-			$this->plugin_helper->render( $this, 'admin/views/add-blast-form' );
+			$this->plugin_helper->render( $this, 'admin/views/add-blast-form', 'edit_posts' );
 		}
 
 		function add_blast_form_meta_boxes() {
 			$this->wph->add_meta_box(
 				'bc-add-title-meta-box',
-				$this->wph->__( 'Title', 'blastcaster' ),
-				array( $this, 'render_add_title_meta_box' ),
+				__( 'Title', 'blastcaster' ),
+				array( $this->blast_form_helper, 'render_add_title_meta_box' ),
 				$this->add_blast_screen_id,
-				'normal'
+				'normal',
+				'default',
+				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-category-meta-box',
-				$this->wph->__( 'Categories', 'blastcaster' ),
-				array( $this, 'render_add_category_meta_box' ),
+				__( 'Categories', 'blastcaster' ),
+				array( $this->blast_form_helper, 'render_add_category_meta_box' ),
 				$this->add_blast_screen_id,
-				'normal'
+				'normal',
+				'default',
+				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-image-meta-box',
-				$this->wph->__( 'Image', 'blastcaster' ),
-				array( $this, 'render_add_image_meta_box' ),
+				__( 'Image', 'blastcaster' ),
+				array( $this->blast_form_helper, 'render_add_image_meta_box' ),
 				$this->add_blast_screen_id,
-				'normal'
+				'normal',
+				'default',
+				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-description-meta-box',
-				$this->wph->__( 'Description', 'blastcaster' ),
-				array( $this, 'render_add_description_meta_box' ),
+				__( 'Description', 'blastcaster' ),
+				array( $this->blast_form_helper, 'render_add_description_meta_box' ),
 				$this->add_blast_screen_id,
-				'normal'
+				'normal',
+				'default',
+				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-tag-meta-box',
-				$this->wph->__( 'Tags', 'blastcaster' ),
-				array( $this, 'render_add_tag_meta_box' ),
+				__( 'Tags', 'blastcaster' ),
+				array( $this->blast_form_helper, 'render_add_tag_meta_box' ),
 				$this->add_blast_screen_id,
-				'normal'
+				'normal',
+				'default',
+				array( $this )
 			);
-		}
-
-		function render_add_title_meta_box() {
-			echo '<textarea id="bc-add-title-input" name="bc-add-title-input" cols="80" rows="3"  class="large-text"></textarea>';
-		}
-
-		function render_add_category_meta_box() {
-			echo '<div id="bc-add-category-picker"></div>';
-		}
-
-		function render_add_image_meta_box() {
-			echo '<div id="bc-add-image-picker"></div>';
-		}
-
-		function render_add_description_meta_box() {
-			echo '<textarea id="bc-add-desc-input" name="bc-add-desc-input" cols="80" rows="5"  class="large-text"></textarea>';
-		}
-
-		function render_add_tag_meta_box() {
-			echo '<div id="bc-add-tag-picker"></div>';
 		}
 
 		function get_page_data() {

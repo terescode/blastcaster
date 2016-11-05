@@ -41,15 +41,6 @@ if ( ! class_exists( 'TcWpHelper' ) ) {
 			return esc_html( $text );
 		}
 
-		// @codingStandardsIgnoreStart
-		/**
-		 * @SuppressWarnings(PHPMD.ShortMethodName)
-		 */
-		function __( $text, $domain = 'default' ) {
-			return __( $text, $domain );
-		}
-		// @codingStandardsIgnoreEnd
-
 		function do_action( $tag, $arg = '' ) {
 			$count = func_num_args();
 			if ( 1 === $count ) {
@@ -72,6 +63,35 @@ if ( ! class_exists( 'TcWpHelper' ) ) {
 		 */
 		function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default', $callback_args = null ) {
 			add_meta_box( $id, $title, $callback, $screen, $context, $priority, $callback_args );
+		}
+
+		function current_user_can( $capability, $objid = null ) {
+			if ( null === $objid ) {
+				return current_user_can( $capability );
+			}
+			return current_user_can( $capability, $objid );
+		}
+
+		function admin_url( $path = '', $scheme = 'admin' ) {
+			return admin_url( $path, $scheme );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_nonce_field( $action = -1, $name = '_wpnonce', $referer = true, $echo = true ) {
+			return wp_nonce_field( $action, $name, $referer, $echo );
+		}
+
+		function do_meta_boxes( $screen, $context, $object ) {
+			return do_meta_boxes( $screen, $context, $object );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function submit_button( $text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null ) {
+			return submit_button( $text, $type, $name, $wrap, $other_attributes );
 		}
 	}
 }

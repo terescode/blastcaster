@@ -240,48 +240,6 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	}
 
 	/**
-	 * Test __
-	 */
-	function test____should_call____and_return_text_given____does_with_required_args() {
-		// @setup
-		$wph = new TcWpHelper();
-
-		\WP_Mock::wpFunction( '__', array(
-			'times' => 1,
-			'args' => array(
-				'translate this',
-				'default',
-			),
-			'return' => 'siht etalsnart',
-		) );
-
-		// @exercise
-		$esc = $wph->__( 'translate this' );
-		$this->assertEquals( 'siht etalsnart', $esc );
-	}
-
-	/**
-	 * Test __
-	 */
-	function test____should_call____and_return_text_given____does_with_optional_args() {
-		// @setup
-		$wph = new TcWpHelper();
-
-		\WP_Mock::wpFunction( '__', array(
-			'times' => 1,
-			'args' => array(
-				'translate this',
-				'basic-plugin',
-			),
-			'return' => 'siht etalsnart',
-		) );
-
-		// @exercise
-		$esc = $wph->__( 'translate this', 'basic-plugin' );
-		$this->assertEquals( 'siht etalsnart', $esc );
-	}
-
-	/**
 	 * Test do_action
 	 */
 	function test_do_action_should_call_do_action_with_required_args() {
@@ -403,7 +361,7 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	}
 
 	/**
-	 * Test addadd_meta_box_posts_page
+	 * Test add_meta_box_posts_page
 	 */
 	function test_add_meta_box_should_call_add_meta_box_given_required_args() {
 		// @setup
@@ -446,5 +404,214 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 		// @exercise
 		$wph = new TcWpHelper();
 		$wph->add_meta_box( 'box_id', 'Meta Box Title', array( 'foo', 'call_me_back' ), 'screen_id', 'normal', 'high', array( 10, 'foo' ) );
+	}
+
+	/**
+	 * Test current_user_can
+	 */
+	function test_current_user_can_should_call_current_user_can_and_return_true_given_current_user_can_with_required_args_does() {
+		// @setup
+		\WP_Mock::wpFunction( 'current_user_can', array(
+			'times' => 1,
+			'args' => array(
+				'install_plugins',
+			),
+			'return' => true,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$youcan = $wph->current_user_can( 'install_plugins' );
+		$this->assertTrue( $youcan );
+	}
+
+	/**
+	 * Test current_user_can
+	 */
+	function test_current_user_can_should_call_current_user_can_and_return_false_given_current_user_can_with_required_args_does() {
+		// @setup
+		\WP_Mock::wpFunction( 'current_user_can', array(
+			'times' => 1,
+			'args' => array(
+				'install_plugins',
+			),
+			'return' => false,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$youcan = $wph->current_user_can( 'install_plugins' );
+		$this->assertFalse( $youcan );
+	}
+
+	/**
+	 * Test current_user_can
+	 */
+	function test_current_user_can_should_call_current_user_can_given_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'current_user_can', array(
+			'times' => 1,
+			'args' => array(
+				'install_plugins',
+				123456789,
+			),
+			'return' => false,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$youcan = $wph->current_user_can( 'install_plugins', 123456789 );
+		$this->assertFalse( $youcan );
+	}
+
+	/**
+	 * Test admin_url
+	 */
+	function test_admin_url_should_call_admin_url_and_return_value_given_required_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'admin_url', array(
+			'times' => 1,
+			'args' => array(
+				'',
+				'admin',
+			),
+			'return' => 'http://i.do.not.exist/index.html',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$url = $wph->admin_url();
+		$this->assertEquals( 'http://i.do.not.exist/index.html', $url );
+	}
+
+	/**
+	 * Test admin_url
+	 */
+	function test_admin_url_should_call_admin_url_and_return_value_given_optional_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'admin_url', array(
+			'times' => 1,
+			'args' => array(
+				'admin-post.php',
+				'https',
+			),
+			'return' => 'https://i.do.not.exist/index.html',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$url = $wph->admin_url( 'admin-post.php', 'https' );
+		$this->assertEquals( 'https://i.do.not.exist/index.html', $url );
+	}
+
+	/**
+	 * Test wp_nonce_field
+	 */
+	function test_wp_nonce_field_should_call_wp_nonce_field_and_return_value_given_required_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_nonce_field', array(
+			'times' => 1,
+			'args' => array(
+				-1,
+				'_wpnonce',
+				true,
+				true,
+			),
+			'return' => 'uid.-1._wpnonce',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$nonce = $wph->wp_nonce_field();
+		$this->assertEquals( 'uid.-1._wpnonce', $nonce );
+	}
+
+	/**
+	 * Test wp_nonce_field
+	 */
+	function test_wp_nonce_field_should_call_wp_nonce_field_and_return_value_given_optional_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_nonce_field', array(
+			'times' => 1,
+			'args' => array(
+				'custom_action',
+				'custom_action_nonce',
+				false,
+				false,
+			),
+			'return' => 'uid.custom_action.custom_action_nonce',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$nonce = $wph->wp_nonce_field( 'custom_action', 'custom_action_nonce', false, false );
+		$this->assertEquals( 'uid.custom_action.custom_action_nonce', $nonce );
+	}
+
+	/**
+	 * Test do_meta_boxes
+	 */
+	function test_do_meta_boxes_should_call_do_meta_boxes_and_return_value_given_do_meta_boxes_does() {
+		// @setup
+		\WP_Mock::wpFunction( 'do_meta_boxes', array(
+			'times' => 1,
+			'args' => array(
+				'a_screen_id',
+				'normal',
+				null,
+			),
+			'return' => '<div>meta boxes</div>',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$html = $wph->do_meta_boxes( 'a_screen_id', 'normal', null );
+		$this->assertEquals( '<div>meta boxes</div>', $html );
+	}
+
+	/**
+	 * Test submit_button
+	 */
+	function test_submit_button_should_call_submit_button_with_required_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'submit_button', array(
+			'times' => 1,
+			'args' => array(
+				null,
+				'primary',
+				'submit',
+				true,
+				null,
+			),
+			'return' => '<input type="submit" name="submit" />',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$html = $wph->submit_button();
+		$this->assertEquals( '<input type="submit" name="submit" />', $html );
+	}
+
+	/**
+	 * Test submit_button
+	 */
+	function test_submit_button_should_call_submit_button_with_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'submit_button', array(
+			'times' => 1,
+			'args' => array(
+				'the-action',
+				'secondary',
+				'click me',
+				false,
+				array( 'disabled' => 'disabled' ),
+			),
+			'return' => '<input type="submit" name="click me" class="secondary" value="the-action" />',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$html = $wph->submit_button( 'the-action', 'secondary', 'click me', false, array( 'disabled' => 'disabled' ) );
+		$this->assertEquals( '<input type="submit" name="click me" class="secondary" value="the-action" />', $html );
 	}
 }

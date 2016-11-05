@@ -14,6 +14,12 @@ if ( ! function_exists( 'plugin_dir_path' ) ) {
 	}
 }
 
+if ( ! function_exists( 'plugin_dir_url' ) ) {
+	function plugin_dir_url( $file ) {
+		return 'http://local.wordpress.dev/wp-content/plugins/' . BC_PLUGIN_ID;
+	}
+}
+
 if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 
 	abstract class BcPhpUnitTestCase extends PHPUnit_Framework_TestCase {

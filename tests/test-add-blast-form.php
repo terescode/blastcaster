@@ -1,6 +1,8 @@
 <?php
 
+require_once 'tests/stub-translate.php';
 require_once 'includes/constants.php';
+require_once 'includes/class-wp-helper.php';
 
 /**
  * Class BcRendererTest
@@ -14,43 +16,27 @@ class AddBlastFormTest extends BcPhpUnitTestCase {
 	 * Test render
 	 */
 	function test_render() {
-/*		// @doubles
-		$plugin = new BcBasicPluginStub( 'plugin-1' );
-		$controller = new BcControllerStub( $plugin );
-
 		// @setup
-		\WP_Mock::wpFunction( 'screen_icon', array(
-			'times' => 1,
-			'args' => array(),
-		) );
+		$wph = $this->mock( 'TcWpHelper' );
 
-		\WP_Mock::wpFunction( 'esc_html_e', array(
-			'times' => 1,
-			'args' => array( '*', '*' ),
-		) );
-
-		\WP_Mock::wpFunction( 'wp_nonce_field', array(
-			'times' => 1,
-			'args' => array( 'meta-box-order', 'meta-box-order-nonce', false ),
-		) );
-
-		\WP_Mock::wpFunction( 'wp_nonce_field', array(
-			'times' => 1,
-			'args' => array( 'closedpostboxes', 'closedpostboxesnonce', false ),
-		) );
-
-		\WP_Mock::wpFunction( 'do_meta_boxes', array(
-			'times' => 1,
-			'args' => array( '', 'normal', null ),
-		) );
-
-		\WP_Mock::wpFunction( 'do_meta_boxes', array(
-			'times' => 1,
-			'args' => array( '', 'advanced', null ),
-		) );
+		$wph->expects( $this->once() )
+			->method( 'admin_url' )
+			->with( 'admin-post.php' );
+		$wph->expects( $this->once() )
+			->method( 'esc_html' );
+		$wph->expects( $this->exactly( 3 ) )
+			->method( 'wp_nonce_field' );
+		$wph->expects( $this->exactly( 2 ) )
+			->method( 'do_meta_boxes' )
+			->withConsecutive(
+				[ '', 'normal', null ],
+				[ '', 'advanced', null ]
+			);
+		$wph->expects( $this->exactly( 1 ) )
+			->method( 'submit_button' );
 		$this->expectOutputRegex( '/<div id="poststuff">/' );
 
 		// @test
-		include( 'admin/views/add-blast-form.php' ); */
+		include( 'admin/views/add-blast-form.php' );
 	}
 }

@@ -3,6 +3,7 @@ require_once BC_PLUGIN_DIR . 'includes/class-wp-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/class-plugin-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-admin-plugin.php';
 require_once BC_PLUGIN_DIR . 'admin/controllers/class-add-blast-controller.php';
+require_once BC_PLUGIN_DIR . 'admin/class-add-blast-form-helper.php';
 
 if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 
@@ -27,7 +28,7 @@ if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 
 		public function __construct( $plugin_helper ) {
 			$this->plugin_helper = $plugin_helper;
-			$this->add_blast_controller = new BcAddBlastController( $this, $plugin_helper );
+			$this->add_blast_controller = new BcAddBlastController( $this, $plugin_helper, new BcAddBlastFormHelper() );
 		}
 
 		public function init() {

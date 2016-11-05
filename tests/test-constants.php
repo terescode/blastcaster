@@ -18,5 +18,6 @@ class ConstantsTest extends BcPhpUnitTestCase {
 		require_once( 'includes/constants.php' );
 		$this->assertNotEmpty( 'BC_PLUGIN_ID' );
 		$this->assertNotEmpty( 'BC_PLUGIN_DIR' );
+		$this->assertNotEmpty( 'BC_PLUGIN_URL' );
 	}
 }

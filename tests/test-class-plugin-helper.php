@@ -321,6 +321,7 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$hooknames = null;
 		$controllers = array();
+		$helper = null;
 		$add_action_expects = array();
 		for ( $idx = 0; $idx < $count; $idx += 1 ) {
 			$hookname = 'test_hookname_' . $idx;
@@ -338,7 +339,7 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			);
 			$add_action_expects[] = array(
 				$this->equalTo( 'admin_footer-' . $hookname ),
-				$this->equalTo( array( 'TcPluginHelper', 'add_postbox_script_in_footer' ) ),
+				$this->equalTo( array( &$helper, 'add_postbox_script_in_footer' ) ),
 			);
 		}
 
@@ -397,16 +398,43 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	/**
 	 * Test render
 	 */
-	function test_render_should_output_hello_world_given_fixture_view() {
+	function test_render_should_output_hello_world_given_no_capability_check() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$controller = $this->mock( 'TcController' );
 
-		// setup expectations
-		$this->expectOutputRegex( '/Hello, world[!]/' );
+		$this->expectOutputRegex( '/Hello, world[!].+CONTROLLER OK.+WPHELPER OK/' );
 
 		// @exercise
 		$helper = new TcPluginHelper( $m_wph );
 		$helper->render( $controller, 'tests/fixtures/view' );
+	}
+
+	function test_render_should_output_hello_world_given_current_user_can_returns_true() {
+		// @setup
+		$m_wph = $this->mock( 'TcWpHelper' );
+		$controller = $this->mock( 'TcController' );
+
+		$m_wph->method( 'current_user_can' )
+			->willReturn( true );
+		$this->expectOutputRegex( '/Hello, world[!].+CONTROLLER OK.+WPHELPER OK/' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph );
+		$helper->render( $controller, 'tests/fixtures/view', 'install_plugins' );
+	}
+
+	function test_render_should_output_nothing_given_current_user_can_returns_false() {
+		// @setup
+		$m_wph = $this->mock( 'TcWpHelper' );
+		$controller = $this->mock( 'TcController' );
+
+		$m_wph->method( 'current_user_can' )
+			->willReturn( false );
+		$this->expectOutputString( '' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph );
+		$helper->render( $controller, 'tests/fixtures/view', 'install_plugins' );
 	}
 }

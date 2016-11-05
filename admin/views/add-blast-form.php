@@ -1,13 +1,12 @@
 <div class="wrap">
-	<?php screen_icon(); ?>
-	<h2><?php esc_html_e( 'Add a blast', 'blastcaster' ); ?></h2>
+	<h2><?php $wph->esc_html( __( 'Add a blast', 'blastcaster' ) ); ?></h2>
 
-	<form name="blastcaster-form" id="blastcaster-form" method="post">
-		<input type="hidden" name="action" value="some-action">
+	<form name="blastcaster-form" id="blastcaster-form" method="post" action="<?php echo $wph->admin_url( 'admin-post.php' ); ?>">
+		<input type="hidden" name="action" value="add_blast">
 		<?php
-			// wp_nonce_field( 'some-action-nonce' );
-			wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
-			wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
+			$wph->wp_nonce_field( 'add_blast', 'add_blast_nonce', false );
+			$wph->wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
+			$wph->wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
 		?>
 		<div id="poststuff">
 			<div id="post-body" class="metabox-holder columns-1">
@@ -17,8 +16,15 @@
 				</div>
 
 				<div id="postbox-container-1" class="postbox-container">
-					<?php do_meta_boxes( '', 'normal', null ); ?>
-					<?php do_meta_boxes( '', 'advanced', null ); ?>
+					<?php
+						$wph->do_meta_boxes( '', 'normal', null );
+						$wph->do_meta_boxes( '', 'advanced', null );
+						$wph->submit_button(
+							__( 'Add blast', 'blastcaster' ),
+							'primary',
+							'add-blast'
+						);
+					?>
 				</div>
 
 			</div> <!-- #post-body -->

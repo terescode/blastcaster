@@ -94,7 +94,7 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 				// do_action( 'admin_footer-{$hookname}' )
 				$this->wph->add_action(
 					'admin_footer-' . $hookname,
-					array( 'TcPluginHelper', 'add_postbox_script_in_footer' )
+					array( $this, 'add_postbox_script_in_footer' )
 				);
 			}
 
@@ -109,9 +109,13 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 		 * @SuppressWarnings(PHPMD.UnusedLocalVariable) The controller is intentionally made
 		 * available to the view as $tc_controller.
 		 */
-		function render( TcController $controller, $view ) {
-			$tc_controller = $controller;
-			include( BC_PLUGIN_DIR . $view . '.php' );
+		function render( TcController $controller, $view, $capability = null, $objid = null ) {
+			$render = ( null !== $capability ? $this->wph->current_user_can( $capability, $objid ) : true );
+			if ( $render ) {
+				$tc_controller = $controller;
+				$wph = $this->wph;
+				include( BC_PLUGIN_DIR . $view . '.php' );
+			}
 		}
 	}
 }
