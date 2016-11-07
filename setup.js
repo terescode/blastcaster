@@ -1,3 +1,5 @@
+/*global require, console*/
+
 var https = require('https'),
   fs = require('fs'),
   crypto = require('crypto'),
@@ -8,7 +10,7 @@ var https = require('https'),
 function downloadSig(callback) {
   'use strict';
   var data = '';
-  
+
   https.get('https://composer.github.io/installer.sig', function (response) {
     response.on('end', function () {
       expectedSig = data.trim();
@@ -26,7 +28,7 @@ function downloadSig(callback) {
 function downloadComposer(path, callback) {
   'use strict';
   var file = fs.createWriteStream(path);
-  
+
   https.get('https://getcomposer.org/installer', function (response) {
     response.on('end', function () {
       callback(null);

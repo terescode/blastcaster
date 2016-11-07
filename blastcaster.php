@@ -16,7 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 require_once 'includes/constants.php';
-require_once BC_PLUGIN_DIR . 'includes/class-blastcaster-plugin.php';
+require_once BC_PLUGIN_DIR . 'includes/blastcaster-plugin.php';
 
-$blastcaster_plugin = com_terescode_create_blastcaster();
+$blastcaster_plugin = \Terescode\BlastCaster\create_plugin();
 $blastcaster_plugin->init();

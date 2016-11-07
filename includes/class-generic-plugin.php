@@ -1,14 +1,30 @@
 <?php
+
+namespace Terescode\BlastCaster;
+
 require_once BC_PLUGIN_DIR . 'includes/class-wp-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/class-plugin-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-admin-plugin.php';
-require_once BC_PLUGIN_DIR . 'admin/controllers/class-add-blast-controller.php';
-require_once BC_PLUGIN_DIR . 'admin/class-add-blast-form-helper.php';
 
-if ( ! class_exists( 'BlastCasterPlugin' ) ) {
+if ( ! class_exists( 'TcGenericPlugin' ) ) {
 
-	class BlastCasterPlugin implements TcAdminPlugin {
-		const BC_PLUGIN_ID = BC_PLUGIN_ID;
+	class TcGenericPlugin implements \TcAdminPlugin {
+
+		/**
+		 * The plugin id.
+		 *
+		 * @var string
+		 * @access private
+		 */
+		private $plugin_id;
+
+		/**
+		 * The wp helper to use.
+		 *
+		 * @var object
+		 * @access private
+		 */
+		private $wph;
 
 		/**
 		 * Helper object
@@ -19,16 +35,18 @@ if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 		private $plugin_helper;
 
 		/**
-		 * Add Blast Controller object
+		 * Array of admin menu controllers
 		 *
 		 * @var array
 		 * @access private
 		 */
-		private $add_blast_controller;
+		private $menu_controllers;
 
-		public function __construct( $plugin_helper ) {
+		public function __construct( $plugin_id, $plugin_helper, $menu_controllers = array() ) {
+			$this->plugin_id = $plugin_id;
 			$this->plugin_helper = $plugin_helper;
-			$this->add_blast_controller = new BcAddBlastController( $this, $plugin_helper, new BcAddBlastFormHelper() );
+			$this->wph = $this->plugin_helper->get_wp_helper();
+			$this->menu_controllers = $menu_controllers;
 		}
 
 		public function init() {
@@ -38,6 +56,9 @@ if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 
 		public function load() {
 			$this->plugin_helper->load_textdomain( $this );
+			foreach ( $this->menu_controllers as $controller ) {
+				$controller->register_handlers();
+			}
 		}
 
 		/**
@@ -59,21 +80,15 @@ if ( ! class_exists( 'BlastCasterPlugin' ) ) {
 		}
 
 		public function get_plugin_id() {
-			return BC_PLUGIN_ID;
+			return $this->plugin_id;
+		}
+
+		public function get_plugin_helper() {
+			return $this->plugin_helper;
 		}
 
 		public function install_admin_menus() {
-			$this->plugin_helper->install_admin_menus( array(
-				$this->add_blast_controller
-			));
-		}
-	}
-
-	if ( ! function_exists( 'com_terescode_create_blastcaster' ) ) {
-		function com_terescode_create_blastcaster() {
-			return new BlastCasterPlugin(
-				new TcPluginHelper( new TcWpHelper() )
-			);
+			$this->plugin_helper->install_admin_menus( $this->menu_controllers );
 		}
 	}
 }

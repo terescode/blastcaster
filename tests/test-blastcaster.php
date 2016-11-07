@@ -1,7 +1,10 @@
 <?php
 
+namespace Terescode\BlastCaster;
+
 require_once 'includes/constants.php';
 require_once 'includes/class-plugin-helper.php';
+require_once 'includes/class-generic-plugin.php';
 
 /**
  * Class WpAdminPluginTest
@@ -9,7 +12,7 @@ require_once 'includes/class-plugin-helper.php';
  * @package Blastcaster
  */
 
-class BlastCasterTest extends BcPhpUnitTestCase {
+class BlastCasterTest extends \BcPhpUnitTestCase {
 
 	/**
 	 * Test including the main plugin file should fail if WPINC is not set
@@ -34,10 +37,10 @@ class BlastCasterTest extends BcPhpUnitTestCase {
 		global $helper;
 		$helper = $this->mock( 'TcPluginHelper' );
 
-		function com_terescode_create_blastcaster() {
+		function create_plugin() {
 			$mock_gen = new \PHPUnit_Framework_MockObject_Generator();
 			$mock = $mock_gen->getMock( 'TcPluginHelper', array(), array(), '', false );
-			return new BlastCasterPlugin( $mock );
+			return new TcGenericPlugin( BC_PLUGIN_ID, $mock );
 		}
 
 		$ret = include_once( 'blastcaster.php' );

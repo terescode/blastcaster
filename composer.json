@@ -4,7 +4,8 @@
 		"phpunit/phpunit": "4.*",
 		"squizlabs/php_codesniffer": "2.*",
 		"wp-coding-standards/wpcs": "0.*",
-		"phpmd/phpmd" : "@stable"
+		"phpmd/phpmd" : "@stable",
+        "php-mock/php-mock-phpunit": "1.*"
 	},
 	"scripts": {
 		"post-install-cmd": [

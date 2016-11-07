@@ -1,5 +1,7 @@
 <?php
 
+namespace Terescode\BlastCaster;
+
 require_once 'includes/constants.php';
 require_once 'admin/controllers/class-add-blast-controller.php';
 require_once 'admin/class-add-blast-form-helper.php';
@@ -10,20 +12,20 @@ require_once 'admin/class-add-blast-form-helper.php';
  * @package Blastcaster
  */
 
-class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
+class BcAddBlastFormHelperTest extends \BcPhpUnitTestCase {
 
 	/**
 	 * Test render title input
 	 */
 	function test_render_add_title_meta_box_should_output_textarea() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
 				$element = $elements->item( 0 );
@@ -41,8 +43,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_title_meta_box_should_output_textarea_with_no_title_given_titles_missing() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{}' );
@@ -50,7 +52,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
 				$element = $elements->item( 0 );
@@ -68,8 +70,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_title_meta_box_should_output_textarea_with_no_title_given_zero_titles() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{"titles":[]}' );
@@ -77,7 +79,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
 				$element = $elements->item( 0 );
@@ -95,8 +97,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_title_meta_box_should_output_textarea_with_title_given_valid_post_data() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
@@ -105,7 +107,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
 				$element = $elements->item( 0 );
@@ -123,13 +125,13 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_category_meta_box_should_output_picker() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-category-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find category picker div' );
 			}
@@ -145,13 +147,13 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_image_meta_box_should_output_image() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
 				$element = $elements->item( 0 );
@@ -172,8 +174,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_image_meta_box_should_output_no_image_given_images_missing() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{}' );
@@ -182,7 +184,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
 				$element = $elements->item( 0 );
@@ -203,8 +205,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_image_meta_box_should_output_no_image_given_zero_images() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{ "images": [] }' );
@@ -213,7 +215,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
 				$element = $elements->item( 0 );
@@ -234,8 +236,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_image_meta_box_should_output_image_given_valid_post_data() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
@@ -245,7 +247,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
 				$element = $elements->item( 0 );
@@ -266,13 +268,13 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_description_meta_box_should_output_textarea() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
 				$element = $elements->item( 0 );
@@ -290,8 +292,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_description_meta_box_should_output_textarea_with_no_description_given_descriptions_missing() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{}' );
@@ -299,7 +301,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
 				$element = $elements->item( 0 );
@@ -317,8 +319,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_description_meta_box_should_output_textarea_with_no_description_given_zero_descriptions() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$page_data = json_decode( '{"descriptions":[]}' );
@@ -326,7 +328,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
 				$element = $elements->item( 0 );
@@ -344,8 +346,8 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_description_meta_box_should_output_textarea_with_description_given_valid_post_data() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
@@ -354,7 +356,7 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 			->willReturn( $page_data );
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
 				$element = $elements->item( 0 );
@@ -372,13 +374,13 @@ class BcAddBlastFormHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_add_tag_meta_box_should_output_picker() {
 		// @setup
-		$m_post = new stdClass;
-		$m_controller = $this->mock( 'BcAddBlastController' );
+		$m_post = new \stdClass;
+		$m_controller = $this->mock( '\Terescode\BlastCaster\BcAddBlastController' );
 		$m_metabox = array( 'args' => array( $m_controller ) );
 
 		$this->expect_html(
 			function ( $result ) {
-				$xpath = new DOMXPath( $result );
+				$xpath = new \DOMXPath( $result );
 				$elements = $xpath->query( '//div[@id="bc-add-tag-picker"]' );
 				$this->assertEquals( 1, $elements->length, 'Could not find tag picker div' );
 			}

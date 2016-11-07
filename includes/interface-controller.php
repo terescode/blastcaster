@@ -3,7 +3,8 @@
 if ( ! interface_exists( 'TcController' ) ) {
 
 	interface TcController {
-		function init();
+		function register_handlers();
+		function register_menu();
 	}
 
 }

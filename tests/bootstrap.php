@@ -20,6 +20,17 @@ if ( ! function_exists( 'plugin_dir_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_include_once' ) ) {
+	function wp_include_once( $file ) {
+		if ( file_exists( WP_INCLUDES_PATH . $file ) ) {
+			include_once( WP_INCLUDES_PATH . $file );
+		} else {
+			throw new Exception( 'Can\'t find wp include ' . WP_INCLUDES_PATH . $file );
+		}
+	}
+}
+
+
 if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 
 	abstract class BcPhpUnitTestCase extends PHPUnit_Framework_TestCase {

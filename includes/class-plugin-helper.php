@@ -81,7 +81,7 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 			$hooknames = array();
 
 			foreach ( $controllers as $controller ) {
-				$hook = $controller->init();
+				$hook = $controller->register_menu();
 				if ( $hook ) {
 					$hooknames[] = $hook;
 				}

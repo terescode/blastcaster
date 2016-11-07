@@ -34,7 +34,7 @@ class AddBlastFormTest extends BcPhpUnitTestCase {
 			);
 		$wph->expects( $this->exactly( 1 ) )
 			->method( 'submit_button' );
-		$this->expectOutputRegex( '/<div id="poststuff">/' );
+		$this->expectOutputRegex( '/<form name="blastcaster-form"/' );
 
 		// @test
 		include( 'admin/views/add-blast-form.php' );

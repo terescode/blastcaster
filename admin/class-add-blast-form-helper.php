@@ -1,5 +1,7 @@
 <?php
 
+namespace Terescode\BlastCaster;
+
 if ( ! class_exists( 'BcAddBlastFormHelper' ) ) {
 
 	class BcAddBlastFormHelper {

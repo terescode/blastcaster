@@ -93,5 +93,12 @@ if ( ! class_exists( 'TcWpHelper' ) ) {
 		function submit_button( $text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null ) {
 			return submit_button( $text, $type, $name, $wrap, $other_attributes );
 		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_insert_post( $postarr, $wp_error = false ) {
+			return wp_insert_post( $postarr, $wp_error );
+		}
 	}
 }

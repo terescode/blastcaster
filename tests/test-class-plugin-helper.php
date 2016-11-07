@@ -299,7 +299,7 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 
 		$controller = $this->mock( 'TcController' );
 		$controller->expects( $this->once() )
-			->method( 'init' )
+			->method( 'register_menu' )
 			->will( $this->returnValue( false ) );
 		$controllers[] = $controller;
 
@@ -327,7 +327,7 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			$hookname = 'test_hookname_' . $idx;
 			$controller = $this->mock( 'TcController' );
 			$controller->expects( $this->once() )
-				->method( 'init' )
+				->method( 'register_menu' )
 				->will( $this->returnValue( $hookname ) );
 			$controllers[] = $controller;
 			$add_action_expects[] = array(

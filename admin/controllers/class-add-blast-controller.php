@@ -1,20 +1,16 @@
 <?php
+
+namespace Terescode\BlastCaster;
+
 require_once BC_PLUGIN_DIR . 'includes/interface-controller.php';
 require_once BC_PLUGIN_DIR . 'admin/class-add-blast-form-helper.php';
 
 
 if ( ! class_exists( 'BcAddBlastController' ) ) {
 
-	class BcAddBlastController implements TcController {
+	class BcAddBlastController implements \TcController {
 		const BC_ADD_BLAST_SCREEN_ID = 'bc_add_blast';
-
-		/**
-		 * The plugin that created the controller.
-		 *
-		 * @var object
-		 * @access protected
-		 */
-		private $plugin;
+		const BC_ADD_BLAST_POST_ACTION = 'add_blast';
 
 		/**
 		 * The wp helper to use.
@@ -56,20 +52,26 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 		 */
 		private $page_data;
 
-		function __construct( $plugin, $plugin_helper, $blast_form_helper ) {
-			$this->plugin = $plugin;
+		function __construct( $plugin_helper, $blast_form_helper ) {
 			$this->wph = $plugin_helper->get_wp_helper();
 			$this->plugin_helper = $plugin_helper;
 			$this->blast_form_helper = $blast_form_helper;
 		}
 
-		function init() {
+		function register_handlers() {
+			$this->wph->add_action(
+				'admin_post_' . self::BC_ADD_BLAST_POST_ACTION,
+				array( $this, 'do_add_blast' )
+			);
+		}
+
+		function register_menu() {
 			$this->add_blast_screen_id = $this->wph->add_posts_page(
 				__( 'Add a blast', 'blastcaster' ),
 				__( 'Add a blast', 'blastcaster' ),
 				'edit_posts',
 				self::BC_ADD_BLAST_SCREEN_ID,
-				array( $this, 'do_add_blast' )
+				array( $this, 'render_add_blast' )
 			);
 			if ( $this->add_blast_screen_id ) {
 				$this->wph->add_action(
@@ -104,7 +106,7 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			return null;
 		}
 
-		function do_add_blast() {
+		function render_add_blast() {
 			if ( isset( $_POST['pageData'] ) ) {
 				$post_data = stripslashes( trim( $_POST['pageData'] ) );
 				if ( ! empty( $post_data ) ) {
@@ -113,6 +115,14 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			}
 
 			$this->plugin_helper->render( $this, 'admin/views/add-blast-form', 'edit_posts' );
+		}
+
+		function do_add_blast() {
+			echo 'HELLO ADMIN POST';
+			/*
+			status_header(200);
+			die("Server received '{$_REQUEST['data']}' from your browser.");
+			*/
 		}
 
 		function add_blast_form_meta_boxes() {

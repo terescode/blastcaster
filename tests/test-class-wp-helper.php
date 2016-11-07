@@ -614,4 +614,67 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 		$html = $wph->submit_button( 'the-action', 'secondary', 'click me', false, array( 'disabled' => 'disabled' ) );
 		$this->assertEquals( '<input type="submit" name="click me" class="secondary" value="the-action" />', $html );
 	}
+
+	/**
+	 * Test wp_insert_post
+	 */
+	function test_wp_insert_post_should_call_wp_insert_post_and_return_0_if_wp_insert_post_does() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_insert_post', array(
+			'times' => 1,
+			'args' => array(
+				array( 'foo' => 'bar', 'bar' => 'baz' ),
+				false,
+			),
+			'return' => 0,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_insert_post( [ 'foo' => 'bar', 'bar' => 'baz' ] );
+		$this->assertEquals( 0, $ret );
+	}
+
+	/**
+	 * Test wp_insert_post
+	 */
+	function test_wp_insert_post_should_call_wp_insert_post_and_return_wp_error_if_wp_insert_post_does() {
+		// @setup
+		wp_include_once( 'class-wp-error.php' );
+		$m_error = $this->mock( 'WP_Error' );
+		\WP_Mock::wpFunction( 'wp_insert_post', array(
+			'times' => 1,
+			'args' => array(
+				array( 'foo' => 'bar', 'bar' => 'baz' ),
+				true,
+			),
+			'return' => $m_error,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_insert_post( [ 'foo' => 'bar', 'bar' => 'baz' ], true );
+		$this->assertInstanceOf( 'WP_Error', $ret );
+		$this->assertEquals( $m_error, $ret );
+	}
+
+	/**
+	 * Test wp_insert_post
+	 */
+	function test_wp_insert_post_should_call_wp_insert_post_and_return_post_id_if_wp_insert_post_does() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_insert_post', array(
+			'times' => 1,
+			'args' => array(
+				array( 'foo' => 'bar', 'bar' => 'baz' ),
+				true,
+			),
+			'return' => 12345,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_insert_post( [ 'foo' => 'bar', 'bar' => 'baz' ], true );
+		$this->assertEquals( 12345, $ret );
+	}
 }

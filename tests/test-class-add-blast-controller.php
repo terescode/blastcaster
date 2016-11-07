@@ -1,10 +1,11 @@
 <?php
 
+namespace Terescode\BlastCaster;
+
 require_once 'tests/stub-translate.php';
 require_once 'includes/constants.php';
 require_once 'includes/class-wp-helper.php';
 require_once 'includes/class-plugin-helper.php';
-require_once 'includes/interface-admin-plugin.php';
 require_once 'admin/class-add-blast-form-helper.php';
 require_once 'admin/controllers/class-add-blast-controller.php';
 
@@ -14,28 +15,50 @@ require_once 'admin/controllers/class-add-blast-controller.php';
  * @package Blastcaster
  */
 
-class BcAddBlastControllerTest extends BcPhpUnitTestCase {
+class BcAddBlastControllerTest extends \BcPhpUnitTestCase {
+
+	/**
+	 * Test register_handlers
+	 */
+	function test_register_handlers_should_add_admin_post_actions() {
+		// @setup
+		$m_wph = $this->mock( 'TcWpHelper' );
+		$m_helper = $this->mock( 'TcPluginHelper' );
+		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
+		// @sut
+		$controller = null;
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->equalTo( 'admin_post_add_blast' ),
+				$this->equalTo( array( &$controller, 'do_add_blast' ) )
+			);
+
+		// @exercise
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->register_handlers();
+	}
 
 	/**
 	 * Test init @should call add_posts_page
 	 */
-	function test_init_should_return_false_given_add_posts_page_does() {
+	function test_register_menu_should_return_false_given_add_posts_page_does() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_wph->method( '__' )
-			->willReturn( 'test' );
 		$m_wph->method( 'add_posts_page' )
 			->willReturn( false );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$hook_suffix = $controller->init();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$hook_suffix = $controller->register_menu();
 		$this->assertFalse( $hook_suffix );
 		$this->assertFalse( $controller->get_screen_id() );
 	}
@@ -43,31 +66,28 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 	/**
 	 * Test init @should call add_posts_page
 	 */
-	function test_init_should_return_hook_suffix_and_add_meta_boxes_hook_given_add_posts_page_does() {
+	function test_register_menu_should_return_hook_suffix_and_add_actions_given_add_posts_page_returns_hook_suffix() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 		// @sut
 		$controller = null;
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_wph->method( '__' )
-			->willReturn( 'test' );
 		$m_wph->method( 'add_posts_page' )
 			->willReturn( 'test_hook_suffix' );
 		$m_wph->expects( $this->once() )
 			->method( 'add_action' )
 			->with(
 				$this->equalTo( 'add_meta_boxes_test_hook_suffix' ),
-				array( &$controller, 'add_blast_form_meta_boxes' )
+				$this->equalTo( array( &$controller, 'add_blast_form_meta_boxes' ) )
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$hook_suffix = $controller->init();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$hook_suffix = $controller->register_menu();
 
 		// @verify
 		$this->assertEquals( 'test_hook_suffix', $hook_suffix );
@@ -75,13 +95,12 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
-	function test_do_add_blast_should_not_set_page_data_given_no_post_data() {
+	function test_render_add_blast_should_not_set_page_data_given_no_post_data() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$m_helper->method( 'get_wp_helper' )
@@ -90,21 +109,20 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$controller->do_add_blast();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->render_add_blast();
 
 		// @verify
 		$this->assertNull( $controller->get_page_data() );
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
-	function test_do_add_blast_should_not_set_page_data_given_empty_post_data() {
+	function test_render_add_blast_should_not_set_page_data_given_empty_post_data() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$_POST['pageData'] = '';
@@ -114,21 +132,20 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$controller->do_add_blast();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->render_add_blast();
 
 		// @verify
 		$this->assertNull( $controller->get_page_data() );
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
-	function test_do_add_blast_should_not_set_page_data_given_wsonly_post_data() {
+	function test_render_add_blast_should_not_set_page_data_given_wsonly_post_data() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$_POST['pageData'] = "\t\t\t\r\n\n\t     \t\t\r\n";
@@ -138,21 +155,20 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$controller->do_add_blast();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->render_add_blast();
 
 		// @verify
 		$this->assertNull( $controller->get_page_data() );
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
-	function test_do_add_blast_should_set_page_data_given_valid_post_data() {
+	function test_render_add_blast_should_set_page_data_given_valid_post_data() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
@@ -163,8 +179,8 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( null );
 
 		// @test
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$controller->do_add_blast();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->render_add_blast();
 
 		// @verify
 		$page_data = $controller->get_page_data();
@@ -179,13 +195,12 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
-	function test_do_add_blast_should_add_admin_notice_given_invalid_post_data() {
+	function test_render_add_blast_should_add_admin_notice_given_invalid_post_data() {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 
 		$json_file = file_get_contents( 'tests/fixtures/sample-invalid.json', true );
@@ -195,8 +210,6 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			->willReturn( $m_wph );
 		$m_helper->method( 'render' )
 			->willReturn( null );
-		$m_wph->method( '__' )
-			->willReturn( 'test' );
 		$m_helper->expects( $this->once() )
 			->method( 'add_admin_notice' )
 			->with(
@@ -204,28 +217,27 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
-		$controller->do_add_blast();
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
+		$controller->render_add_blast();
 
 		// @verify
 		$page_data = $controller->get_page_data();
-		$this->assertNull( $controller->get_page_data() );
+		$this->assertNull( $page_data );
 	}
 
 	/**
-	 * Test do_add_blast
+	 * Test render_add_blast
 	 */
 	/*
-	function test_do_add_blast_should_add_admin_notice_given_invalid_post_data_no_json_last_error_msg() {
+	function test_render_add_blast_should_add_admin_notice_given_invalid_post_data_no_json_last_error_msg() {
 		// TODO: currently no different than previous test.  Need to test function_exists == false,
 		// maybe with namespace trick?
 
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		// @sut
-		$controller = new BcAddBlastController( $m_plugin, $m_helper );
+		$controller = new BcAddBlastController( $m_helper );
 
 		// @setup
 		$json_file = file_get_contents( 'tests/fixtures/sample-invalid.json', true );
@@ -233,8 +245,6 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_wph->method( '__' )
-			->willReturn( 'test' );
 		$m_helper->expects( $this->once() )
 			->method( 'add_admin_notice' )
 			->with(
@@ -242,7 +252,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$controller->do_add_blast();
+		$controller->render_add_blast();
 
 		// @verify
 		$page_data = $controller->get_page_data();
@@ -258,15 +268,12 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 		// @setup
 		$m_wph = $this->mock( 'TcWpHelper' );
 		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_plugin = $this->mock( 'TcAdminPlugin' );
 		$m_form_helper = $this->mock( 'BcAddBlastFormHelper' );
 		// @sut
 		$controller = null;
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_wph->method( '__' )
-			->willReturn( 'test' );
 		$m_wph->expects( $this->exactly( 5 ) )
 			->method( 'add_meta_box' )
 			->withConsecutive(
@@ -278,7 +285,7 @@ class BcAddBlastControllerTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$controller = new BcAddBlastController( $m_plugin, $m_helper, $m_form_helper );
+		$controller = new BcAddBlastController( $m_helper, $m_form_helper );
 		$controller->add_blast_form_meta_boxes();
 	}
 }

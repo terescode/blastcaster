@@ -27,4 +27,7 @@
 	  <log type="coverage-clover" target="./reports/coverage.xml"/>
 	  <log type="testdox-html" target="./reports/testdox.html"/>
 	</logging>
+	<php>
+	  <const name="WP_INCLUDES_PATH" value="../../../wp-includes/"/>
+	</php>
 </phpunit>
