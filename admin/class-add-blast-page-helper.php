@@ -2,9 +2,9 @@
 
 namespace Terescode\BlastCaster;
 
-if ( ! class_exists( 'BcAddBlastFormHelper' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPageHelper' ) ) {
 
-	class BcAddBlastFormHelper {
+	class BcAddBlastPageHelper {
 
 		function __construct() {
 		}
@@ -42,6 +42,11 @@ if ( ! class_exists( 'BcAddBlastFormHelper' ) ) {
 				}
 			}
 			echo '<div id="bc-add-image-picker">';
+			// TODO: add checkbox for no image
+			// initially show carousel of recommended images and image upload tab
+			// if no recommended images show "no images to recommend"
+			// if no image is selected, hide image controls - drawer up/down
+			echo '<input type="hidden" name="bc-add-image-url" value="" />';
 			echo '<img src="' . $primary_image . '" />';
 			echo '</div>';
 		}

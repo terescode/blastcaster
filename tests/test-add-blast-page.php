@@ -17,26 +17,31 @@ class AddBlastFormTest extends BcPhpUnitTestCase {
 	 */
 	function test_render() {
 		// @setup
-		$wph = $this->mock( 'TcWpHelper' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 
-		$wph->expects( $this->once() )
+		$m_wph->expects( $this->once() )
 			->method( 'admin_url' )
 			->with( 'admin-post.php' );
-		$wph->expects( $this->once() )
+		$m_wph->expects( $this->once() )
 			->method( 'esc_html' );
-		$wph->expects( $this->exactly( 3 ) )
+		$m_wph->expects( $this->once() )
+			->method( 'esc_url' );
+		$m_wph->expects( $this->exactly( 3 ) )
 			->method( 'wp_nonce_field' );
-		$wph->expects( $this->exactly( 2 ) )
+		$m_wph->expects( $this->exactly( 2 ) )
 			->method( 'do_meta_boxes' )
 			->withConsecutive(
 				[ '', 'normal', null ],
 				[ '', 'advanced', null ]
 			);
-		$wph->expects( $this->exactly( 1 ) )
+		$m_wph->expects( $this->exactly( 1 ) )
 			->method( 'submit_button' );
 		$this->expectOutputRegex( '/<form name="blastcaster-form"/' );
 
 		// @test
-		include( 'admin/views/add-blast-form.php' );
+		$wph = $m_wph;
+		$plugin_helper = $m_helper;
+		include( 'admin/views/add-blast-page.php' );
 	}
 }

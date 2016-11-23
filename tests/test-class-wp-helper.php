@@ -1,5 +1,7 @@
 <?php
 
+namespace Terescode\WordPress;
+
 // @SUT
 require_once 'includes/class-wp-helper.php';
 
@@ -9,7 +11,7 @@ require_once 'includes/class-wp-helper.php';
  * @package Blastcaster
  */
 
-class TcWpHelperTest extends BcPhpUnitTestCase {
+class TcWpHelperTest extends \BcPhpUnitTestCase {
 
 	/**
 	 * Test setup
@@ -31,7 +33,7 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_add_action_should_call_add_action_given_required_args() {
 		// @setup
-		$stub = new stdClass;
+		$stub = new \stdClass;
 		$wph = new TcWpHelper();
 
 		\WP_Mock::expectActionAdded(
@@ -48,7 +50,7 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_add_action_should_call_add_action_given_optional_args() {
 		// @setup
-		$stub = new stdClass;
+		$stub = new \stdClass;
 		$wph = new TcWpHelper();
 
 		\WP_Mock::expectActionAdded(
@@ -67,7 +69,7 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_register_activation_hook_should_call_register_activation_hook_given_args() {
 		// @setup
-		$stub = new stdClass;
+		$stub = new \stdClass;
 		$wph = new TcWpHelper();
 
 		\WP_Mock::wpFunction( 'register_activation_hook', array(
@@ -87,7 +89,7 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_register_deactivation_hook_should_call_register_deactivation_hook_given_args() {
 		// @setup
-		$stub = new stdClass;
+		$stub = new \stdClass;
 		$wph = new TcWpHelper();
 
 		\WP_Mock::wpFunction( 'register_deactivation_hook', array(
@@ -237,6 +239,50 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 		// @exercise
 		$esc = $wph->esc_html( '<lemon-pepper>' );
 		$this->assertEquals( '&lt;lemon-pepper&gt;', $esc );
+	}
+
+	/**
+	 * Test esc_url
+	 */
+	function test_esc_url_should_call_esc_url_and_return_result_given_required_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'esc_url', array(
+			'times' => 1,
+			'args' => array(
+				'http://www.google.com?test=I am a parameter',
+				null,
+				'display',
+			),
+			'return' => 'http://www.google.com?test=I%20am%20a%20parameter',
+		) );
+
+		// @exercise
+		$esc = $wph->esc_url( 'http://www.google.com?test=I am a parameter' );
+		$this->assertEquals( 'http://www.google.com?test=I%20am%20a%20parameter', $esc );
+	}
+
+	/**
+	 * Test esc_url
+	 */
+	function test_esc_url_should_call_esc_url_and_return_result_given_optional_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'esc_url', array(
+			'times' => 1,
+			'args' => array(
+				'http://www.google.com?test=I am a parameter',
+				[ 'http', 'https' ],
+				'display',
+			),
+			'return' => 'http://www.google.com?test=I%20am%20a%20parameter',
+		) );
+
+		// @exercise
+		$esc = $wph->esc_url( 'http://www.google.com?test=I am a parameter', [ 'http', 'https' ] );
+		$this->assertEquals( 'http://www.google.com?test=I%20am%20a%20parameter', $esc );
 	}
 
 	/**
@@ -676,5 +722,96 @@ class TcWpHelperTest extends BcPhpUnitTestCase {
 		$wph = new TcWpHelper();
 		$ret = $wph->wp_insert_post( [ 'foo' => 'bar', 'bar' => 'baz' ], true );
 		$this->assertEquals( 12345, $ret );
+	}
+
+	/**
+	 * Test sanitize_text_field
+	 */
+	function test_sanitize_text_field_should_call_sanitize_text_field_and_return_the_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'sanitize_text_field', array(
+			'times' => 1,
+			'args' => array(
+				'<script>This is some text probably from a text field</script>'
+			),
+			'return' => 'This is some text probably from a text field',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->sanitize_text_field( '<script>This is some text probably from a text field</script>' );
+		$this->assertEquals( 'This is some text probably from a text field', $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_status_header_should_call_status_header_with_required_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'status_header', array(
+			'times' => 1,
+			'args' => array(
+				201,
+				'',
+			),
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$wph->status_header( 201 );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_status_header_should_call_status_header_with_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'status_header', array(
+			'times' => 1,
+			'args' => array(
+				201,
+				'Created',
+			),
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$wph->status_header( 201, 'Created' );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_safe_redirect_should_call_wp_safe_redirect_with_required_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_safe_redirect', array(
+			'times' => 1,
+			'args' => array(
+				'http://local.wordpress.dev/edit.php?page=page',
+				302,
+			),
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$wph->wp_safe_redirect( 'http://local.wordpress.dev/edit.php?page=page' );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_safe_redirect_should_call_wp_safe_redirect_with_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_safe_redirect', array(
+			'times' => 1,
+			'args' => array(
+				'http://local.wordpress.dev/edit.php?page=page',
+				301,
+			),
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$wph->wp_safe_redirect( 'http://local.wordpress.dev/edit.php?page=page', 301 );
 	}
 }

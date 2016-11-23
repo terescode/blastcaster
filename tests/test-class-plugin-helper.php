@@ -1,9 +1,12 @@
 <?php
 
+namespace Terescode\WordPress;
+
 // Include constants
 require_once 'includes/constants.php';
 require_once 'includes/class-wp-helper.php';
-require_once 'includes/interface-controller.php';
+require_once 'includes/interface-view.php';
+require_once 'includes/interface-strings.php';
 // @SUT
 require_once 'includes/class-plugin-helper.php';
 
@@ -13,42 +16,43 @@ require_once 'includes/class-plugin-helper.php';
  * @package Blastcaster
  */
 
-class TcPluginHelperTest extends BcPhpUnitTestCase {
+class TcPluginHelperTest extends \BcPhpUnitTestCase {
 
 	/**
 	 * Test init_plugin
 	 */
 	function test_init_plugin_should_register_hooks_and_call_actions() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$plugin = $this->mock( 'TcPlugin' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_plugin = $this->mock( 'Terescode\WordPress\TcPlugin' );
 
-		$plugin->method( 'get_plugin_id' )
+		$m_plugin->method( 'get_plugin_id' )
 			->willReturn( 'basic-plugin' );
 		$m_wph->expects( $this->once() )
 			->method( 'register_activation_hook' )
 			->with(
 				$this->equalTo( BC_PLUGIN_DIR . '/basic-plugin.php' ),
-				$this->equalTo( array( $plugin, 'activate' ) )
+				$this->equalTo( array( $m_plugin, 'activate' ) )
 			);
 
 		$m_wph->expects( $this->once() )
 			->method( 'register_deactivation_hook' )
 			->with(
 				$this->equalTo( BC_PLUGIN_DIR . '/basic-plugin.php' ),
-				$this->equalTo( array( $plugin, 'deactivate' ) )
+				$this->equalTo( array( $m_plugin, 'deactivate' ) )
 			);
 
 		$m_wph->expects( $this->once() )
 			->method( 'add_action' )
 			->with(
 				$this->equalTo( 'plugins_loaded' ),
-				$this->equalTo( array( $plugin, 'load' ) )
+				$this->equalTo( array( $m_plugin, 'load' ) )
 			);
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->init_plugin( $plugin );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->init_plugin( $m_plugin );
 	}
 
 	/**
@@ -56,23 +60,24 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_init_admin_plugin_should_register_hooks_and_call_actions() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$plugin = $this->mock( 'TcAdminPlugin' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_plugin = $this->mock( 'Terescode\WordPress\TcAdminPlugin' );
 
-		$plugin->method( 'get_plugin_id' )
+		$m_plugin->method( 'get_plugin_id' )
 			->willReturn( 'admin-plugin' );
 		$m_wph->expects( $this->once() )
 			->method( 'register_activation_hook' )
 			->with(
 				$this->equalTo( BC_PLUGIN_DIR . '/admin-plugin.php' ),
-				$this->equalTo( array( $plugin, 'activate' ) )
+				$this->equalTo( array( $m_plugin, 'activate' ) )
 			);
 
 		$m_wph->expects( $this->once() )
 			->method( 'register_deactivation_hook' )
 			->with(
 				$this->equalTo( BC_PLUGIN_DIR . '/admin-plugin.php' ),
-				$this->equalTo( array( $plugin, 'deactivate' ) )
+				$this->equalTo( array( $m_plugin, 'deactivate' ) )
 			);
 
 		$m_wph->expects( $this->exactly( 2 ) )
@@ -80,17 +85,17 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			->withConsecutive(
 				[
 					$this->equalTo( 'plugins_loaded' ),
-					$this->equalTo( array( $plugin, 'load' ) ),
+					$this->equalTo( array( $m_plugin, 'load' ) ),
 				],
 				[
 					$this->equalTo( 'admin_menu' ),
-					$this->equalTo( array( $plugin, 'install_admin_menus' ) ),
+					$this->equalTo( array( $m_plugin, 'install_admin_menus' ) ),
 				]
 			);
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->init_admin_plugin( $plugin );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->init_admin_plugin( $m_plugin );
 	}
 
 	/**
@@ -98,10 +103,11 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_load_textdomain_should_call_load_plugin_textdomain() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$plugin = $this->mock( 'TcPlugin' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_plugin = $this->mock( 'Terescode\WordPress\TcPlugin' );
 
-		$plugin->method( 'get_plugin_id' )
+		$m_plugin->method( 'get_plugin_id' )
 			->willReturn( 'basic-plugin' );
 		$m_wph->expects( $this->once() )
 			->method( 'load_plugin_textdomain' )
@@ -112,8 +118,8 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			);
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->load_textdomain( $plugin );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->load_textdomain( $m_plugin );
 	}
 
 	/**
@@ -121,51 +127,19 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_plugin_file_name_should_return_expected_value_given_plugin_id() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$plugin = $this->mock( 'TcPlugin' );
-		$plugin->method( 'get_plugin_id' )
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_plugin = $this->mock( 'Terescode\WordPress\TcPlugin' );
+
+		$m_plugin->method( 'get_plugin_id' )
 			->willReturn( 'basic-plugin' );
 
 		// exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$actual = $helper->plugin_file_name( $plugin );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$actual = $helper->plugin_file_name( $m_plugin );
 
 		// verify
 		$this->assertEquals( BC_PLUGIN_DIR . '/basic-plugin.php', $actual );
-	}
-
-
-	/**
-	 * Test load_{$pagenow} hook
-	 */
-	function test_load_pagenow_should_call_add_meta_boxes_and_enqueue_script_given_hookname() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$hookname = 'hookname_1';
-
-		$m_wph->expects( $this->exactly( 2 ) )
-			->method( 'do_action' )
-			->withConsecutive(
-				[
-					$this->equalTo( 'add_meta_boxes_hookname_1' ),
-					$this->equalTo( null ),
-				],
-				[
-					$this->equalTo( 'add_meta_boxes' ),
-					$this->equalTo( $hookname ),
-					$this->equalTo( null ),
-				]
-			);
-
-		$m_wph->expects( $this->once() )
-			->method( 'wp_enqueue_script' )
-			->with(
-				$this->equalTo( 'postbox' )
-			);
-
-		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->load_pagenow( $hookname );
 	}
 
 	/**
@@ -173,7 +147,8 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_admin_notices_should_output_correct_type_given_parameters() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
 
 		$m_wph->expects( $this->exactly( 4 ) )
 			->method( 'esc_html' )
@@ -191,7 +166,7 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			->will( $this->returnArgument( 0 ) );
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
 		$this->expectOutputRegex( '/class="error/' );
 		$this->expectOutputRegex( '/That is mangatsika cool/' );
 		$helper->admin_notices( 'That is mangatsika cool', TcPluginHelper::NOTICE_TYPE_ERROR, false );
@@ -210,35 +185,12 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	}
 
 	/**
-	 * Test add_postbox_script_in_footer
-	 */
-	function test_add_postbox_script_in_footer_should_output_script() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-
-		$this->expect_html(
-			function ( $result ) {
-				// @verify
-				$xpath = new DOMXPath( $result );
-				$elements = $xpath->query( '//script' );
-				$this->assertEquals( 1, $elements->length, 'Should only be one script in output!' );
-				$node = $elements->item( 0 );
-				$this->assertEquals( XML_ELEMENT_NODE, $node->nodeType );
-				$this->assertRegExp( '/postboxes\.add_postbox_toggles/', $node->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->add_postbox_script_in_footer();
-	}
-
-	/**
 	 * Test add_admin_notice
 	 */
 	function test_add_admin_notice_should_add_admin_notices_action() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
 
 		$m_wph->expects( $this->once() )
 			->method( 'add_action' )
@@ -265,130 +217,17 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 			);
 
 		// @test
-		$helper = new TcPluginHelper( $m_wph );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
 		$helper->add_admin_notice( 'That is mangatsika cool', TcPluginHelper::NOTICE_TYPE_ERROR, true );
 	}
 
-	/**
-	 * Test install_admin_menus
-	 */
-	function test_install_admin_menus_should_add_zero_hooks_given_zero_controllers() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$controllers = array();
-		$hooknames = null;
-
-		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$hooknames = $helper->install_admin_menus( $controllers );
-
-		// @verify
-		$this->assertNotNull( $hooknames );
-		$this->assertInternalType( 'array', $hooknames );
-		$this->assertEquals( 0, count( $hooknames ) );
-	}
-
-	/**
-	 * Test install_admin_menus
-	 */
-	function test_install_admin_menus_should_add_zero_hooks_given_controller_init_returns_falsy() {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$controllers = array();
-		$hooknames = null;
-
-		$controller = $this->mock( 'TcController' );
-		$controller->expects( $this->once() )
-			->method( 'register_menu' )
-			->will( $this->returnValue( false ) );
-		$controllers[] = $controller;
-
-		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$hooknames = $helper->install_admin_menus( $controllers );
-
-		// @verify
-		$this->assertNotNull( $hooknames );
-		$this->assertInternalType( 'array', $hooknames );
-		$this->assertEquals( 0, count( $hooknames ) );
-	}
-
-	/**
-	 * Helper function to test admin_menus
-	 */
-	function install_admin_menus_should_add_N_hooks_given_N_controllers( $count ) {
-		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$hooknames = null;
-		$controllers = array();
-		$helper = null;
-		$add_action_expects = array();
-		for ( $idx = 0; $idx < $count; $idx += 1 ) {
-			$hookname = 'test_hookname_' . $idx;
-			$controller = $this->mock( 'TcController' );
-			$controller->expects( $this->once() )
-				->method( 'register_menu' )
-				->will( $this->returnValue( $hookname ) );
-			$controllers[] = $controller;
-			$add_action_expects[] = array(
-				$this->equalTo( 'load-' . $hookname ),
-				$this->callback( function ( $subject ) {
-					return is_callable( $subject ) &&
-						$subject[0] instanceof TcCallbackWrapper;
-				}),
-			);
-			$add_action_expects[] = array(
-				$this->equalTo( 'admin_footer-' . $hookname ),
-				$this->equalTo( array( &$helper, 'add_postbox_script_in_footer' ) ),
-			);
-		}
-
-		$builder = $m_wph->expects( $this->exactly( 2 * $count ) )
-			->method( 'add_action' );
-
-		call_user_func_array( array( $builder, 'withConsecutive' ), $add_action_expects );
-
-		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$hooknames = $helper->install_admin_menus( $controllers );
-
-		// @verify
-		$this->assertNotNull( $hooknames );
-		$this->assertInternalType( 'array', $hooknames );
-		$this->assertEquals( $count, count( $hooknames ) );
-		for ( $idx = 0; $idx < $count; $idx += 1 ) {
-			$this->assertEquals( 'test_hookname_' . $idx, $hooknames[ $idx ] );
-		}
-	}
-
-	/**
-	 * Test install_admin_menus
-	 */
-	function test_install_admin_menus_should_add_1_hook_given_1_controller() {
-		$this->invoke_with_random_count(
-			1,
-			1,
-			array( $this, 'install_admin_menus_should_add_N_hooks_given_N_controllers' )
-		);
-	}
-
-	/**
-	 * Test install_admin_menus
-	 */
-	function test_install_admin_menus_should_add_N_hooks_given_N_controllers() {
-		$this->invoke_with_random_count(
-			5,
-			10,
-			array( $this, 'install_admin_menus_should_add_N_hooks_given_N_controllers' )
-		);
-	}
-
 	function test_get_wp_helper_should_return_helper_given_in_constructor() {
-		$m_wph = $this->mock( 'TcWpHelper' );
-		// @sut
-		$helper = new TcPluginHelper( $m_wph );
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
 
 		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
 		$wph = $helper->get_wp_helper();
 
 		// @verify
@@ -400,41 +239,165 @@ class TcPluginHelperTest extends BcPhpUnitTestCase {
 	 */
 	function test_render_should_output_hello_world_given_no_capability_check() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$controller = $this->mock( 'TcController' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_view = $this->mock( 'Terescode\WordPress\TcView' );
 
-		$this->expectOutputRegex( '/Hello, world[!].+CONTROLLER OK.+WPHELPER OK/' );
+		$this->expectOutputRegex( '/Hello, world[!].+VIEW OK.+WPHELPER OK/' );
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->render( $controller, 'tests/fixtures/view' );
+		$helper = new TcPluginHelper( $m_wph , $m_strings );
+		$helper->render( $m_view, 'tests/fixtures/view' );
 	}
 
 	function test_render_should_output_hello_world_given_current_user_can_returns_true() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$controller = $this->mock( 'TcController' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_view = $this->mock( 'Terescode\WordPress\TcView' );
 
 		$m_wph->method( 'current_user_can' )
 			->willReturn( true );
-		$this->expectOutputRegex( '/Hello, world[!].+CONTROLLER OK.+WPHELPER OK/' );
+		$this->expectOutputRegex( '/Hello, world[!].+VIEW OK.+WPHELPER OK/' );
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->render( $controller, 'tests/fixtures/view', 'install_plugins' );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->render( $m_view, 'tests/fixtures/view', 'install_plugins' );
 	}
 
 	function test_render_should_output_nothing_given_current_user_can_returns_false() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$controller = $this->mock( 'TcController' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+		$m_view = $this->mock( 'Terescode\WordPress\TcView' );
 
 		$m_wph->method( 'current_user_can' )
 			->willReturn( false );
 		$this->expectOutputString( '' );
 
 		// @exercise
-		$helper = new TcPluginHelper( $m_wph );
-		$helper->render( $controller, 'tests/fixtures/view', 'install_plugins' );
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->render( $m_view, 'tests/fixtures/view', 'install_plugins' );
+	}
+
+	function test_param_should_return_null_given_no_post_param() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo' );
+
+		// @verify
+		$this->assertNull( $val );
+	}
+
+	function test_param_should_return_value_given_post_has_param() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo'] = 'bar';
+
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo' );
+
+		// @verify
+		$this->assertEquals( 'bar', $val );
+	}
+
+	function test_param_should_return_value_given_get_has_param() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		unset( $_POST['foo'] );
+		$_GET['foo'] = 'bar';
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo' );
+
+		// @verify
+		$this->assertEquals( 'bar', $val );
+	}
+
+	function test_param_should_call_sanitize_text_field_given_no_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo'] = 'bar';
+
+		$m_wph->expects( $this->once() )
+			->method( 'sanitize_text_field' )
+			->with( $this->equalTo( 'bar' ) )
+			->willReturn( 'bar' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo' );
+
+		// @verify
+		$this->assertEquals( 'bar', $val );
+	}
+
+	function test_param_should_call_sanitize_text_field_given_text_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo'] = 'bar';
+
+		$m_wph->expects( $this->once() )
+			->method( 'sanitize_text_field' )
+			->with( $this->equalTo( 'bar' ) )
+			->willReturn( 'bar' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo', 'text' );
+
+		// @verify
+		$this->assertEquals( 'bar', $val );
+	}
+
+	function test_string_should_call_string_with_required_args_and_return_value() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_strings->expects( $this->once() )
+			->method( 'get_string' )
+			->with( $this->equalTo( 'bc.a.code' ), $this->equalTo( array() ) )
+			->willReturn( 'a string' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->string( 'bc.a.code' );
+		$this->assertEquals( 'a string', $str );
+	}
+
+	function test_string_should_call_string_with_optional_args_and_return_value() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_strings->expects( $this->once() )
+			->method( 'get_string' )
+			->with( $this->equalTo( 'bc.a.code' ), $this->equalTo( array( 'foo' ) ) )
+			->willReturn( 'a string' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->string( 'bc.a.code', array( 'foo' ) );
+		$this->assertEquals( 'a string', $str );
 	}
 }

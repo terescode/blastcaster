@@ -7,7 +7,8 @@
             "useTabChar": false,
             "spaceUnits": 2,
             "linting.enabled": true,
-            "linting.collapsed": false
+            "linting.collapsed": true,
+            "fonts.fontSize": "13px"
         },
         "**.json": {
             "useTabChar": false,

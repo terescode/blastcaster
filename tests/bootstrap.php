@@ -30,7 +30,6 @@ if ( ! function_exists( 'wp_include_once' ) ) {
 	}
 }
 
-
 if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 
 	abstract class BcPhpUnitTestCase extends PHPUnit_Framework_TestCase {

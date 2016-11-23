@@ -1,6 +1,8 @@
 <?php
 
-if ( ! interface_exists( 'TcPlugin' ) ) {
+namespace Terescode\WordPress;
+
+if ( ! interface_exists( __NAMESPACE__ . '\TcPlugin' ) ) {
 
 	interface TcPlugin {
 

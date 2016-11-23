@@ -1,8 +1,11 @@
 <?php
+
+namespace Terescode\WordPress;
+
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-if ( ! class_exists( 'TcWpHelper' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 	class TcWpHelper {
 		function __construct() {
 		}
@@ -39,6 +42,10 @@ if ( ! class_exists( 'TcWpHelper' ) ) {
 
 		function esc_html( $text ) {
 			return esc_html( $text );
+		}
+
+		function esc_url( $url, $protocols = null, $_context = 'display' ) {
+			return esc_url( $url, $protocols, $_context );
 		}
 
 		function do_action( $tag, $arg = '' ) {
@@ -100,5 +107,27 @@ if ( ! class_exists( 'TcWpHelper' ) ) {
 		function wp_insert_post( $postarr, $wp_error = false ) {
 			return wp_insert_post( $postarr, $wp_error );
 		}
+
+		function sanitize_text_field( $str ) {
+			return sanitize_text_field( $str );
+		}
+
+		function status_header( $code, $description = '' ) {
+			status_header( $code, $description );
+		}
+
+		function wp_safe_redirect( $location, $status = 302 ) {
+			wp_safe_redirect( $location, $status );
+		}
+
+		/**
+		 * Some WP functions require us to "die" but this makes things hard to test.  This function
+		 * allows us to mock the die call so our tests don't die. Since we can't actually cover this
+		 * code we have to ignore it.
+		 * @codeCoverageIgnore
+		 */
+		/*function die_hard() {
+			die;
+		}*/
 	}
 }

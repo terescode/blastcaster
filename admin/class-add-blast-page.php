@@ -2,13 +2,14 @@
 
 namespace Terescode\BlastCaster;
 
-require_once BC_PLUGIN_DIR . 'includes/interface-controller.php';
-require_once BC_PLUGIN_DIR . 'admin/class-add-blast-form-helper.php';
+require_once BC_PLUGIN_DIR . 'includes/interface-view.php';
+require_once BC_PLUGIN_DIR . 'includes/class-blastcaster-strings.php';
 
+use Terescode\WordPress\TcView;
 
-if ( ! class_exists( 'BcAddBlastController' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 
-	class BcAddBlastController implements \TcController {
+	class BcAddBlastPage implements TcView {
 		const BC_ADD_BLAST_SCREEN_ID = 'bc_add_blast';
 		const BC_ADD_BLAST_POST_ACTION = 'add_blast';
 
@@ -34,12 +35,12 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 		 * @var string
 		 * @access private
 		 */
-		private $add_blast_screen_id;
+		private $add_blast_hook_suffix;
 
 		/**
 		 * Add Blast Form helper
 		 *
-		 * @var string
+		 * @var object
 		 * @access private
 		 */
 		private $blast_form_helper;
@@ -58,28 +59,34 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			$this->blast_form_helper = $blast_form_helper;
 		}
 
-		function register_handlers() {
-			$this->wph->add_action(
-				'admin_post_' . self::BC_ADD_BLAST_POST_ACTION,
-				array( $this, 'do_add_blast' )
-			);
-		}
-
-		function register_menu() {
-			$this->add_blast_screen_id = $this->wph->add_posts_page(
-				__( 'Add a blast', 'blastcaster' ),
-				__( 'Add a blast', 'blastcaster' ),
+		public function add_page() {
+			$this->add_blast_hook_suffix = $this->wph->add_posts_page(
+				$this->plugin_helper->string( BcStrings::ABF_BLAST_PAGE_TITLE ),
+				$this->plugin_helper->string( BcStrings::ABF_BLAST_MENU_TITLE ),
 				'edit_posts',
 				self::BC_ADD_BLAST_SCREEN_ID,
-				array( $this, 'render_add_blast' )
+				array( $this, 'render' )
 			);
-			if ( $this->add_blast_screen_id ) {
-				$this->wph->add_action(
-					'add_meta_boxes_' . $this->add_blast_screen_id,
-					array( $this, 'add_blast_form_meta_boxes' )
-				);
+			return $this->add_blast_hook_suffix;
+		}
+
+		function get_hook_suffix() {
+			return $this->add_blast_hook_suffix;
+		}
+
+		public function load_pagenow() {
+			// TODO: refactor as separate marshaller/converter class
+			if ( isset( $_POST['pageData'] ) ) {
+				$post_data = stripslashes( trim( $_POST['pageData'] ) );
+				if ( ! empty( $post_data ) ) {
+					$this->page_data = $this->decode_page_data( $post_data );
+				}
 			}
-			return $this->add_blast_screen_id;
+			/*
+			$code = $this->plugin_helper->param( 'code' );
+			if ( ! empty( $code ) ) {
+			}
+			*/
 		}
 
 		private function decode_page_data( $post_data ) {
@@ -96,7 +103,7 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			}
 
 			$json_error_msg = sprintf(
-				__( 'The page data received from the original source could not be decoded. (%1$d - %2$s)', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_INVALID_PAGE_DATA ),
 				$json_error,
 				$json_error_msg
 			);
@@ -106,67 +113,56 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 			return null;
 		}
 
-		function render_add_blast() {
-			if ( isset( $_POST['pageData'] ) ) {
-				$post_data = stripslashes( trim( $_POST['pageData'] ) );
-				if ( ! empty( $post_data ) ) {
-					$this->page_data = $this->decode_page_data( $post_data );
-				}
-			}
-
-			$this->plugin_helper->render( $this, 'admin/views/add-blast-form', 'edit_posts' );
+		function render() {
+			$this->plugin_helper->render( $this, 'admin/views/add-blast-page', 'edit_posts' );
 		}
 
-		function do_add_blast() {
-			echo 'HELLO ADMIN POST';
-			/*
-			status_header(200);
-			die("Server received '{$_REQUEST['data']}' from your browser.");
-			*/
+		public function is_metabox_page() {
+			return true;
 		}
 
-		function add_blast_form_meta_boxes() {
+		public function add_meta_boxes() {
 			$this->wph->add_meta_box(
 				'bc-add-title-meta-box',
-				__( 'Title', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_TITLE_LABEL ),
 				array( $this->blast_form_helper, 'render_add_title_meta_box' ),
-				$this->add_blast_screen_id,
+				$this->add_blast_hook_suffix,
 				'normal',
 				'default',
 				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-category-meta-box',
-				__( 'Categories', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_CATEGORIES_LABEL ),
 				array( $this->blast_form_helper, 'render_add_category_meta_box' ),
-				$this->add_blast_screen_id,
+				$this->add_blast_hook_suffix,
 				'normal',
 				'default',
 				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-image-meta-box',
-				__( 'Image', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_IMAGE_LABEL ),
 				array( $this->blast_form_helper, 'render_add_image_meta_box' ),
-				$this->add_blast_screen_id,
+				$this->add_blast_hook_suffix,
 				'normal',
 				'default',
 				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-description-meta-box',
-				__( 'Description', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_DESCRIPTION_LABEL ),
 				array( $this->blast_form_helper, 'render_add_description_meta_box' ),
-				$this->add_blast_screen_id,
+				$this->add_blast_hook_suffix,
 				'normal',
 				'default',
 				array( $this )
 			);
 			$this->wph->add_meta_box(
 				'bc-add-tag-meta-box',
-				__( 'Tags', 'blastcaster' ),
+				$this->plugin_helper->string( BcStrings::ABF_TAGS_LABEL ),
 				array( $this->blast_form_helper, 'render_add_tag_meta_box' ),
-				$this->add_blast_screen_id,
+				$this->add_blast_hook_suffix,
 				'normal',
 				'default',
 				array( $this )
@@ -175,10 +171,6 @@ if ( ! class_exists( 'BcAddBlastController' ) ) {
 
 		function get_page_data() {
 			return $this->page_data;
-		}
-
-		function get_screen_id() {
-			return $this->add_blast_screen_id;
 		}
 	}
 

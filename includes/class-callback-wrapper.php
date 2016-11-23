@@ -1,6 +1,8 @@
 <?php
 
-if ( ! class_exists( 'TcCallbackWrapper' ) ) {
+namespace Terescode\WordPress;
+
+if ( ! class_exists( __NAMESPACE__ . '\TcCallbackWrapper' ) ) {
 	class TcCallbackWrapper {
 
 		private $callable;

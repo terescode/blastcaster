@@ -1,14 +1,16 @@
 <?php
 
+namespace Terescode\WordPress;
+
 require_once BC_PLUGIN_DIR . 'includes/interface-plugin.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-admin-plugin.php';
-require_once BC_PLUGIN_DIR . 'includes/interface-controller.php';
+require_once BC_PLUGIN_DIR . 'includes/interface-view.php';
 require_once BC_PLUGIN_DIR . 'includes/class-callback-wrapper.php';
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-if ( ! class_exists( 'TcPluginHelper' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 	class TcPluginHelper {
 
 		const NOTICE_TYPE_ERROR = 'error';
@@ -16,9 +18,15 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 		const NOTICE_TYPE_NAG = 'update-nag';
 
 		private $wph;
+		private $strings;
+		private $sanitizers;
 
-		function __construct( $wph ) {
+		function __construct( $wph, $strings ) {
 			$this->wph = $wph;
+			$this->strings = $strings;
+			$this->sanitizers = [
+				'text' => array( $wph, 'sanitize_text_field' ),
+			];
 		}
 
 		function init_plugin( TcPlugin $plugin ) {
@@ -49,24 +57,10 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 			return BC_PLUGIN_DIR . '/' . $plugin->get_plugin_id() . '.php';
 		}
 
-		function load_pagenow( $hookname ) {
-			/* Fire metabox hooks */
-			$this->wph->do_action( 'add_meta_boxes_' . $hookname, null );
-			$this->wph->do_action( 'add_meta_boxes', $hookname, null );
-
-			/* Ensure postbox is loaded */
-			$this->wph->wp_enqueue_script( 'postbox' );
-		}
-
 		function admin_notices( $notice, $type, $dismissable ) {
 			echo '<div class="' . $this->wph->esc_attr( $type ) . ' notice' . ( $dismissable ? ' is-dismissable' : '' ) . '"><p>';
 			echo $this->wph->esc_html( $notice );
 			echo '</p></div>';
-		}
-
-
-		function add_postbox_script_in_footer() {
-			echo '<script type="text/javascript">jQuery(function () { postboxes.add_postbox_toggles(pagenow); });</script>';
 		}
 
 		/**
@@ -77,45 +71,43 @@ if ( ! class_exists( 'TcPluginHelper' ) ) {
 			$this->wph->add_action( 'admin_notices', array( $delegate, 'call' ) );
 		}
 
-		function install_admin_menus( $controllers ) {
-			$hooknames = array();
-
-			foreach ( $controllers as $controller ) {
-				$hook = $controller->register_menu();
-				if ( $hook ) {
-					$hooknames[] = $hook;
-				}
-			}
-
-			foreach ( $hooknames as $hookname ) {
-				// do_action( 'load-{$pagenow}' )
-				$delegate = new TcCallbackWrapper( array( $this, 'load_pagenow' ), $hookname );
-				$this->wph->add_action( 'load-' . $hookname, array( $delegate, 'call' ) );
-				// do_action( 'admin_footer-{$hookname}' )
-				$this->wph->add_action(
-					'admin_footer-' . $hookname,
-					array( $this, 'add_postbox_script_in_footer' )
-				);
-			}
-
-			return $hooknames;
-		}
-
 		function get_wp_helper() {
 			return $this->wph;
 		}
 
 		/**
-		 * @SuppressWarnings(PHPMD.UnusedLocalVariable) The controller is intentionally made
-		 * available to the view as $tc_controller.
+		 * @SuppressWarnings(PHPMD.UnusedLocalVariable)
 		 */
-		function render( TcController $controller, $view, $capability = null, $objid = null ) {
+		function render( TcView $view, $path, $capability = null, $objid = null ) {
 			$render = ( null !== $capability ? $this->wph->current_user_can( $capability, $objid ) : true );
 			if ( $render ) {
-				$tc_controller = $controller;
+				$tc_view = $view;
+				$plugin_helper = $this;
 				$wph = $this->wph;
-				include( BC_PLUGIN_DIR . $view . '.php' );
+				include( BC_PLUGIN_DIR . $path . '.php' );
 			}
+		}
+
+		function param( $name, $type = 'text' ) {
+			$val = null;
+			if ( isset( $_POST[ $name ] ) ) {
+				$val = $_POST[ $name ];
+			} elseif ( isset( $_GET[ $name ] ) ) {
+				$val = $_GET[ $name ];
+			}
+
+			if ( null !== $val ) {
+				return call_user_func(
+					$this->sanitizers[ $type ],
+					$val
+				);
+			}
+
+			return $val;
+		}
+
+		function string( $code, $args = array() ) {
+			return $this->strings->get_string( $code, $args );
 		}
 	}
 }

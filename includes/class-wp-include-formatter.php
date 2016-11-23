@@ -5,7 +5,7 @@ namespace Terescode\BlastCaster;
 require_once BC_PLUGIN_DIR . 'includes/class-blast.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-blast-formatter.php';
 
-if ( ! class_exists( '\Terescode\BlastCaster\BcWpIncludeFormatter' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\BcWpIncludeFormatter' ) ) {
 
 	class BcWpIncludeFormatter implements BcBlastFormatter {
 		private $template_path;

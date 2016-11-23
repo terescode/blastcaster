@@ -6,6 +6,8 @@ require_once 'includes/constants.php';
 require_once 'includes/class-plugin-helper.php';
 require_once 'includes/class-generic-plugin.php';
 
+use Terescode\WordPress\TcGenericPlugin;
+
 /**
  * Class WpAdminPluginTest
  *
@@ -34,12 +36,9 @@ class BlastCasterTest extends \BcPhpUnitTestCase {
 	public function test_include_plugin_file_should_succeed_given_WPINC_is_set() {
 		define( 'WPINC', 1 );
 
-		global $helper;
-		$helper = $this->mock( 'TcPluginHelper' );
-
 		function create_plugin() {
 			$mock_gen = new \PHPUnit_Framework_MockObject_Generator();
-			$mock = $mock_gen->getMock( 'TcPluginHelper', array(), array(), '', false );
+			$mock = $mock_gen->getMock( 'Terescode\WordPress\TcPluginHelper', array(), array(), '', false );
 			return new TcGenericPlugin( BC_PLUGIN_ID, $mock );
 		}
 

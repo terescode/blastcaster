@@ -18,9 +18,9 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 
 	function test_create_post_should_return_false_given_formatter_fails() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
-		$m_formatter = $this->mock( '\Terescode\BlastCaster\BcBlastFormatter' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_formatter = $this->mock( 'Terescode\BlastCaster\BcBlastFormatter' );
 		$blast = new BcBlast( 'TDD is fun', 'TDD is test driven development!' );
 		$dao = new BcBlastDao( $m_helper, $m_formatter );
 
@@ -40,8 +40,8 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 		// @setup
 		wp_include_once( 'class-wp-error.php' );
 		$m_error = $this->mock( 'WP_Error' );
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
 		$blast = new BcBlast( 'TDD is fun', 'TDD is test driven development!' );
 
@@ -60,8 +60,8 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 
 	function test_create_post_should_return_post_id_if_wp_insert_post_does() {
 		// @setup
-		$m_wph = $this->mock( 'TcWpHelper' );
-		$m_helper = $this->mock( 'TcPluginHelper' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
 		$blast = new BcBlast( 'TDD is fun', 'TDD is test driven development!' );
 

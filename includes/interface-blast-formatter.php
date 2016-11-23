@@ -4,7 +4,7 @@ namespace Terescode\BlastCaster;
 
 require_once BC_PLUGIN_DIR . 'includes/class-blast.php';
 
-if ( ! interface_exists( 'BcBlastFormatter' ) ) {
+if ( ! interface_exists( __NAMESPACE__ . '\BcBlastFormatter' ) ) {
 	interface BcBlastFormatter {
 		/**
 		 * Formats the given blast for posting to a content marketing stream.

@@ -1,5 +1,7 @@
 <?php
 
+namespace Terescode\WordPress;
+
 // @SUT
 require_once 'includes/class-callback-wrapper.php';
 
@@ -9,7 +11,7 @@ require_once 'includes/class-callback-wrapper.php';
  * @package Blastcaster
  */
 
-class TcCallbackWrapperTest extends BcPhpUnitTestCase {
+class TcCallbackWrapperTest extends \BcPhpUnitTestCase {
 
 	function user_func_1() {
 		$this->assertEquals( 0, func_num_args() );
@@ -27,7 +29,7 @@ class TcCallbackWrapperTest extends BcPhpUnitTestCase {
 	}
 
 	function user_func_exc() {
-		throw new Exception( 'mangatsika' );
+		throw new \Exception( 'mangatsika' );
 	}
 
 	/**
@@ -68,7 +70,7 @@ class TcCallbackWrapperTest extends BcPhpUnitTestCase {
 				$args[] = $index;
 			}
 			// @exercise
-			$reflect  = new ReflectionClass( 'TcCallbackWrapper' );
+			$reflect  = new \ReflectionClass( __NAMESPACE__ . '\TcCallbackWrapper' );
 			$wrapper = $reflect->newInstanceArgs( $args );
 			$wrapper->call();
 		});
@@ -95,7 +97,7 @@ class TcCallbackWrapperTest extends BcPhpUnitTestCase {
 		try {
 			$return = $wrapper->call();
 			$this->assertTrue( false );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			$this->assertNotNull( $e );
 			$this->assertEquals( 'mangatsika', $e->getMessage() );
 		}

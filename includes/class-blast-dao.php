@@ -5,17 +5,9 @@ namespace Terescode\BlastCaster;
 require_once BC_PLUGIN_DIR . 'includes/class-plugin-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-blast-formatter.php';
 
-if ( ! class_exists( 'BcBlastDao' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\BcBlastDao' ) ) {
 
 	class BcBlastDao {
-
-		/**
-		 * The plugin helper to use.
-		 *
-		 * @var object
-		 * @access protected
-		 */
-		private $plugin_helper;
 
 		/**
 		 * The wp helper to use.
@@ -24,6 +16,14 @@ if ( ! class_exists( 'BcBlastDao' ) ) {
 		 * @access private
 		 */
 		private $wph;
+
+		/**
+		 * The plugin helper to use.
+		 *
+		 * @var object
+		 * @access protected
+		 */
+		private $plugin_helper;
 
 		/**
 		 * The formatter to use.

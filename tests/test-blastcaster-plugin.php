@@ -4,6 +4,7 @@ namespace Terescode\BlastCaster;
 
 require_once 'includes/constants.php';
 require_once 'includes/blastcaster-plugin.php';
+require_once 'tests/stub-translate.php';
 
 /**
  * Class BlastCasterPluginTest
@@ -23,6 +24,6 @@ class BlastCasterPluginTest extends \BcPhpUnitTestCase {
 		// @verify
 		$this->assertNotNull( $plugin );
 		$this->assertEquals( BC_PLUGIN_ID, $plugin->get_plugin_id() );
-		$this->assertInstanceOf( '\Terescode\BlastCaster\TcGenericPlugin', $plugin );
+		$this->assertInstanceOf( 'Terescode\WordPress\TcGenericPlugin', $plugin );
 	}
 }

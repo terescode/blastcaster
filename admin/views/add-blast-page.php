@@ -2,14 +2,14 @@
 
 namespace Terescode\BlastCaster;
 
-require_once BC_PLUGIN_DIR . 'admin/controllers/class-add-blast-controller.php'
+require_once BC_PLUGIN_DIR . 'admin/class-add-blast-page.php'
 
 ?>
 <div class="wrap">
-	<h2><?php $wph->esc_html( __( 'Add a blast', 'blastcaster' ) ); ?></h2>
+	<h2><?php $wph->esc_html( $plugin_helper->string( BcStrings::ABF_BLAST_MENU_TITLE ) ); ?></h2>
 
-	<form name="blastcaster-form" id="blastcaster-form" method="post" action="<?php echo $wph->admin_url( 'admin-post.php' ); ?>">
-		<input type="hidden" name="action" value="<?php echo BcAddBlastController::BC_ADD_BLAST_POST_ACTION; ?>">
+	<form name="blastcaster-form" id="blastcaster-form" method="post" action="<?php echo $wph->esc_url( $wph->admin_url( 'admin-post.php' ) ); ?>">
+		<input type="hidden" name="action" value="<?php echo BcAddBlastPage::BC_ADD_BLAST_POST_ACTION; ?>">
 		<?php
 			$wph->wp_nonce_field( 'add_blast', 'add_blast_nonce', false );
 			$wph->wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
@@ -27,7 +27,7 @@ require_once BC_PLUGIN_DIR . 'admin/controllers/class-add-blast-controller.php'
 						$wph->do_meta_boxes( '', 'normal', null );
 						$wph->do_meta_boxes( '', 'advanced', null );
 						$wph->submit_button(
-							__( 'Add blast', 'blastcaster' ),
+							$plugin_helper->string( BcStrings::ABF_BLAST_BUTTON_LABEL ),
 							'primary',
 							'add-blast'
 						);

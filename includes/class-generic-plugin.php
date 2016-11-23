@@ -1,14 +1,14 @@
 <?php
 
-namespace Terescode\BlastCaster;
+namespace Terescode\WordPress;
 
 require_once BC_PLUGIN_DIR . 'includes/class-wp-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/class-plugin-helper.php';
 require_once BC_PLUGIN_DIR . 'includes/interface-admin-plugin.php';
 
-if ( ! class_exists( 'TcGenericPlugin' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\TcGenericPlugin' ) ) {
 
-	class TcGenericPlugin implements \TcAdminPlugin {
+	class TcGenericPlugin implements TcAdminPlugin {
 
 		/**
 		 * The plugin id.
@@ -51,7 +51,6 @@ if ( ! class_exists( 'TcGenericPlugin' ) ) {
 
 		public function init() {
 			$this->plugin_helper->init_admin_plugin( $this );
-
 		}
 
 		public function load() {
@@ -88,7 +87,31 @@ if ( ! class_exists( 'TcGenericPlugin' ) ) {
 		}
 
 		public function install_admin_menus() {
-			$this->plugin_helper->install_admin_menus( $this->menu_controllers );
+			$hooknames = array();
+
+			foreach ( $this->menu_controllers as $controller ) {
+				$hook_suffix = $controller->register_menu();
+				if ( $hook_suffix ) {
+					// do_action( 'load-{$pagenow}' )
+					$this->wph->add_action(
+						'load-' . $hook_suffix,
+						array( $controller, 'load_pagenow' )
+					);
+					// do_action( 'admin_head-{$pagenow}' )
+					$this->wph->add_action(
+						'admin_head-' . $hook_suffix,
+						array( $controller, 'admin_head' )
+					);
+					// do_action( 'admin_footer-{$hookname}' )
+					$this->wph->add_action(
+						'admin_footer-' . $hook_suffix,
+						array( $controller, 'admin_footer' )
+					);
+					$hooknames[] = $hook_suffix;
+				}
+			}
+
+			return $hooknames;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <?php
 
 function __( $foo, $bar ) {
-	return 'translated string';
+	return $foo;
 }

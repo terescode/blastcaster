@@ -2,7 +2,7 @@
 
 namespace Terescode\BlastCaster;
 
-if ( ! class_exists( 'BcBlast' ) ) {
+if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 	class BcBlast {
 		private $title;
 		private $description;
