@@ -41,13 +41,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 		}
 
 		function handle_error( $err ) {
-			$this->wph->wp_safe_redirect(
-				$this->wph->admin_url(
-					'edit.php?page='
-					. BcAddBlastPage::BC_ADD_BLAST_SCREEN_ID
-					. '&code='
-					. $err
-				)
+			$this->plugin_helper->add_admin_notice(
+				$this->plugin_helper->string( $err )
 			);
 		}
 

@@ -57,6 +57,7 @@ if ( ! class_exists( __NAMESPACE__ . '\TcGenericAction' ) ) {
 				$err = $validator->validate( $data );
 				if ( $err ) {
 					$this->action_handler->handle_error( $err );
+					return;
 				}
 			}
 

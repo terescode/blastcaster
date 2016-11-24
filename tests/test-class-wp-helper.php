@@ -814,4 +814,44 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$wph = new TcWpHelper();
 		$wph->wp_safe_redirect( 'http://local.wordpress.dev/edit.php?page=page', 301 );
 	}
+
+		/**
+	 * Test status_header
+	 */
+	function test_wp_verify_nonce_should_call_wp_verify_nonce_and_return_value_with_required_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_verify_nonce', array(
+			'times' => 1,
+			'args' => array(
+				'123456',
+				-1,
+			),
+			'return' => false,
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_verify_nonce( '123456' );
+		$this->assertFalse( $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_verify_nonce_should_call_wp_verify_nonce_and_return_with_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_verify_nonce', array(
+			'times' => 1,
+			'args' => array(
+				'123456',
+				'action',
+			),
+			'return' => 2
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_verify_nonce( '123456', 'action' );
+		$this->assertEquals( 2, $ret );
+	}
 }

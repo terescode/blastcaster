@@ -19,7 +19,7 @@ class TcGenericControllerTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test register_handlers
 	 */
-	function test_register_handlers_should_call_1_add_action_given_1_action() {
+	function test_process_actions_should_not_call_action_given_no_action_param() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -29,54 +29,75 @@ class TcGenericControllerTest extends \BcPhpUnitTestCase {
 			->willReturn( $m_wph );
 		$m_action->method( 'get_name' )
 			->willReturn( 'my_action' );
-		$m_wph->expects( $this->once() )
-			->method( 'add_action' )
-			->with(
-				'admin_post_my_action',
-				array( $m_action, 'do_action' )
-			);
+		$m_helper->expects( $this->once() )
+			->method( 'param' )
+			->willReturn( null );
+		$m_wph->expects( $this->never() )
+			->method( 'wp_verify_nonce' );
+		$m_action->expects( $this->never() )
+			->method( 'do_action' );
 
 		// @exercise
 		$controller = new TcGenericController( $m_helper, null, array( $m_action ) );
-		$controller->register_handlers();
+		$controller->process_actions();
 	}
 
 	/**
 	 * Test register_handlers
 	 */
-	function test_register_handlers_should_call_N_add_action_given_N_action() {
-		$this->invoke_with_random_count( 5, 5, function ( $count ) {
-			// @setup
-			$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-			$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-			$m_actions = array();
-			for ( $i = 0; $i < $count; $i += 1 ) {
-				$m_action = $this->mock( 'Terescode\WordPress\TcAction' );
-				$m_action->method( 'get_name' )
-					->willReturn( 'my_action_' . $i );
-				$m_actions[] = $m_action;
-			}
+	function test_process_actions_should_not_call_action_given_wp_verify_nonce_fails() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_action = $this->mock( 'Terescode\WordPress\TcAction' );
 
-			$m_helper->method( 'get_wp_helper' )
-				->willReturn( $m_wph );
-			$m_args = array();
-			for ( $i = 0; $i < $count; $i += 1 ) {
-				$m_args[] = array(
-					'admin_post_my_action_' . $i,
-					array( $m_actions[ $i ], 'do_action' ),
-				);
-			}
-			$chain = $m_wph->expects( $this->exactly( $count ) )
-				->method( 'add_action' );
-			call_user_func_array(
-				array( $chain, 'withConsecutive' ),
-				$m_args
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_action->method( 'get_name' )
+			->willReturn( 'my_action' );
+		$m_helper->expects( $this->exactly( 2 ) )
+			->method( 'param' )
+			->will(
+				$this->onConsecutiveCalls( 'my_action', '123456' )
 			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_verify_nonce' )
+			->willReturn( false );
+		$m_action->expects( $this->never() )
+			->method( 'do_action' );
 
-			// @exercise
-			$controller = new TcGenericController( $m_helper, null, $m_actions );
-			$controller->register_handlers();
-		});
+		// @exercise
+		$controller = new TcGenericController( $m_helper, null, array( $m_action ) );
+		$controller->process_actions();
+	}
+
+		/**
+	 * Test register_handlers
+	 */
+	function test_process_actions_should_call_action_given_wp_verify_nonce_succeeds() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_action = $this->mock( 'Terescode\WordPress\TcAction' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_action->method( 'get_name' )
+			->willReturn( 'my_action' );
+		$m_helper->expects( $this->exactly( 2 ) )
+			->method( 'param' )
+			->will(
+				$this->onConsecutiveCalls( 'my_action', '123456' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_verify_nonce' )
+			->willReturn( 2 );
+		$m_action->expects( $this->once() )
+			->method( 'do_action' );
+
+		// @exercise
+		$controller = new TcGenericController( $m_helper, null, array( $m_action ) );
+		$controller->process_actions();
 	}
 
 	/**

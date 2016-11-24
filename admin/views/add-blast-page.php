@@ -6,9 +6,9 @@ require_once BC_PLUGIN_DIR . 'admin/class-add-blast-page.php'
 
 ?>
 <div class="wrap">
-	<h2><?php $wph->esc_html( $plugin_helper->string( BcStrings::ABF_BLAST_MENU_TITLE ) ); ?></h2>
+	<h1><?php echo $wph->esc_html( $plugin_helper->string( BcStrings::ABF_BLAST_MENU_TITLE ) ); ?></h1>
 
-	<form name="blastcaster-form" id="blastcaster-form" method="post" action="<?php echo $wph->esc_url( $wph->admin_url( 'admin-post.php' ) ); ?>">
+	<form name="blastcaster-form" id="blastcaster-form" method="post">
 		<input type="hidden" name="action" value="<?php echo BcAddBlastPage::BC_ADD_BLAST_POST_ACTION; ?>">
 		<?php
 			$wph->wp_nonce_field( 'add_blast', 'add_blast_nonce', false );

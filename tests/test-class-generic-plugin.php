@@ -60,7 +60,7 @@ class TcGenericPluginTest extends \BcPhpUnitTestCase {
 			->method( 'load_textdomain' )
 			->with( $this->equalTo( $plugin ) );
 		$m_controller->expects( $this->once() )
-			->method( 'register_handlers' );
+			->method( 'process_actions' );
 
 		// @exercise
 		$plugin->load();
@@ -85,7 +85,7 @@ class TcGenericPluginTest extends \BcPhpUnitTestCase {
 				->with( $this->equalTo( $plugin ) );
 			foreach ( $m_controllers as $controller ) {
 				$controller->expects( $this->once() )
-					->method( 'register_handlers' );
+					->method( 'process_actions' );
 			}
 
 			// @exercise

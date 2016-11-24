@@ -6,7 +6,25 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPageHelper' ) ) {
 
 	class BcAddBlastPageHelper {
 
-		function __construct() {
+		/**
+		 * The wp helper to use.
+		 *
+		 * @var object
+		 * @access protected
+		 */
+		private $wph;
+
+		/**
+		 * The plugin helper to use.
+		 *
+		 * @var object
+		 * @access protected
+		 */
+		private $plugin_helper;
+
+		function __construct( $plugin_helper ) {
+			$this->wph = $plugin_helper->get_wp_helper();
+			$this->plugin_helper = $plugin_helper;
 		}
 
 		/**
@@ -14,8 +32,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPageHelper' ) ) {
 		 */
 		function render_add_title_meta_box( $post, $metabox ) {
 			$page_data = $metabox['args'][0]->get_page_data();
-			$primary_title = '';
-			if ( null !== $page_data && isset( $page_data->titles ) ) {
+			$primary_title = $this->plugin_helper->param( 'bc-add-title-input' );
+			if ( empty( $primary_title ) && null !== $page_data && isset( $page_data->titles ) ) {
 				if ( 0 < count( $page_data->titles ) ) {
 					$primary_title = $page_data->titles[0];
 				}
@@ -56,7 +74,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPageHelper' ) ) {
 		 */
 		function render_add_description_meta_box( $post, $metabox ) {
 			$page_data = $metabox['args'][0]->get_page_data();
-			$primary_desc = '';
+			$primary_desc = $this->plugin_helper->param( 'bc-add-desc-input' );
 			if ( null !== $page_data && isset( $page_data->descriptions ) ) {
 				if ( 0 < count( $page_data->descriptions ) ) {
 					$primary_desc = $page_data->descriptions[0];

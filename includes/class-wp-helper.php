@@ -120,14 +120,8 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 			wp_safe_redirect( $location, $status );
 		}
 
-		/**
-		 * Some WP functions require us to "die" but this makes things hard to test.  This function
-		 * allows us to mock the die call so our tests don't die. Since we can't actually cover this
-		 * code we have to ignore it.
-		 * @codeCoverageIgnore
-		 */
-		/*function die_hard() {
-			die;
-		}*/
+		function wp_verify_nonce( $nonce, $action = -1 ) {
+			return wp_verify_nonce( $nonce, $action );
+		}
 	}
 }

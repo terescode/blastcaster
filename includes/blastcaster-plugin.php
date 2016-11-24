@@ -43,7 +43,7 @@ if ( ! function_exists( __NAMESPACE__ . '\create_plugin' ) ) {
 					$plugin_helper,
 					new BcAddBlastPage(
 						$plugin_helper,
-						new BcAddBlastPageHelper()
+						new BcAddBlastPageHelper( $plugin_helper )
 					),
 					[
 						new TcGenericAction(

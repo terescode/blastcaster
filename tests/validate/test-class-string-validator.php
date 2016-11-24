@@ -24,6 +24,17 @@ class TcStringValidatorTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( -1, $ret );
 	}
 
+	function test_validate_should_return_null_given_null_code_and_param_returns_empty() {
+		// @setup
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$data_map = [];
+
+		// @exercise
+		$validator = new TcStringValidator( $m_helper, 'foo' );
+		$ret = $validator->validate( $data_map );
+		$this->assertNull( $ret );
+	}
+
 	function test_validate_should_set_value_and_return_null_given_param_returns_value() {
 		// @setup
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );

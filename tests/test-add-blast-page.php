@@ -10,7 +10,7 @@ require_once 'includes/class-wp-helper.php';
  * @package Blastcaster
  */
 
-class AddBlastFormTest extends BcPhpUnitTestCase {
+class AddBlastPageTest extends BcPhpUnitTestCase {
 
 	/**
 	 * Test render
@@ -21,12 +21,7 @@ class AddBlastFormTest extends BcPhpUnitTestCase {
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 
 		$m_wph->expects( $this->once() )
-			->method( 'admin_url' )
-			->with( 'admin-post.php' );
-		$m_wph->expects( $this->once() )
 			->method( 'esc_html' );
-		$m_wph->expects( $this->once() )
-			->method( 'esc_url' );
 		$m_wph->expects( $this->exactly( 3 ) )
 			->method( 'wp_nonce_field' );
 		$m_wph->expects( $this->exactly( 2 ) )

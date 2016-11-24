@@ -87,6 +87,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			if ( ! empty( $code ) ) {
 			}
 			*/
+			$this->wph->wp_enqueue_script( 'jquery-ui-tabs' );
 		}
 
 		private function decode_page_data( $post_data ) {

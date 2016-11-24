@@ -19,7 +19,7 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test handle_error
 	 */
-	function test_handle_error_should_redirect_with_error_given_err_is_not_null() {
+	function test_handle_error_should_add_admin_notice_with_error_given_err_is_not_null() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -27,17 +27,12 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_wph->expects( $this->once() )
-			->method( 'admin_url' )
-			->with( $this->isType( 'string' ) )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastPage::BC_ADD_BLAST_SCREEN_ID
-				. '&code=a.error.code'
-			) );
+		$m_helper->method( 'string' )
+			->with( 'a.error.code' )
+			->willReturn( 'a string' );
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with( 'a string' );
 
 		// @exercise
 		$controller = new BcAddBlastHandler( $m_helper, $m_dao );

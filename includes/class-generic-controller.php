@@ -49,15 +49,19 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastController' ) ) {
 			$this->wph = $plugin_helper->get_wp_helper();
 			$this->plugin_helper = $plugin_helper;
 			$this->view = $view;
-			$this->actions = $actions;
+			$this->actions = [];
+			foreach ( $actions as $action ) {
+				$this->actions[ $action->get_name() ] = $action;
+			}
 		}
 
-		function register_handlers() {
-			foreach ( $this->actions as $action ) {
-				$this->wph->add_action(
-					'admin_post_' . $action->get_name(),
-					array( $action, 'do_action' )
-				);
+		function process_actions() {
+			$action = $this->plugin_helper->param( 'action' );
+			if ( ! empty( $action ) ) {
+				$action_nonce = $this->plugin_helper->param( $action . '_nonce' );
+				if ( $this->wph->wp_verify_nonce( $action_nonce, $action ) ) {
+					$this->actions[ $action ]->do_action();
+				}
 			}
 		}
 

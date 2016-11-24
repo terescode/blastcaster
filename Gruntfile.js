@@ -357,7 +357,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['init', 'phpcs', 'phpmd', 'phpunit']);
 
   // Build task aliases
-  grunt.registerTask('build', ['test', 'check', 'compress']);
+  grunt.registerTask('build', ['test', 'check', 'makepot', 'po2mo', 'compress']);
 
   // Alias the default task to build
   grunt.registerTask('default', ['build']);
