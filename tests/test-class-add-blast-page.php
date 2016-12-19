@@ -2,13 +2,14 @@
 
 namespace Terescode\BlastCaster;
 
-require_once 'tests/stub-translate.php';
 require_once 'includes/constants.php';
 require_once 'includes/class-wp-helper.php';
 require_once 'includes/class-plugin-helper.php';
 require_once 'includes/class-blast-dao.php';
 require_once 'admin/class-add-blast-page-helper.php';
 require_once 'admin/class-add-blast-page.php';
+
+use Terescode\WordPress\TcPluginHelper;
 
 /**
  * Class WpAdminPluginTest
@@ -63,6 +64,57 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 	}
 
 	/**
+	 * Test print_scripts
+	 */
+	function test_print_scripts_should_add_admin_notice_given_build_action_data_returns_false() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_page_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastPageHelper' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				BcStrings::ABF_BUILD_ACTION_DATA_FAILED,
+				TcPluginHelper::NOTICE_TYPE_ERROR,
+				true
+			);
+		$m_page_helper->method( 'build_action_data' )
+			->willReturn( false );
+
+		// @exercise
+		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
+		$view->print_scripts();
+	}
+
+	/**
+	 * Test print_scripts
+	 */
+	function test_print_scripts_should_output_bc_data_given_build_action_data_returns_data() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_page_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastPageHelper' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_helper->expects( $this->never() )
+			->method( 'add_admin_notice' );
+		$m_page_helper->method( 'build_action_data' )
+			->willReturn( '{"action":"awesome_action","foo":"bar"}' );
+		$this->expectOutputString(
+			'<script type="text/javascript">var terescode={"bc_data":'
+			. '{"action":"awesome_action","foo":"bar"}};</script>'
+		);
+
+		// @exercise
+		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
+		$view->print_scripts();
+	}
+
+	/**
 	 * Test render_add_blast
 	 */
 	function test_load_pagenow_should_not_set_page_data_given_no_post_data() {
@@ -73,6 +125,33 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_style' )
+			->with(
+				$this->equalTo( 'bc-styles' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( [] ),
+				$this->equalTo( false ),
+				$this->equalTo( 'all' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_script' )
+			->with(
+				$this->equalTo( 'bc-scripts' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/js/bundle.js' ),
+				$this->equalTo( [ 'jquery' ] ),
+				$this->equalTo( false ),
+				$this->equalTo( true )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->stringContains( 'admin_print_scripts-' ),
+				$this->callback( function( $subject ) {
+				  	return is_array( $subject ) && 2 === count( $subject ) &&
+					$subject[0] instanceof BcAddBlastPage && 'print_scripts' === $subject[1];
+				})
+			);
 
 		// @exercise
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
@@ -94,6 +173,33 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 		$_POST['pageData'] = '';
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_style' )
+			->with(
+				$this->equalTo( 'bc-styles' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( [] ),
+				$this->equalTo( false ),
+				$this->equalTo( 'all' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_script' )
+			->with(
+				$this->equalTo( 'bc-scripts' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/js/bundle.js' ),
+				$this->equalTo( [ 'jquery' ] ),
+				$this->equalTo( false ),
+				$this->equalTo( true )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->stringContains( 'admin_print_scripts-' ),
+				$this->callback( function( $subject ) {
+				  	return is_array( $subject ) && 2 === count( $subject ) &&
+					$subject[0] instanceof BcAddBlastPage && 'print_scripts' === $subject[1];
+				})
+			);
 
 		// @exercise
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
@@ -115,6 +221,33 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 		$_POST['pageData'] = "\t\t\t\r\n\n\t     \t\t\r\n";
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_style' )
+			->with(
+				$this->equalTo( 'bc-styles' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( [] ),
+				$this->equalTo( false ),
+				$this->equalTo( 'all' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_script' )
+			->with(
+				$this->equalTo( 'bc-scripts' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/js/bundle.js' ),
+				$this->equalTo( [ 'jquery' ] ),
+				$this->equalTo( false ),
+				$this->equalTo( true )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->stringContains( 'admin_print_scripts-' ),
+				$this->callback( function( $subject ) {
+				  	return is_array( $subject ) && 2 === count( $subject ) &&
+					$subject[0] instanceof BcAddBlastPage && 'print_scripts' === $subject[1];
+				})
+			);
 
 		// @exercise
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
@@ -137,6 +270,33 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 		$_POST['pageData'] = $json_file;
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_style' )
+			->with(
+				$this->equalTo( 'bc-styles' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( [] ),
+				$this->equalTo( false ),
+				$this->equalTo( 'all' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_script' )
+			->with(
+				$this->equalTo( 'bc-scripts' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/js/bundle.js' ),
+				$this->equalTo( [ 'jquery' ] ),
+				$this->equalTo( false ),
+				$this->equalTo( true )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->stringContains( 'admin_print_scripts-' ),
+				$this->callback( function( $subject ) {
+				  	return is_array( $subject ) && 2 === count( $subject ) &&
+					$subject[0] instanceof BcAddBlastPage && 'print_scripts' === $subject[1];
+				})
+			);
 
 		// @test
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
@@ -168,6 +328,33 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_style' )
+			->with(
+				$this->equalTo( 'bc-styles' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( [] ),
+				$this->equalTo( false ),
+				$this->equalTo( 'all' )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'wp_enqueue_script' )
+			->with(
+				$this->equalTo( 'bc-scripts' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/js/bundle.js' ),
+				$this->equalTo( [ 'jquery' ] ),
+				$this->equalTo( false ),
+				$this->equalTo( true )
+			);
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->stringContains( 'admin_print_scripts-' ),
+				$this->callback( function( $subject ) {
+				  	return is_array( $subject ) && 2 === count( $subject ) &&
+					$subject[0] instanceof BcAddBlastPage && 'print_scripts' === $subject[1];
+				})
+			);
 		$m_helper->expects( $this->once() )
 			->method( 'add_admin_notice' )
 			->with(
@@ -212,7 +399,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test is_metabox_page
 	 */
-	function test_is_metabox_page_should_return_true() {
+	function test_is_metabox_page_should_return_false() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -223,274 +410,23 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 
 		// @exercise
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
-		$this->assertTrue( $view->is_metabox_page() );
+		$this->assertFalse( $view->is_metabox_page() );
 	}
 
 	/**
 	 * Test add blast boxes
 	 */
-	function test_add_meta_boxes_should_call_add_meta_box() {
+	function test_add_meta_boxes_should_do_nothing() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$m_page_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastPageHelper' );
-		// @sut
-		$view = null;
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_helper->method( 'string' )
-			->willReturn( 'translated string' );
-		$m_wph->expects( $this->exactly( 5 ) )
-			->method( 'add_meta_box' )
-			->withConsecutive(
-				[ $this->equalTo( 'bc-add-title-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_page_helper, 'render_add_title_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$view ) ) ],
-				[ $this->equalTo( 'bc-add-category-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_page_helper, 'render_add_category_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$view ) ) ],
-				[ $this->equalTo( 'bc-add-image-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_page_helper, 'render_add_image_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$view ) ) ],
-				[ $this->equalTo( 'bc-add-description-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_page_helper, 'render_add_description_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$view ) ) ],
-				[ $this->equalTo( 'bc-add-tag-meta-box' ), $this->isType( 'string' ), $this->equalTo( array( $m_page_helper, 'render_add_tag_meta_box' ) ), $this->equalTo( null ), $this->equalTo( 'normal' ), $this->equalTo( 'default' ), $this->equalTo( array( &$view ) ) ]
-			);
 
 		// @exercise
 		$view = new BcAddBlastPage( $m_helper, $m_page_helper );
 		$view->add_meta_boxes();
 	}
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_no_access() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->expects( $this->once() )
-			->method( 'current_user_can' )
-			->with( $this->equalTo( 'edit_posts' ) )
-			->willReturn( false );
-		$m_wph->expects( $this->once() )
-			->method( 'admin_url' )
-			->with( $this->isType( 'string' ) )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastPage::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_NO_ACCESS
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_missing_title() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_MISSING_BLAST_TITLE
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_missing_description() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_helper->method( 'param' )
-			->will( $this->onConsecutiveCalls(
-				'a title',
-				null
-			));
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_MISSING_BLAST_DESCRIPTION
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_missing_image_type() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_helper->method( 'param' )
-			->will( $this->onConsecutiveCalls(
-				'a title',
-				'a description',
-				null
-			));
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_INVALID_BLAST_IMAGE_TYPE
-			));
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_invalid_image_type() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_helper->method( 'param' )
-			->will( $this->onConsecutiveCalls(
-				'a title',
-				'a description',
-				'not_a_type'
-			));
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_INVALID_BLAST_IMAGE_TYPE
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_missing_image_url() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_helper->method( 'param' )
-			->will( $this->onConsecutiveCalls(
-				'a title',
-				'a description',
-				'url',
-				null
-			));
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_MISSING_BLAST_IMAGE_URL
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
-
-	/**
-	 * Test do_add_blast
-	 */
-	/*function test_do_add_blast_should_redirect_with_error_given_missing_image_upload() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_form_helper = $this->mock( 'Terescode\BlastCaster\BcAddBlastFormHelper' );
-		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_wph->method( 'current_user_can' )
-			->willReturn( true );
-		$m_helper->method( 'param' )
-			->will( $this->onConsecutiveCalls(
-				'a title',
-				'a description',
-				'file',
-				null
-			));
-		$m_wph->method( 'admin_url' )
-			->will( $this->returnArgument( 0 ) );
-		$m_wph->expects( $this->once() )
-			->method( 'wp_safe_redirect' )
-			->with( $this->equalTo(
-				'edit.php?page='
-				. BcAddBlastController::BC_ADD_BLAST_SCREEN_ID
-				. '&code=' . BcStrings::ABF_MISSING_BLAST_IMAGE_FILE
-			) );
-
-		// @exercise
-		$controller = new BcAddBlastController( $m_helper, $m_form_helper, $m_dao );
-		$controller->do_add_blast();
-	}*/
 }

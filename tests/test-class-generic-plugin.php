@@ -49,7 +49,7 @@ class TcGenericPluginTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test load
 	 */
-	function test_load_should_call_load_textdomain_with_self_and_register_handlers_given_1_handler() {
+	function test_load_should_call_load_textdomain_with_self() {
 		// @setup
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$m_controller = $this->mock( 'Terescode\WordPress\TcController' );
@@ -59,39 +59,11 @@ class TcGenericPluginTest extends \BcPhpUnitTestCase {
 		$m_helper->expects( $this->once() )
 			->method( 'load_textdomain' )
 			->with( $this->equalTo( $plugin ) );
-		$m_controller->expects( $this->once() )
-			->method( 'process_actions' );
 
 		// @exercise
 		$plugin->load();
 	}
 
-	/**
-	 * Test load
-	 */
-	function test_load_should_call_load_textdomain_with_self_and_register_handlers_given_N_handlers() {
-		$this->invoke_with_random_count( 5, 5, function ( $count ) {
-			// @setup
-			$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-			$m_controllers = array();
-			for ( $i = 0; $i < $count; $i += 1 ) {
-				$m_controllers[] = $this->mock( 'Terescode\WordPress\TcController' );
-			}
-			// @sut
-			$plugin = new TcGenericPlugin( 'generic-plugin-id', $m_helper, $m_controllers );
-
-			$m_helper->expects( $this->once() )
-				->method( 'load_textdomain' )
-				->with( $this->equalTo( $plugin ) );
-			foreach ( $m_controllers as $controller ) {
-				$controller->expects( $this->once() )
-					->method( 'process_actions' );
-			}
-
-			// @exercise
-			$plugin->load();
-		});
-	}
 	/**
 	 * Test install_admin_menus
 	 */

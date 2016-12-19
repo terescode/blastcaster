@@ -20,7 +20,7 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		// @verify
 		$this->assertEquals( 'TDD is fun', $blast->get_title() );
 		$this->assertEquals( 'Article excerpt about TDD', $blast->get_description() );
-		$this->assertNull( $blast->get_image() );
+		$this->assertNull( $blast->get_image_data() );
 		$this->assertCount( 0, $blast->get_categories() );
 		$this->assertCount( 0, $blast->get_tags() );
 	}
@@ -30,7 +30,11 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		$blast = new BcBlast(
 			'TDD is fun',
 			'Article excerpt about TDD',
-			'http://www.terescode.com/path/to/image.png',
+			[
+				'file' => 'image.png',
+				'url' => 'http://www.terescode.com/path/to/image.png',
+				'type' => 'image/png',
+			],
 			[ 'Software Development' ],
 			[ 'TDD', 'test', 'development', 'agile' ]
 		);
@@ -38,7 +42,12 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		// @verify
 		$this->assertEquals( 'TDD is fun', $blast->get_title() );
 		$this->assertEquals( 'Article excerpt about TDD', $blast->get_description() );
-		$this->assertEquals( 'http://www.terescode.com/path/to/image.png', $blast->get_image() );
+		$this->assertInternalType( 'array', $blast->get_image_data() );
+		$image_data = $blast->get_image_data();
+		$this->assertEquals( 3, count( $image_data ) );
+		$this->assertEquals( 'http://www.terescode.com/path/to/image.png', $image_data['url'] );
+		$this->assertEquals( 'image.png', $image_data['file'] );
+		$this->assertEquals( 'image/png', $image_data['type'] );
 		$categories = $blast->get_categories();
 		$this->assertCount( 1, $categories );
 		$this->assertEquals( [ 'Software Development' ], $categories );
@@ -74,10 +83,21 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		$blast = new BcBlast( 'TDD is fun', 'Article excerpt about TDD' );
 
 		// @exercise
-		$blast->set_image( 'http://www.terescode.com/path/to/image.png' );
+		$blast->set_image_data(
+			[
+				'file' => 'image.png',
+				'url' => 'http://www.terescode.com/path/to/image.png',
+				'type' => 'image/png',
+			]
+		);
 
 		// @verify
-		$this->assertEquals( 'http://www.terescode.com/path/to/image.png', $blast->get_image() );
+		$image_data = $blast->get_image_data();
+		$this->assertEquals( 3, count( $image_data ) );
+		$this->assertEquals( 'http://www.terescode.com/path/to/image.png', $image_data['url'] );
+		$this->assertEquals( 'image.png', $image_data['file'] );
+		$this->assertEquals( 'image/png', $image_data['type'] );
+
 	}
 
 	function test_set_categories_should_set_categories_given_argument() {

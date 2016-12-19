@@ -4,7 +4,6 @@ namespace Terescode\BlastCaster;
 
 require_once 'includes/constants.php';
 require_once 'includes/blastcaster-plugin.php';
-require_once 'tests/stub-translate.php';
 
 /**
  * Class BlastCasterPluginTest

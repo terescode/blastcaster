@@ -7,13 +7,22 @@
             "useTabChar": false,
             "spaceUnits": 2,
             "linting.enabled": true,
-            "linting.collapsed": true,
-            "fonts.fontSize": "13px"
+            "linting.collapsed": false,
+            "fonts.fontSize": "12px",
+            "mikaeljorhult.bracketsPHPLintTools.php-available": true,
+            "themes.theme": "dark-theme"
         },
         "**.json": {
             "useTabChar": false,
             "spaceUnits": 2,
-            "linting.enabled": true
+            "linting.enabled": true,
+            "fonts.fontSize": "12px"
         }
-    }
+    },
+    "dimitrk.exclude-indexing-filetree.excludeList": [
+        ".git(?!ignore)",
+        "build",
+        "vendor",
+        "node_modules"
+    ]
 }

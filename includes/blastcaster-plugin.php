@@ -13,6 +13,7 @@ require_once BC_PLUGIN_DIR . 'includes/validate/class-string-validator.php';
 require_once BC_PLUGIN_DIR . 'includes/validate/class-blast-image-validator.php';
 require_once BC_PLUGIN_DIR . 'includes/class-blast-dao.php';
 require_once BC_PLUGIN_DIR . 'includes/class-wp-include-formatter.php';
+require_once BC_PLUGIN_DIR . 'includes/class-media-loader.php';
 require_once BC_PLUGIN_DIR . 'admin/class-add-blast-page.php';
 require_once BC_PLUGIN_DIR . 'admin/class-add-blast-page-helper.php';
 require_once BC_PLUGIN_DIR . 'admin/class-add-blast-handler.php';
@@ -51,12 +52,13 @@ if ( ! function_exists( __NAMESPACE__ . '\create_plugin' ) ) {
 							BcAddBlastPage::BC_ADD_BLAST_POST_ACTION,
 							[
 								new TcCapabilityValidator( $plugin_helper, 'edit_posts', BcStrings::ABF_NO_ACCESS ),
-								new TcStringValidator( $plugin_helper, 'bc-add-title-input', BcStrings::ABF_MISSING_BLAST_TITLE ),
-								new TcStringValidator( $plugin_helper, 'bc-add-desc-input', BcStrings::ABF_MISSING_BLAST_DESCRIPTION ),
+								new TcStringValidator( $plugin_helper, 'bc-add-title', BcStrings::ABF_MISSING_BLAST_TITLE ),
+								new TcStringValidator( $plugin_helper, 'bc-add-desc', BcStrings::ABF_MISSING_BLAST_DESCRIPTION ),
 								new BcBlastImageValidator( $plugin_helper ),
 							],
 							new BcAddBlastHandler(
 								$plugin_helper,
+								new BcMediaLoader( $plugin_helper, BcAddBlastPage::BC_ADD_BLAST_POST_ACTION ),
 								new BcBlastDao(
 									$plugin_helper,
 									new BcWpIncludeFormatter( BC_PLUGIN_DIR . 'admin/templates/wp-post-tpl.php' )

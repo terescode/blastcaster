@@ -24,6 +24,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_INVALID_BLAST_IMAGE_TYPE = 'bc.abf.invalid-image-type';
 		const ABF_MISSING_BLAST_IMAGE_URL = 'bc.abf.missing-image-url';
 		const ABF_MISSING_BLAST_IMAGE_FILE = 'bc.abf.missing-image-file';
+		const ABF_BUILD_ACTION_DATA_FAILED = 'bc.abf.build-action-data-failed';
+		const ABF_LOAD_MEDIA_FAILED = 'bc.abf.load-media-failed';
 
 		private $bundle;
 
@@ -56,11 +58,15 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 				self::ABF_MISSING_BLAST_DESCRIPTION =>
 					__( 'Please provide a description for the blast.', 'blastcaster' ),
 				self::ABF_INVALID_BLAST_IMAGE_TYPE =>
-					__( 'Oops! The image type was missing. Try submitting your request again.', 'blastcaster' ),
+					__( 'Oops! The image type was missing. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
 				self::ABF_MISSING_BLAST_IMAGE_URL =>
 					__( 'Please select an image for the blast.', 'blastcaster' ),
 				self::ABF_MISSING_BLAST_IMAGE_FILE =>
 					__( 'Please choose an image for the blast.', 'blastcaster' ),
+				self::ABF_BUILD_ACTION_DATA_FAILED =>
+					__( 'Oops! The action data could not be generated. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
+				self::ABF_LOAD_MEDIA_FAILED =>
+					__( 'Oops! The image could not be loaded into the media gallery. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
 			);
 		}
 

@@ -36,9 +36,8 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 		$this->assertFalse( $ret );
 	}
 
-	function test_create_post_should_return_wp_error_if_wp_insert_post_does() {
+	function test_create_post_should_return_wp_error_given_wp_insert_post_does() {
 		// @setup
-		wp_include_once( 'class-wp-error.php' );
 		$m_error = $this->mock( 'WP_Error' );
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -58,7 +57,7 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 		$this->assertInstanceOf( 'WP_Error', $ret );
 	}
 
-	function test_create_post_should_return_post_id_if_wp_insert_post_does() {
+	function test_create_post_should_return_post_id_given_wp_insert_post_does_and_no_image() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -69,6 +68,155 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 			->willReturn( $m_wph );
 		$m_wph->method( 'wp_insert_post' )
 			->willReturn( 3456789 );
+
+		// @exercise
+		$dao = new BcBlastDao( $m_helper, $formatter );
+		$ret = $dao->create_post( $blast );
+
+		// @verify
+		$this->assertEquals( 3456789, $ret );
+	}
+
+	function test_create_post_should_return_wp_error_given_wp_insert_attachment_does() {
+		// @setup
+		$m_error = $this->mock( 'WP_Error' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$blast = new BcBlast(
+			'TDD is fun',
+			'TDD is test driven development!',
+			[
+				'file' => '/path/to/file.png',
+				'type' => 'image/png',
+			]
+		);
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'wp_insert_post' )
+			->willReturn( 3456789 );
+		$m_wph->method( 'wp_upload_dir' )
+			->willReturn( [ 'url' => 'http://local.wordpress.dev/wp-content/uploads/2016/12' ] );
+		$m_wph->method( 'wp_insert_attachment' )
+			->willReturn( $m_error );
+		$m_wph->method( 'is_wp_error' )
+			->will( $this->onConsecutiveCalls( false, true ) );
+
+		// @exercise
+		$dao = new BcBlastDao( $m_helper, $formatter );
+		$ret = $dao->create_post( $blast );
+
+		// @verify
+		$this->assertInstanceOf( 'WP_Error', $ret );
+	}
+
+	function test_create_post_should_return_false_given_wp_update_attachment_metadata_does() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$blast = new BcBlast(
+			'TDD is fun',
+			'TDD is test driven development!',
+			[
+				'file' => '/path/to/file.png',
+				'type' => 'image/png',
+			]
+		);
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'wp_insert_post' )
+			->willReturn( 3456789 );
+		$m_wph->method( 'wp_upload_dir' )
+			->willReturn( [ 'url' => 'http://local.wordpress.dev/wp-content/uploads/2016/12' ] );
+		$m_wph->method( 'wp_insert_attachment' )
+			->willReturn( 98765432 );
+		$m_wph->method( 'is_wp_error' )
+			->will( $this->onConsecutiveCalls( false, false ) );
+		$m_wph->method( 'wp_generate_attachment_metadata' )
+			->willReturn( [] );
+		$m_wph->method( 'wp_update_attachment_metadata' )
+			->willReturn( false );
+
+		// @exercise
+		$dao = new BcBlastDao( $m_helper, $formatter );
+		$ret = $dao->create_post( $blast );
+
+		// @verify
+		$this->assertFalse( $ret );
+	}
+
+	function test_create_post_should_return_false_given_set_post_thumbnail_does() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$blast = new BcBlast(
+			'TDD is fun',
+			'TDD is test driven development!',
+			[
+				'file' => '/path/to/file.png',
+				'type' => 'image/png',
+			]
+		);
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'wp_insert_post' )
+			->willReturn( 3456789 );
+		$m_wph->method( 'wp_upload_dir' )
+			->willReturn( [ 'url' => 'http://local.wordpress.dev/wp-content/uploads/2016/12' ] );
+		$m_wph->method( 'wp_insert_attachment' )
+			->willReturn( 98765432 );
+		$m_wph->method( 'is_wp_error' )
+			->will( $this->onConsecutiveCalls( false, false ) );
+		$m_wph->method( 'wp_generate_attachment_metadata' )
+			->willReturn( [] );
+		$m_wph->method( 'wp_update_attachment_metadata' )
+			->willReturn( true );
+		$m_wph->method( 'set_post_thumbnail' )
+			->willReturn( false );
+
+		// @exercise
+		$dao = new BcBlastDao( $m_helper, $formatter );
+		$ret = $dao->create_post( $blast );
+
+		// @verify
+		$this->assertFalse( $ret );
+	}
+
+	function test_create_post_should_return_post_id_given_set_post_thumbnail_does_not_return_false() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$blast = new BcBlast(
+			'TDD is fun',
+			'TDD is test driven development!',
+			[
+				'file' => '/path/to/file.png',
+				'type' => 'image/png',
+			]
+		);
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'wp_insert_post' )
+			->willReturn( 3456789 );
+		$m_wph->method( 'wp_upload_dir' )
+			->willReturn( [ 'url' => 'http://local.wordpress.dev/wp-content/uploads/2016/12' ] );
+		$m_wph->method( 'wp_insert_attachment' )
+			->willReturn( 98765432 );
+		$m_wph->method( 'is_wp_error' )
+			->will( $this->onConsecutiveCalls( false, false ) );
+		$m_wph->method( 'wp_generate_attachment_metadata' )
+			->willReturn( [] );
+		$m_wph->method( 'wp_update_attachment_metadata' )
+			->willReturn( true );
+		$m_wph->method( 'set_post_thumbnail' )
+			->willReturn( true );
 
 		// @exercise
 		$dao = new BcBlastDao( $m_helper, $formatter );

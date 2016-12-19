@@ -2,8 +2,11 @@
 
 namespace Terescode\WordPress;
 
+require_once ABSPATH . 'wp-admin/includes/file.php';
+require_once ABSPATH . WPINC . '/class-wp-error.php';
+
 /**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods, PHPMD.TooManyMethods)
  */
 if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 	class TcWpHelper {
@@ -34,6 +37,13 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		 */
 		function wp_enqueue_script( $handle, $src = false, $deps = array(), $ver = false, $in_footer = false ) {
 			wp_enqueue_script( $handle, $src, $deps, $ver, $in_footer );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_enqueue_style( $handle, $src = false, $deps = array(), $ver = false, $media = 'all' ) {
+			wp_enqueue_style( $handle, $src, $deps, $ver, $media );
 		}
 
 		function esc_attr( $text ) {
@@ -90,6 +100,10 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 			return wp_nonce_field( $action, $name, $referer, $echo );
 		}
 
+		function wp_create_nonce( $action = -1 ) {
+			return wp_create_nonce( $action );
+		}
+
 		function do_meta_boxes( $screen, $context, $object ) {
 			return do_meta_boxes( $screen, $context, $object );
 		}
@@ -122,6 +136,54 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 
 		function wp_verify_nonce( $nonce, $action = -1 ) {
 			return wp_verify_nonce( $nonce, $action );
+		}
+
+		function download_url( $url, $timeout = 300 ) {
+			return download_url( $url, $timeout );
+		}
+
+		function is_wp_error( $thing ) {
+			return is_wp_error( $thing );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_handle_sideload( $file, $overrides = false, $time = null ) {
+			return wp_handle_sideload( $file, $overrides, $time );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_handle_upload( $file, $overrides = false, $time = null ) {
+			return wp_handle_upload( $file, $overrides, $time );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false ) {
+			return wp_upload_dir( $time, $create_dir, $refresh_cache );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function wp_insert_attachment( $args, $file = false, $parent = 0, $wp_error = false ) {
+			return wp_insert_attachment( $args, $file, $parent, $wp_error );
+		}
+
+		function wp_generate_attachment_metadata( $attachment_id, $file ) {
+			return wp_generate_attachment_metadata( $attachment_id, $file );
+		}
+
+		function wp_update_attachment_metadata( $post_id, $data ) {
+			return wp_update_attachment_metadata( $post_id, $data );
+		}
+
+		function set_post_thumbnail( $post, $thumbnail_id ) {
+			return set_post_thumbnail( $post, $thumbnail_id );
 		}
 	}
 }

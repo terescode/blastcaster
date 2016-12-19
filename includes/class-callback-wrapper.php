@@ -13,19 +13,14 @@ if ( ! class_exists( __NAMESPACE__ . '\TcCallbackWrapper' ) ) {
 			if ( 1 <= $count ) {
 				$this->callable = func_get_arg( 0 );
 			}
-			if ( 2 <= $count ) {
-				$this->args = array_slice( func_get_args(), 1 );
-			} else {
-				$this->args = array();
-			}
+			$this->args = ( 2 <= $count ? array_slice( func_get_args(), 1 ) : array() );
 		}
 
 		function call() {
 			if ( is_callable( $this->callable ) ) {
 				return call_user_func_array( $this->callable, $this->args );
-			} else {
-				return false;
 			}
+			return false;
 		}
 
 		function get_callable() {

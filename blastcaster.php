@@ -11,11 +11,12 @@
  * @package BlastCaster
  */
 
-if ( ! defined( 'WPINC' ) ) {
+require_once 'includes/constants.php';
+
+if ( ! \Terescode\BlastCaster\is_wpinc_defined() ) {
 	return -1;
 }
 
-require_once 'includes/constants.php';
 require_once BC_PLUGIN_DIR . 'includes/blastcaster-plugin.php';
 
 $blastcaster_plugin = Terescode\BlastCaster\create_plugin();

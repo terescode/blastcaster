@@ -1,5 +1,5 @@
 <?php
 
-function __( $foo, $bar ) {
+function __( $foo, $bar = 'default' ) {
 	return $foo;
 }

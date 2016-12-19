@@ -1,0 +1,18 @@
+#blastcaster-root {
+	width: 100%;
+	max-width: 1024px;
+}
+#blastcaster-root p {
+	font-size: 1.2em;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+#blastcaster-form input[type="text"],
+#blastcaster-form textarea {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+#blastcaster-root .image-picker__file-upload input[type="file"] {
+	display: none;
+}

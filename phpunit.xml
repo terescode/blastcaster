@@ -12,22 +12,8 @@
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
-	<filter>
-	  <whitelist>
-		<directory suffix=".php">./</directory>
-		<exclude>
-		  <directory suffix=".php">./node_modules/</directory>
-		  <directory suffix=".php">./vendor/</directory>
-		  <directory suffix=".php">./tests/</directory>
-		</exclude>
-	  </whitelist>
-	</filter>
-	<logging>
-	  <log type="coverage-html" target="./reports/coverage/" lowUpperBound="95" highLowerBound="100"/>
-	  <log type="coverage-clover" target="./reports/coverage.xml"/>
-	  <log type="testdox-html" target="./reports/testdox.html"/>
-	</logging>
 	<php>
-	  <const name="WP_INCLUDES_PATH" value="../../../wp-includes/"/>
+	  <const name="ABSPATH" value="../../../"/>
+	  <const name="WPINC" value="wp-includes/"/>
 	</php>
 </phpunit>

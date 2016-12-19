@@ -11,20 +11,77 @@ module.exports = function (grunt) {
 
   var fs = require('fs'),
     util = require('util'),
+    _ = require('lodash'),
     chalk = require('chalk'),
     multitasker = require('grunt-multitasker')(grunt),
-    xml2js = require('xml2js');
+    xml2js = require('xml2js'),
+    webpack = require('webpack'),
+    webpackConfig = require("./webpack.config.js"),
+    phpXdebug = '/usr/bin/php -d zend_extension=/usr/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so';
 
   function runFn(callback) {
     return function () {
-      var options = this.options({});
+      var options = this.options({}),
+        opts = _.extend({
+          stdio: 'inherit'
+        }, options.opts);
       grunt.util.spawn({
         cmd: options.cmd,
         args: options.args.concat(this.args),
-        opts: {
-          stdio: 'inherit'
-        }
+        opts: opts
       }, callback(this.async()));
+    };
+  }
+
+  function runPhpWithXdebug(callback) {
+    return function () {
+      var options = this.options({}),
+        php = options.php,
+        phpUnit = options.cmd,
+        phpUnitArgs = options.args.concat(this.args),
+        xDebugPath = options.xDebugPath,
+        tmpPath = options.tmpPath,
+        zendExtension = '\nzend_extension=' + xDebugPath + '\n',
+        done = callback(this.async());
+      grunt.util.spawn({
+        cmd: php,
+        args: [
+          '-r',
+          'echo php_ini_loaded_file();'
+        ]
+      }, function (err, result, code) {
+        var iniPath;
+        if (err || 0 !== code) {
+          grunt.log.writeln(util.inspect(result, false, null));
+          done(err);
+          return;
+        }
+
+        iniPath = String(result).trim();
+        if (!iniPath) {
+          grunt.file.write(tmpPath, zendExtension);
+        } else {
+          grunt.file.copy(iniPath, tmpPath, {
+            process: function (contents, srcPath, destPath) {
+              return contents + zendExtension;
+            }
+          });
+        }
+
+        grunt.util.spawn({
+          cmd: php,
+          args: [
+            phpUnit
+          ].concat(phpUnitArgs),
+          opts: _.extend({
+            stdio: 'inherit',
+            env: { 'PHPRC': tmpPath }
+          }, options.opts)
+        }, function (err, result, code) {
+          grunt.file.delete(tmpPath, { force: true });
+          done(err, result, code);
+        });
+      });
     };
   }
 
@@ -163,12 +220,7 @@ module.exports = function (grunt) {
         usePhp: true,
         composerLocation: 'composer.phar'
       },
-      install: {
-
-      },
-      update: {
-
-      }
+      run: {}
     },
 
     // Configure phpcs task
@@ -182,7 +234,7 @@ module.exports = function (grunt) {
       }
     },
 
-    // Configure phpmd task
+    // Define phpmd command
     'phpmd': {
       application: {
         options: {
@@ -200,7 +252,7 @@ module.exports = function (grunt) {
       }
     },
 
-    // Configure grunt-phpunit task
+    // Define phpunit command
     phpunit: {
       application: {
         options: {
@@ -213,22 +265,69 @@ module.exports = function (grunt) {
       }
     },
 
-    // Configure grunt-contrib-jshint task
-    jshint: {
-      all: ['js/*.js', '!js/*.min.js']
+    'phpunit-cov': {
+      application: {
+        options: {
+          php: '/usr/bin/php',
+          cmd: 'vendor/bin/phpunit',
+          tmpPath: '/tmp/php.ini',
+          xDebugPath: '/usr/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so',
+          args: [
+            '-c',
+            'phpunit.xml.dist'
+          ]
+        }
+      }
     },
 
-    // Configure grunt-contrib-uglify task
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-      },
+    // Configure webpack
+    webpack: {
+      options: webpackConfig,
       build: {
-        files: [{
-          expand: true, // Enable dynamic expansion.
-          src: ['js/*.js', '!js/*.min.js'], // Actual pattern(s) to match.
-          ext: '.min.js' // Dest filepaths will have this extension.
-        }]
+        plugins: webpackConfig.plugins.concat(
+          new webpack.DefinePlugin({
+            "process.env": {
+              "NODE_ENV": JSON.stringify("production")
+            }
+          }),
+          new webpack.optimize.UglifyJsPlugin({
+            compress: {
+              warnings: false
+            },
+            output: {
+              comments: false
+            }
+          })
+        )
+      },
+      "build-dev": {
+        devtool: "sourcemap",
+        debug: true
+      }
+    },
+
+    // Configure webpack-dev-server
+    'webpack-dev-server': {
+      options: {
+        webpack: webpackConfig,
+        publicPath: "/" + webpackConfig.output.publicPath
+      },
+      start: {
+        keepAlive: true,
+        webpack: {
+          devtool: "eval",
+          debug: true
+        }
+      }
+    },
+
+    watch: {
+      app: {
+        files: [ "admin/js/**" ],
+        tasks: [ "webpack:build-dev" ],
+        options: {
+          spawn: false
+        }
       }
     },
 
@@ -298,11 +397,11 @@ module.exports = function (grunt) {
   /**
    * Load Grunt plugins and tasks
    */
-  grunt.loadNpmTasks('grunt-composer');
   grunt.loadNpmTasks('grunt-contrib-compress');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-phpcs');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks("grunt-webpack");
+  grunt.loadNpmTasks('grunt-composer');
   grunt.loadNpmTasks('grunt-wp-i18n');
   grunt.loadNpmTasks('grunt-po2mo');
 
@@ -332,7 +431,7 @@ module.exports = function (grunt) {
    * Check coverage
    */
   grunt.registerTask('check', 'Check code coverage', function () {
-    this.requires('test');
+    this.requires('test-all-dist');
     checkCoverage(this.async());
   });
 
@@ -353,12 +452,32 @@ module.exports = function (grunt) {
    */
   grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests.', runFn(phpUnitCompleted));
 
+  /**
+   * phpunit-cov
+   * Run phpunit task using the task configuration to spawn a command with
+   * specified arguments with no coverage
+   */
+  grunt.registerMultiTask('phpunit-cov', 'Runs PHPUnit tests.', runPhpWithXdebug(phpUnitCompleted));
+
   // Test task - run phpcs and phpunit
-  grunt.registerTask('test', ['init', 'phpcs', 'phpmd', 'phpunit']);
+  grunt.registerTask('test', function () {
+    if (0 < this.args.length) {
+      grunt.task.run('phpunit:application:tests/test-' + this.args[0]);
+    } else {
+      grunt.task.run('test-all');
+    }
+  });
+
+
+  // Test task - run phpcs and phpunit
+  grunt.registerTask('test-all', ['init', 'phpcs', 'phpmd', 'phpunit']);
+
+  // Test DIST task - run phpcs and phpunit
+  grunt.registerTask('test-all-dist', ['init', 'phpcs', 'phpmd', 'phpunit-cov']);
 
   // Build task aliases
-  grunt.registerTask('build', ['test', 'check', 'makepot', 'po2mo', 'compress']);
+  grunt.registerTask('build-dist', ['test-all-dist', 'check', 'webpack:build', 'makepot', 'po2mo', 'compress']);
 
   // Alias the default task to build
-  grunt.registerTask('default', ['build']);
+  grunt.registerTask('default', ['build-dist']);
 };

@@ -6,14 +6,14 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 	class BcBlast {
 		private $title;
 		private $description;
-		private $image;
+		private $image_data;
 		private $categories;
 		private $tags;
 
-		function __construct( $title, $description, $image = null, $categories = array(), $tags = array() ) {
+		function __construct( $title, $description, $image_data = null, $categories = array(), $tags = array() ) {
 			$this->title = $title;
 			$this->description = $description;
-			$this->image = $image;
+			$this->image_data = $image_data;
 			$this->categories = $categories;
 			$this->tags = $tags;
 		}
@@ -26,8 +26,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 			return $this->description;
 		}
 
-		function get_image() {
-			return $this->image;
+		function get_image_data() {
+			return $this->image_data;
 		}
 
 		function get_categories() {
@@ -46,8 +46,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 			$this->description = $description;
 		}
 
-		function set_image( $image ) {
-			$this->image = $image;
+		function set_image_data( $image_data ) {
+			$this->image_data = $image_data;
 		}
 
 		function set_categories( $categories ) {

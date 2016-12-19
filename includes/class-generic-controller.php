@@ -77,6 +77,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastController' ) ) {
 		}
 
 		function load_pagenow() {
+			$this->process_actions();
+
 			if ( $this->view->is_metabox_page() ) {
 				/* Fire metabox hooks */
 				$this->wph->do_action( 'add_meta_boxes_' . $this->view->get_hook_suffix(), null );

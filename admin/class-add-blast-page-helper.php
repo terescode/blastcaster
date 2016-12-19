@@ -27,67 +27,24 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPageHelper' ) ) {
 			$this->plugin_helper = $plugin_helper;
 		}
 
-		/**
-		 * @SuppressWarnings(PHPMD.UnusedFormalParameter) because we never use $post
-		 */
-		function render_add_title_meta_box( $post, $metabox ) {
-			$page_data = $metabox['args'][0]->get_page_data();
-			$primary_title = $this->plugin_helper->param( 'bc-add-title-input' );
-			if ( empty( $primary_title ) && null !== $page_data && isset( $page_data->titles ) ) {
-				if ( 0 < count( $page_data->titles ) ) {
-					$primary_title = $page_data->titles[0];
-				}
+		function build_action_data( $action, $extra_data = array() ) {
+			$bc_data = new \stdClass();
+			$bc_data->action = $action;
+			$bc_data->action_nonce = $this->wph->wp_create_nonce( $action );
+			foreach ( $extra_data as $key => $val ) {
+				$bc_data->{$key} = $val;
 			}
-			echo '<textarea id="bc-add-title-input" name="bc-add-title-input" cols="80" rows="3"  class="large-text">' . $primary_title . '</textarea>';
+			return json_encode( $bc_data );
 		}
 
-		/**
-		 * @SuppressWarnings(PHPMD.UnusedFormalParameter) because we never use $post
-		 */
-		function render_add_category_meta_box( $post, $metabox ) {
-			echo '<div id="bc-add-category-picker"></div>';
-		}
-
-		/**
-		 * @SuppressWarnings(PHPMD.UnusedFormalParameter) because we never use $post
-		 */
-		function render_add_image_meta_box( $post, $metabox ) {
-			$page_data = $metabox['args'][0]->get_page_data();
-			$primary_image = BC_PLUGIN_URL . '/admin/images/noImage.png';
-			if ( null !== $page_data && isset( $page_data->images ) ) {
-				if ( 0 < count( $page_data->images ) ) {
-					$primary_image = $page_data->images[0];
+		function forward_param( &$data, $param, $key = null ) {
+			$val = $this->plugin_helper->param( $param );
+			if ( ! empty( $val ) ) {
+				if ( null === $key ) {
+					$key = $param;
 				}
+				$data[ $key ] = $val;
 			}
-			echo '<div id="bc-add-image-picker">';
-			// TODO: add checkbox for no image
-			// initially show carousel of recommended images and image upload tab
-			// if no recommended images show "no images to recommend"
-			// if no image is selected, hide image controls - drawer up/down
-			echo '<input type="hidden" name="bc-add-image-url" value="" />';
-			echo '<img src="' . $primary_image . '" />';
-			echo '</div>';
-		}
-
-		/**
-		 * @SuppressWarnings(PHPMD.UnusedFormalParameter) because we never use $post
-		 */
-		function render_add_description_meta_box( $post, $metabox ) {
-			$page_data = $metabox['args'][0]->get_page_data();
-			$primary_desc = $this->plugin_helper->param( 'bc-add-desc-input' );
-			if ( null !== $page_data && isset( $page_data->descriptions ) ) {
-				if ( 0 < count( $page_data->descriptions ) ) {
-					$primary_desc = $page_data->descriptions[0];
-				}
-			}
-			echo '<textarea id="bc-add-desc-input" name="bc-add-desc-input" cols="80" rows="5"  class="large-text">' . $primary_desc . '</textarea>';
-		}
-
-		/**
-		 * @SuppressWarnings(PHPMD.UnusedFormalParameter) because we never use $post
-		 */
-		function render_add_tag_meta_box( $post, $metabox ) {
-			echo '<div id="bc-add-tag-picker"></div>';
 		}
 	}
 

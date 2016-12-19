@@ -59,7 +59,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$this->blast_form_helper = $blast_form_helper;
 		}
 
-		public function add_page() {
+		function add_page() {
 			$this->add_blast_hook_suffix = $this->wph->add_posts_page(
 				$this->plugin_helper->string( BcStrings::ABF_BLAST_PAGE_TITLE ),
 				$this->plugin_helper->string( BcStrings::ABF_BLAST_MENU_TITLE ),
@@ -74,20 +74,37 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			return $this->add_blast_hook_suffix;
 		}
 
+		function print_scripts() {
+			$extra_data = [];
+
+			$extra_data['page_data'] = ( $this->page_data ? $this->page_data : new \stdClass() );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-title' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-url' );
+
+			$bc_data_js = $this->blast_form_helper->build_action_data(
+				self::BC_ADD_BLAST_POST_ACTION,
+				$extra_data
+			);
+			if ( ! $bc_data_js ) {
+				$this->plugin_helper->add_admin_notice( BcStrings::ABF_BUILD_ACTION_DATA_FAILED );
+				return;
+			}
+			echo '<script type="text/javascript">var terescode={"bc_data":' . $bc_data_js . '};</script>';
+		}
+
 		public function load_pagenow() {
-			// TODO: refactor as separate marshaller/converter class
 			if ( isset( $_POST['pageData'] ) ) {
 				$post_data = stripslashes( trim( $_POST['pageData'] ) );
 				if ( ! empty( $post_data ) ) {
 					$this->page_data = $this->decode_page_data( $post_data );
 				}
 			}
-			/*
-			$code = $this->plugin_helper->param( 'code' );
-			if ( ! empty( $code ) ) {
-			}
-			*/
-			$this->wph->wp_enqueue_script( 'jquery-ui-tabs' );
+			// TODO: need to add CSS to webpack optimization and reference bundle here
+			$this->wph->wp_enqueue_style( 'bc-styles', BC_PLUGIN_URL . 'admin/css/app.css' );
+			$this->wph->wp_enqueue_script( 'bc-scripts', BC_PLUGIN_URL . 'admin/js/bundle.js', [ 'jquery' ], false, true );
+			$this->wph->add_action( 'admin_print_scripts-' . $this->get_hook_suffix(), array( $this, 'print_scripts' ) );
 		}
 
 		private function decode_page_data( $post_data ) {
@@ -118,56 +135,12 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$this->plugin_helper->render( $this, 'admin/views/add-blast-page', 'edit_posts' );
 		}
 
-		public function is_metabox_page() {
-			return true;
+		function is_metabox_page() {
+			return false;
 		}
 
-		public function add_meta_boxes() {
-			$this->wph->add_meta_box(
-				'bc-add-title-meta-box',
-				$this->plugin_helper->string( BcStrings::ABF_TITLE_LABEL ),
-				array( $this->blast_form_helper, 'render_add_title_meta_box' ),
-				$this->add_blast_hook_suffix,
-				'normal',
-				'default',
-				array( $this )
-			);
-			$this->wph->add_meta_box(
-				'bc-add-category-meta-box',
-				$this->plugin_helper->string( BcStrings::ABF_CATEGORIES_LABEL ),
-				array( $this->blast_form_helper, 'render_add_category_meta_box' ),
-				$this->add_blast_hook_suffix,
-				'normal',
-				'default',
-				array( $this )
-			);
-			$this->wph->add_meta_box(
-				'bc-add-image-meta-box',
-				$this->plugin_helper->string( BcStrings::ABF_IMAGE_LABEL ),
-				array( $this->blast_form_helper, 'render_add_image_meta_box' ),
-				$this->add_blast_hook_suffix,
-				'normal',
-				'default',
-				array( $this )
-			);
-			$this->wph->add_meta_box(
-				'bc-add-description-meta-box',
-				$this->plugin_helper->string( BcStrings::ABF_DESCRIPTION_LABEL ),
-				array( $this->blast_form_helper, 'render_add_description_meta_box' ),
-				$this->add_blast_hook_suffix,
-				'normal',
-				'default',
-				array( $this )
-			);
-			$this->wph->add_meta_box(
-				'bc-add-tag-meta-box',
-				$this->plugin_helper->string( BcStrings::ABF_TAGS_LABEL ),
-				array( $this->blast_form_helper, 'render_add_tag_meta_box' ),
-				$this->add_blast_hook_suffix,
-				'normal',
-				'default',
-				array( $this )
-			);
+		function add_meta_boxes() {
+
 		}
 
 		function get_page_data() {

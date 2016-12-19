@@ -55,9 +55,6 @@ if ( ! class_exists( __NAMESPACE__ . '\TcGenericPlugin' ) ) {
 
 		public function load() {
 			$this->plugin_helper->load_textdomain( $this );
-			foreach ( $this->menu_controllers as $controller ) {
-				$controller->process_actions();
-			}
 		}
 
 		/**

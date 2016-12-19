@@ -3,6 +3,8 @@
 namespace Terescode\BlastCaster;
 
 require_once 'includes/constants.php';
+require_once 'includes/class-wp-helper.php';
+require_once 'includes/class-plugin-helper.php';
 require_once 'admin/class-add-blast-page.php';
 require_once 'admin/class-add-blast-page-helper.php';
 
@@ -15,495 +17,145 @@ require_once 'admin/class-add-blast-page-helper.php';
 class BcAddBlastPageHelperTest extends \BcPhpUnitTestCase {
 
 	/**
-	 * Test render title input
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
-	function test_render_add_title_meta_box_should_output_textarea() {
+	function test_build_action_data_returns_false_given_json_encode_does() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
+		global $json_encode_called;
+
+		$json_encode_called = false;
+		function json_encode() {
+			global $json_encode_called;
+			$json_encode_called = true;
+			return false;
+		}
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
+		$m_wph->method( 'wp_create_nonce' )
+			->willReturn( '123941924731234' );
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_title_meta_box( $m_post, $m_metabox );
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$action_data = $page_helper->build_action_data( 'awesome_action' );
+
+		// @verify
+		$this->assertTrue( $json_encode_called );
+		$this->assertFalse( $action_data );
 	}
 
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_title_meta_box_should_output_textarea_with_no_title_given_titles_missing() {
+	function test_build_action_data_returns_valid_json_given_required_args() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
 
-		$page_data = json_decode( '{}' );
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
+		$m_wph->method( 'wp_create_nonce' )
+			->willReturn( '123941924731234' );
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_title_meta_box( $m_post, $m_metabox );
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$action_data = $page_helper->build_action_data( 'awesome_action' );
+
+		// @verify
+		$this->assertNotNull( $action_data );
+		$this->assertEquals(
+			'{"action":"awesome_action","action_nonce":"123941924731234"}',
+			$action_data
+		);
 	}
 
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_title_meta_box_should_output_textarea_with_no_title_given_zero_titles() {
+	function test_build_action_data_returns_valid_json_given_optional_args() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
+		$foo = new \stdClass();
 
-		$page_data = json_decode( '{"titles":[]}' );
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
+		$m_wph->method( 'wp_create_nonce' )
+			->willReturn( '123941924731234' );
+		$foo->bar = 'baz';
+		$foo->bop = 1234;
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_title_meta_box( $m_post, $m_metabox );
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$action_data = $page_helper->build_action_data(
+			'awesome_action',
+			[
+				'foo' => $foo,
+			]
+		);
+
+		// @verify
+		$this->assertNotNull( $action_data );
+		$this->assertEquals(
+			'{"action":"awesome_action","action_nonce":"123941924731234","foo":{"bar":"baz","bop":1234}}',
+			$action_data
+		);
 	}
 
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_title_meta_box_should_output_textarea_with_title_given_valid_post_data() {
+	function test_forward_param_sets_nothing_given_param_returns_null() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
-		$page_data = json_decode( $json_file );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-				$element = $elements->item( 0 );
-				$this->assertStringStartsWith( 'Carbon Fiber in Automotive Manufacturing', $element->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_title_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_title_meta_box_should_output_textarea_with_title_given_sticky_form_data() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
 		$m_helper->method( 'param' )
-			->willReturn( 'a title' );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-title-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find title text area' );
-				$element = $elements->item( 0 );
-				$this->assertStringStartsWith( 'a title', $element->textContent );
-			}
-		);
+			->willReturn( null );
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_title_meta_box( $m_post, $m_metabox );
+		$data = [];
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$page_helper->forward_param( $data, 'type' );
+
+		// @verify
+		$this->assertEmpty( $data );
 	}
 
-	/**
-	 * Test render category picker
-	 */
-	function test_render_add_category_meta_box_should_output_picker() {
+	function test_forward_param_sets_value_given_param_returns_value() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-category-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find category picker div' );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_category_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render image picker
-	 */
-	function test_render_add_image_meta_box_should_output_image() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
-				$element = $elements->item( 0 );
-				$elements = $xpath->query( 'img', $element );
-				$this->assertEquals( 1, $elements->length, 'Could not find primary image' );
-				$element = $elements->item( 0 );
-				$this->assertContains( 'noImage.png', $element->getAttribute( 'src' ) );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_image_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render image picker
-	 */
-	function test_render_add_image_meta_box_should_output_no_image_given_images_missing() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$page_data = json_decode( '{}' );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
-				$element = $elements->item( 0 );
-				$elements = $xpath->query( 'img', $element );
-				$this->assertEquals( 1, $elements->length, 'Could not find primary image' );
-				$element = $elements->item( 0 );
-				$this->assertContains( 'noImage.png', $element->getAttribute( 'src' ) );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_image_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render image picker
-	 */
-	function test_render_add_image_meta_box_should_output_no_image_given_zero_images() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$page_data = json_decode( '{ "images": [] }' );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
-				$element = $elements->item( 0 );
-				$elements = $xpath->query( 'img', $element );
-				$this->assertEquals( 1, $elements->length, 'Could not find primary image' );
-				$element = $elements->item( 0 );
-				$this->assertContains( 'noImage.png', $element->getAttribute( 'src' ) );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_image_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render image picker
-	 */
-	function test_render_add_image_meta_box_should_output_image_given_valid_post_data() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
-		$page_data = json_decode( $json_file );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-image-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find image picker div' );
-				$element = $elements->item( 0 );
-				$elements = $xpath->query( 'img', $element );
-				$this->assertEquals( 1, $elements->length, 'Could not find primary image' );
-				$element = $elements->item( 0 );
-				$this->assertContains( 'carbon-fiber-market-2020.jpg', $element->getAttribute( 'src' ) );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_image_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render description input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_description_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render description input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea_with_no_description_given_descriptions_missing() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$page_data = json_decode( '{}' );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_description_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea_with_no_description_given_zero_descriptions() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$page_data = json_decode( '{"descriptions":[]}' );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-				$element = $elements->item( 0 );
-				$this->assertEquals( '', $element->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_description_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea_with_description_given_valid_post_data() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
-
-		$json_file = file_get_contents( 'tests/fixtures/sample.json', true );
-		$page_data = json_decode( $json_file );
-		$m_helper->method( 'get_wp_helper' )
-			->willReturn( $m_wph );
-		$m_page->method( 'get_page_data' )
-			->willReturn( $page_data );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-				$element = $elements->item( 0 );
-				$this->assertStringStartsWith( 'According to a newly published report from IHS Markit,', $element->textContent );
-			}
-		);
-
-		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_description_meta_box( $m_post, $m_metabox );
-	}
-
-	/**
-	 * Test render title input
-	 */
-	function test_render_add_description_meta_box_should_output_textarea_with_description_given_sticky_form_data() {
-		// @setup
-		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
-		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
 		$m_helper->method( 'param' )
-			->willReturn( 'a description' );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//textarea[@id="bc-add-desc-input"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find description text area' );
-				$element = $elements->item( 0 );
-				$this->assertStringStartsWith( 'a description', $element->textContent );
-			}
-		);
+			->willReturn( 'foo' );
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_description_meta_box( $m_post, $m_metabox );
+		$data = [];
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$page_helper->forward_param( $data, 'type' );
+
+		// @verify
+		$this->assertTrue( isset( $data['type'] ) );
+		$this->assertEquals( 'foo', $data['type'] );
 	}
 
-	/**
-	 * Test render tag picker
-	 */
-	function test_render_add_tag_meta_box_should_output_picker() {
+	function test_forward_param_sets_key_value_given_key_and_param_returns_value() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$m_post = new \stdClass;
-		$m_page = $this->mock( '\Terescode\BlastCaster\BcAddBlastPage' );
-		$m_metabox = array( 'args' => array( $m_page ) );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$this->expect_html(
-			function ( $result ) {
-				$xpath = new \DOMXPath( $result );
-				$elements = $xpath->query( '//div[@id="bc-add-tag-picker"]' );
-				$this->assertEquals( 1, $elements->length, 'Could not find tag picker div' );
-			}
-		);
+		$m_helper->method( 'param' )
+			->willReturn( 'foo' );
 
 		// @exercise
-		$helper = new BcAddBlastPageHelper( $m_helper );
-		$helper->render_add_tag_meta_box( $m_post, $m_metabox );
+		$data = [];
+		$page_helper = new BcAddBlastPageHelper( $m_helper );
+		$page_helper->forward_param( $data, 'type', 'not_type' );
+
+		// @verify
+		$this->assertFalse( isset( $data['type'] ) );
+		$this->assertTrue( isset( $data['not_type'] ) );
+		$this->assertEquals( 'foo', $data['not_type'] );
 	}
 }

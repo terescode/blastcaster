@@ -5,6 +5,51 @@ namespace Terescode\WordPress;
 // @SUT
 require_once 'includes/class-wp-helper.php';
 
+function download_url( $url, $timeout = 300 ) {
+	global $test_helper;
+	return $test_helper->stub( $url, $timeout );
+}
+
+function is_wp_error( $thing ) {
+	global $test_helper;
+	return $test_helper->stub( $thing );
+}
+
+function wp_handle_sideload( $file, $overrides = false, $time = null ) {
+	global $test_helper;
+	return $test_helper->stub( $file, $overrides, $time );
+}
+
+function wp_handle_upload( $file, $overrides = false, $time = null ) {
+	global $test_helper;
+	return $test_helper->stub( $file, $overrides, $time );
+}
+
+function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false ) {
+	global $test_helper;
+	return $test_helper->stub( $time, $create_dir, $refresh_cache );
+}
+
+function wp_insert_attachment( $args, $file = false, $parent = 0, $wp_error = false ) {
+	global $test_helper;
+	return $test_helper->stub( $args, $file, $parent, $wp_error );
+}
+
+function wp_generate_attachment_metadata( $attachment_id, $file ) {
+	global $test_helper;
+	return $test_helper->stub( $attachment_id, $file );
+}
+
+function wp_update_attachment_metadata( $post_id, $data ) {
+	global $test_helper;
+	return $test_helper->stub( $post_id, $data );
+}
+
+function set_post_thumbnail( $post, $thumbnail_id ) {
+	global $test_helper;
+	return $test_helper->stub( $post, $thumbnail_id );
+}
+
 /**
  * Class TcPluginHelperTest
  *
@@ -203,6 +248,50 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 
 		// @exercise
 		$wph->wp_enqueue_script( 'postbox', true, array( 'foo', 'bar' ), false, true );
+	}
+
+	/**
+	 * Test wp_enqueue_script
+	 */
+	function test_wp_enqueue_style_should_call_wp_enqueue_style_given_required_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'wp_enqueue_style', array(
+			'times' => 1,
+			'args' => array(
+				'wp-handle',
+				false,
+				\WP_Mock\Functions::type( 'array' ),
+				false,
+				'all',
+			),
+		) );
+
+		// @exercise
+		$wph->wp_enqueue_style( 'wp-handle' );
+	}
+
+	/**
+	 * Test wp_enqueue_script
+	 */
+	function test_wp_enqueue_style_should_call_wp_enqueue_style_given_optional_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'wp_enqueue_style', array(
+			'times' => 1,
+			'args' => array(
+				'wp-handle',
+				'/path/to/file.css',
+				\WP_Mock\Functions::type( 'array' ),
+				'1.2.1',
+				'print',
+			),
+		) );
+
+		// @exercise
+		$wph->wp_enqueue_style( 'wp-handle', '/path/to/file.css', array(), '1.2.1', 'print' );
 	}
 
 	/**
@@ -595,6 +684,44 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 	}
 
 	/**
+	 * Test wp_nonce_field
+	 */
+	function test_wp_create_nonce_should_call_wp_create_nonce_and_return_value_given_required_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_create_nonce', array(
+			'times' => 1,
+			'args' => array(
+				-1
+			),
+			'return' => 'uid.-1._wpnonce',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$nonce = $wph->wp_create_nonce();
+		$this->assertEquals( 'uid.-1._wpnonce', $nonce );
+	}
+
+	/**
+	 * Test wp_nonce_field
+	 */
+	function test_wp_create_nonce_should_call_wp_create_nonce_and_return_value_given_optional_args_and_returns_value() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_create_nonce', array(
+			'times' => 1,
+			'args' => array(
+				'custom_action',
+			),
+			'return' => 'uid.custom_action.custom_action_nonce',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$nonce = $wph->wp_create_nonce( 'custom_action' );
+		$this->assertEquals( 'uid.custom_action.custom_action_nonce', $nonce );
+	}
+
+	/**
 	 * Test do_meta_boxes
 	 */
 	function test_do_meta_boxes_should_call_do_meta_boxes_and_return_value_given_do_meta_boxes_does() {
@@ -686,7 +813,6 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 	 */
 	function test_wp_insert_post_should_call_wp_insert_post_and_return_wp_error_if_wp_insert_post_does() {
 		// @setup
-		wp_include_once( 'class-wp-error.php' );
 		$m_error = $this->mock( 'WP_Error' );
 		\WP_Mock::wpFunction( 'wp_insert_post', array(
 			'times' => 1,
@@ -815,7 +941,7 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$wph->wp_safe_redirect( 'http://local.wordpress.dev/edit.php?page=page', 301 );
 	}
 
-		/**
+	/**
 	 * Test status_header
 	 */
 	function test_wp_verify_nonce_should_call_wp_verify_nonce_and_return_value_with_required_args() {
@@ -846,12 +972,369 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 				'123456',
 				'action',
 			),
-			'return' => 2
+			'return' => 2,
 		) );
 
 		// @exercise
 		$wph = new TcWpHelper();
 		$ret = $wph->wp_verify_nonce( '123456', 'action' );
 		$this->assertEquals( 2, $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_download_url_should_call_download_url_and_return_value_with_required_args() {
+		// @setup
+		$m_error = $this->mock( 'WP_Error' );
+
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				'https://www.terescode.com/favico.ico',
+				300
+			)
+			->willReturn( $m_error );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->download_url( 'https://www.terescode.com/favico.ico' );
+		$this->assertInstanceOf( 'WP_Error', $ret );
+		$this->assertEquals( $m_error, $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_download_url_should_call_download_url_and_return_value_with_optional_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				'https://www.terescode.com/favico.ico',
+				5
+			)
+			->willReturn( '/path/to/favico.ico' );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->download_url( 'https://www.terescode.com/favico.ico', 5 );
+		$this->assertEquals( '/path/to/favico.ico', $ret );
+	}
+
+	/**
+	 * Test status_header
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	function test_is_wp_error_should_call_is_wp_error_and_return_value() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				'the_thing'
+			)
+			->willReturn( true );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->is_wp_error( 'the_thing' );
+		$this->assertTrue( $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_handle_sideload_should_call_wp_handle_sideload_and_return_value_with_required_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'name' => 'name.png',
+					'tmp_name' => '/path/to/temp_file.png',
+					'error' => 0,
+				],
+				false,
+				null
+			)
+			->willReturn( [ 'file' => '/path/to/uploaded/file.png' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_handle_sideload(
+			[
+				'name' => 'name.png',
+				'tmp_name' => '/path/to/temp_file.png',
+				'error' => 0,
+			]
+		);
+		$this->assertNotNull( $ret );
+		$this->assertTrue( isset( $ret['file'] ) );
+		$this->assertEquals( '/path/to/uploaded/file.png', $ret['file'] );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_handle_sideload_should_call_wp_handle_sideload_and_return_value_with_optional_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'name' => 'name.png',
+					'tmp_name' => '/path/to/temp_file.png',
+					'error' => 0,
+				],
+				[ 'action' => 'awesome_action' ],
+				'2016/03'
+			)
+			->willReturn( [ 'file' => '/path/to/uploaded/file.png' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_handle_sideload(
+			[
+				'name' => 'name.png',
+				'tmp_name' => '/path/to/temp_file.png',
+				'error' => 0,
+			],
+			[ 'action' => 'awesome_action' ],
+			'2016/03'
+		);
+		$this->assertNotNull( $ret );
+		$this->assertTrue( isset( $ret['file'] ) );
+		$this->assertEquals( '/path/to/uploaded/file.png', $ret['file'] );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_handle_upload_should_call_wp_handle_upload_and_return_value_with_required_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'name' => 'name.png',
+					'tmp_name' => '/path/to/temp_file.png',
+					'error' => 0,
+				],
+				false,
+				null
+			)
+			->willReturn( [ 'file' => '/path/to/uploaded/file.png' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_handle_upload(
+			[
+				'name' => 'name.png',
+				'tmp_name' => '/path/to/temp_file.png',
+				'error' => 0,
+			]
+		);
+		$this->assertNotNull( $ret );
+		$this->assertTrue( isset( $ret['file'] ) );
+		$this->assertEquals( '/path/to/uploaded/file.png', $ret['file'] );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_wp_handle_upload_should_call_wp_handle_upload_and_return_value_with_optional_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'name' => 'name.png',
+					'tmp_name' => '/path/to/temp_file.png',
+					'error' => 0,
+				],
+				[ 'action' => 'awesome_action' ],
+				'2016/03'
+			)
+			->willReturn( [ 'file' => '/path/to/uploaded/file.png' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_handle_upload(
+			[
+				'name' => 'name.png',
+				'tmp_name' => '/path/to/temp_file.png',
+				'error' => 0,
+			],
+			[ 'action' => 'awesome_action' ],
+			'2016/03'
+		);
+		$this->assertNotNull( $ret );
+		$this->assertTrue( isset( $ret['file'] ) );
+		$this->assertEquals( '/path/to/uploaded/file.png', $ret['file'] );
+	}
+
+	/**
+	 * Test wp_upload_dir
+	 */
+	function test_wp_upload_dir_should_call_wp_upload_dir_and_return_result_with_required_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				null,
+				true,
+				false
+			)
+			->willReturn( [ 'path' => '/path/to/upload/dir' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_upload_dir();
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 1, count( $ret ) );
+		$this->assertEquals( '/path/to/upload/dir', $ret['path'] );
+	}
+
+	/**
+	 * Test wp_upload_dir
+	 */
+	function test_wp_upload_dir_should_call_wp_upload_dir_and_return_result_with_optional_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				'yyyy/mm',
+				true,
+				true
+			)
+			->willReturn( [ 'path' => '/path/to/upload/dir' ] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_upload_dir( 'yyyy/mm', true, true );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 1, count( $ret ) );
+		$this->assertEquals( '/path/to/upload/dir', $ret['path'] );
+	}
+
+	/**
+	 * Test wp_insert_attachment
+	 */
+	function test_wp_insert_attachment_should_call_wp_insert_attachment_and_return_result_with_required_args() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'foo' => 'bar',
+					'baz' => 'bark',
+				],
+				false,
+				0,
+				false
+			)
+			->willReturn( 0 );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_insert_attachment( [ 'foo' => 'bar', 'baz' => 'bark' ] );
+		$this->assertEquals( 0, $ret );
+	}
+
+	/**
+	 * Test wp_insert_attachment
+	 */
+	function test_wp_insert_attachment_should_call_wp_insert_attachment_and_return_result_with_optional_args() {
+		// @setup
+		$m_error = $this->mock( 'WP_Error' );
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				[
+					'foo' => 'bar',
+					'baz' => 'bark',
+				],
+				true,
+				123456789,
+				true
+			)
+			->willReturn( $m_error );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_insert_attachment( [ 'foo' => 'bar', 'baz' => 'bark' ], true, 123456789, true );
+		$this->assertEquals( $m_error, $ret );
+	}
+
+	/**
+	 * Test wp_generate_attachment_metadata
+	 */
+	function test_wp_generate_attachment_metadata_should_call_wp_generate_attachment_metadata_and_return_result() {
+		// @setup
+		$this->create_stub()->expects( $this->once() )
+			->method( 'stub' )
+			->with(
+				12345678,
+				'/path/to/uploaded/file.png'
+			)
+			->willReturn( [
+				'width' => 1900,
+				'height' => 1200,
+				'file' => '/path/to/uploaded/file.png',
+			] );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_generate_attachment_metadata( 12345678, '/path/to/uploaded/file.png' );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 3, count( $ret ) );
+		$this->assertEquals( 1900, $ret['width'] );
+		$this->assertEquals( 1200, $ret['height'] );
+		$this->assertEquals( '/path/to/uploaded/file.png', $ret['file'] );
+	}
+
+	/**
+	 * Test wp_update_attachment_metadata
+	 */
+	function test_wp_update_attachment_metadata_should_call_wp_update_attachment_metadata_and_return_result() {
+		// @setup
+		$this->create_stub()->expects( $this->exactly( 2 ) )
+			->method( 'stub' )
+			->with(
+				12345678,
+				[
+					'foo' => 'bar',
+				]
+			)
+			->will( $this->onConsecutiveCalls( true, false ) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_update_attachment_metadata( 12345678, [ 'foo' => 'bar' ] );
+		$this->assertTrue( $ret );
+		$ret = $wph->wp_update_attachment_metadata( 12345678, [ 'foo' => 'bar' ] );
+		$this->assertFalse( $ret );
+	}
+
+	/**
+	 * Test set_post_thumbnail
+	 */
+	function test_set_post_thumbnail_should_call_set_post_thumbnail_and_return_result() {
+		// @setup
+		$this->create_stub()->expects( $this->exactly( 2 ) )
+			->method( 'stub' )
+			->with(
+				12345678,
+				98765432
+			)
+			->will( $this->onConsecutiveCalls( true, false ) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->set_post_thumbnail( 12345678, 98765432 );
+		$this->assertTrue( $ret );
+		$ret = $wph->set_post_thumbnail( 12345678, 98765432 );
+		$this->assertFalse( $ret );
 	}
 }

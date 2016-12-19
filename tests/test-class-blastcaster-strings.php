@@ -5,7 +5,6 @@ namespace Terescode\BlastCaster;
 require_once 'includes/constants.php';
 require_once 'includes/class-blastcaster-strings.php';
 require_once 'includes/class-plugin-helper.php';
-require_once 'tests/stub-translate.php';
 
 /**
  * Class WpAdminPluginTest

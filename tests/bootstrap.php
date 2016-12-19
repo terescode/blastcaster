@@ -20,14 +20,18 @@ if ( ! function_exists( 'plugin_dir_url' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_include_once' ) ) {
-	function wp_include_once( $file ) {
-		if ( file_exists( WP_INCLUDES_PATH . $file ) ) {
-			include_once( WP_INCLUDES_PATH . $file );
-		} else {
-			throw new Exception( 'Can\'t find wp include ' . WP_INCLUDES_PATH . $file );
-		}
+if ( ! function_exists( '__' ) ) {
+	function __( $foo, $bar = 'default' ) {
+		return $foo;
 	}
+}
+
+if ( isset( $_ENV['PHP_BINARY'] ) ) {
+	define( 'PHP_BINARY', $_ENV['PHP_BINARY'] );
+}
+
+interface TestHelper {
+	public function stub();
 }
 
 if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
@@ -41,23 +45,15 @@ if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 		 */
 		private $expect_html_callback = null;
 
-		/**
-		 * Test setup
-		 */
-		public function setUp() {
-			//\WP_Mock::setUp();
-		}
-
-		/**
-		 * Teardown
-		 */
-
-		public function tearDown() {
-			//\WP_Mock::tearDown();
-		}
 
 		public function expect_html( $callback ) {
 			$this->expect_html_callback = $callback;
+		}
+
+		public function create_stub() {
+			global $test_helper;
+			$test_helper = $this->mock( 'TestHelper' );
+			return $test_helper;
 		}
 
 		public function hasExpectationOnOutput() {
@@ -117,4 +113,3 @@ if ( ! class_exists( 'BcPhpUnitTestCase' ) ) {
 		}
 	}
 }
-
