@@ -41,16 +41,20 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 		$m_error = $this->mock( 'WP_Error' );
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
-		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$m_formatter = $this->mock( 'Terescode\BlastCaster\BcBlastFormatter' );
 		$blast = new BcBlast( 'TDD is fun', 'TDD is test driven development!' );
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
+		$m_formatter->method( 'format' )
+			->willReturn( 'some content' );
 		$m_wph->method( 'wp_insert_post' )
 			->willReturn( $m_error );
+		$m_wph->method( 'is_wp_error' )
+			->willReturn( true );
 
 		// @exercise
-		$dao = new BcBlastDao( $m_helper, $formatter );
+		$dao = new BcBlastDao( $m_helper, $m_formatter );
 		$ret = $dao->create_post( $blast );
 
 		// @verify

@@ -26,6 +26,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_MISSING_BLAST_IMAGE_FILE = 'bc.abf.missing-image-file';
 		const ABF_BUILD_ACTION_DATA_FAILED = 'bc.abf.build-action-data-failed';
 		const ABF_LOAD_MEDIA_FAILED = 'bc.abf.load-media-failed';
+		const ABF_INSERT_POST_FAILED = 'bc.abf.insert-post-failed';
 
 		private $bundle;
 

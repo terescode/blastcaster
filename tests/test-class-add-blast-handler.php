@@ -158,4 +158,31 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 		] );
 		$this->assertEquals( \Terescode\BlastCaster\BcStrings::ABF_BUILD_ACTION_DATA_FAILED, $ret );
 	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_returns_error_given_create_post_returns_error() {
+		// @setup
+		$m_error = $this->mock( 'WP_Error' );
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'is_wp_error' )
+			->willReturn( true );
+		$m_dao->method( 'create_post' )
+			->willReturn( $m_error );
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$ret = $controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+		] );
+		$this->assertEquals( \Terescode\BlastCaster\BcStrings::ABF_INSERT_POST_FAILED, $ret );
+	}
 }
