@@ -78,10 +78,12 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$extra_data = [];
 
 			$extra_data['page_data'] = ( $this->page_data ? $this->page_data : new \stdClass() );
+			$extra_data['categories'] = $this->wph->get_categories( [ 'hide_empty' => false ] );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-title' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-url' );
+			$this->blast_form_helper->forward_param( $extra_data, 'mode' );
 
 			$bc_data_js = $this->blast_form_helper->build_action_data(
 				self::BC_ADD_BLAST_POST_ACTION,

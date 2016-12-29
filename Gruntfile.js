@@ -462,7 +462,7 @@ module.exports = function (grunt) {
   // Test task - run phpcs and phpunit
   grunt.registerTask('test', function () {
     if (0 < this.args.length) {
-      grunt.task.run('phpunit:application:tests/test-' + this.args[0]);
+      grunt.task.run('phpunit:application:tests/' + this.args[0]);
     } else {
       grunt.task.run('test-all');
     }

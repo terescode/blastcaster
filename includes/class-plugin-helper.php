@@ -96,14 +96,24 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 				$val = $_GET[ $name ];
 			}
 
-			if ( null !== $val ) {
-				return call_user_func(
-					$this->sanitizers[ $type ],
-					$val
-				);
+			if ( null === $val ) {
+				return $val;
 			}
 
-			return $val;
+			if ( is_array( $val ) ) {
+				foreach ( $val as $key => $value ) {
+					$val[ $key ] = call_user_func(
+						$this->sanitizers[ $type ],
+						$value
+					);
+				}
+				return $val;
+			}
+
+			return call_user_func(
+				$this->sanitizers[ $type ],
+				$val
+			);
 		}
 
 		function string( $code, $args = array() ) {

@@ -11,6 +11,7 @@ import {GridList, GridTile} from 'material-ui/GridList';
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
 import {cyan50, cyan500, grey400} from 'material-ui/styles/colors.js';
+import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
 const styles = {
   paperStyle: {
@@ -28,6 +29,16 @@ const styles = {
   },
   imgToggle: {
     marginTop: 16
+  },
+  catPickerStyle: {
+    width: '40%'
+  },
+  catPickerRow: {
+    height: 32
+  },
+  catPickerCell: {
+    paddingLeft: 6,
+    paddingRight: 6
   },
   noImagePanel: {
     backgroundColor: cyan50,
@@ -252,6 +263,62 @@ ImagePicker.contextTypes = {
   muiTheme: React.PropTypes.object
 };
 
+class CategoryPickerRow extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const { children, term, name, ...otherProps } = this.props;
+    return (
+      <TableRow {...otherProps}>
+        {children}
+        <TableRowColumn style={styles.catPickerCell}>
+          {this.props.selected && <input type="hidden" name="bc-add-cat[]" value={term} />}
+          {name}
+        </TableRowColumn>
+      </TableRow>
+    );
+  }
+}
+
+class CategoryPicker extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    var labelStyle = {
+        color: this.context.muiTheme.textField.floatingLabelColor,
+        fontSize: '12px',
+        cursor: 'auto'
+      };
+    return (
+      <div style={styles.catPickerStyle}>
+        <label style={labelStyle}>Categories</label>
+        <Table
+          height='150px'
+          selectable={true}
+          multiSelectable={true}
+        >
+          <TableBody
+            displayRowCheckbox={true}
+            deselectOnClickaway={false}
+          >
+            {this.props.data.categories.map( (row, index) => {
+              return (<CategoryPickerRow style={styles.catPickerRow} key={index} name={row.name} term={row.term_id} />);}
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+}
+
+CategoryPicker.contextTypes = {
+  muiTheme: React.PropTypes.object
+};
+
 class BlastForm extends React.Component {
   constructor(props) {
     super(props);
@@ -298,6 +365,7 @@ class BlastForm extends React.Component {
                 fullWidth={true}
                 defaultValue={this.state.title}
               />
+              <CategoryPicker data={this.props.data} />
               <ImagePicker data={this.props.data} />
               <TextField
                 hintText="Enter a description for the blast"

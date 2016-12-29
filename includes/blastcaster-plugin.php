@@ -11,6 +11,7 @@ require_once BC_PLUGIN_DIR . 'includes/class-generic-action.php';
 require_once BC_PLUGIN_DIR . 'includes/validate/class-capability-validator.php';
 require_once BC_PLUGIN_DIR . 'includes/validate/class-string-validator.php';
 require_once BC_PLUGIN_DIR . 'includes/validate/class-blast-image-validator.php';
+require_once BC_PLUGIN_DIR . 'includes/validate/class-wp-category-validator.php';
 require_once BC_PLUGIN_DIR . 'includes/class-blast-dao.php';
 require_once BC_PLUGIN_DIR . 'includes/class-wp-include-formatter.php';
 require_once BC_PLUGIN_DIR . 'includes/class-media-loader.php';
@@ -25,6 +26,7 @@ use Terescode\WordPress\TcGenericController;
 use Terescode\WordPress\TcGenericAction;
 use Terescode\WordPress\TcCapabilityValidator;
 use Terescode\WordPress\TcStringValidator;
+use Terescode\WordPress\TcWpCategoryValidator;
 use Terescode\BlastCaster\BcBlastImageValidator;
 use Terescode\BlastCaster\BcStrings;
 use Terescode\BlastCaster\BcAddBlastPage;
@@ -55,6 +57,7 @@ if ( ! function_exists( __NAMESPACE__ . '\create_plugin' ) ) {
 								new TcStringValidator( $plugin_helper, 'bc-add-title', BcStrings::ABF_MISSING_BLAST_TITLE ),
 								new TcStringValidator( $plugin_helper, 'bc-add-desc', BcStrings::ABF_MISSING_BLAST_DESCRIPTION ),
 								new BcBlastImageValidator( $plugin_helper ),
+								new TcWpCategoryValidator( $plugin_helper, 'bc-add-cat' ),
 							],
 							new BcAddBlastHandler(
 								$plugin_helper,

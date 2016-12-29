@@ -93,6 +93,11 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlastDao' ) ) {
 				'post_status' => 'publish',
 			];
 
+			$categories = $blast->get_categories();
+			if ( 0 < count( $categories ) ) {
+				$postarr['post_category'] = $categories;
+			}
+
 			$post_id = $this->wph->wp_insert_post( $postarr, true );
 			if ( $this->wph->is_wp_error( $post_id ) ) {
 				return $post_id;

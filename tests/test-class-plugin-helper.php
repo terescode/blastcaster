@@ -329,6 +329,27 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( 'bar', $val );
 	}
 
+	function test_param_should_return_array_given_param_is_array() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo[]'] = array( 'bar', 'baz', 'bam' );
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo[]' );
+
+		// @verify
+		$this->assertInternalType( 'array', $val );
+		$this->assertEquals( 3, count( $val ) );
+		$this->assertEquals( 'bar', $val[0] );
+		$this->assertEquals( 'baz', $val[1] );
+		$this->assertEquals( 'bam', $val[2] );
+	}
+
 	function test_param_should_call_sanitize_text_field_given_no_type() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );

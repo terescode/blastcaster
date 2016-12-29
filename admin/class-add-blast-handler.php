@@ -74,7 +74,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 			$blast = new BcBlast(
 				$data['bc-add-title'],
 				$data['bc-add-desc'],
-				$image_data
+				$image_data,
+				isset( $data['bc-add-cat'] ) ? $data['bc-add-cat'] : array()
 			);
 
 			$result = $this->blast_dao->create_post( $blast );

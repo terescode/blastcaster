@@ -1337,4 +1337,46 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$ret = $wph->set_post_thumbnail( 12345678, 98765432 );
 		$this->assertFalse( $ret );
 	}
+
+	/**
+	 * Test get_categories
+	 */
+	function test_get_categories_should_call_get_categories_with_required_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_categories', array(
+			'times' => 1,
+			'args' => array(
+				''
+			),
+			'return' => [],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_categories();
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 0, count( $ret ) );
+	}
+
+	/**
+	 * Test get_categories
+	 */
+	function test_get_categories_should_call_get_categories_with_optional_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_categories', array(
+			'times' => 1,
+			'args' => array(
+				[
+					'hide_empty' => false
+				]
+			),
+			'return' => [ 'foo' => 'bar' ],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_categories( [ 'hide_empty' => false ] );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 1, count( $ret ) );
+	}
 }

@@ -185,5 +185,9 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		function set_post_thumbnail( $post, $thumbnail_id ) {
 			return set_post_thumbnail( $post, $thumbnail_id );
 		}
+
+		function get_categories( $args = '' ) {
+			return get_categories( $args );
+		}
 	}
 }
