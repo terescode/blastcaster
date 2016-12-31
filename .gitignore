@@ -6,10 +6,11 @@ composer.phar
 vendor/*
 
 # NodeJS
-
 node_modules/*
+
+# Build time assets
+build/*
 reports/*
 
 # Logs
-
 *.log
