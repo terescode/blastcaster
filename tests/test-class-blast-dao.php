@@ -229,4 +229,36 @@ class BcBlastDaoTest extends \BcPhpUnitTestCase {
 		// @verify
 		$this->assertEquals( 3456789, $ret );
 	}
+
+	function test_create_post_should_set_post_category_given_blast_with_categories() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$formatter = new BcWpIncludeFormatter( 'tests/fixtures/sample-template.php' );
+		$blast = new BcBlast(
+			'TDD is fun',
+			'TDD is test driven development!',
+			[
+				'file' => '/path/to/file.png',
+				'type' => 'image/png',
+			],
+			[ 1, 2, 3 ]
+		);
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->expects( $this->once() )
+			->method( 'wp_insert_post' )
+			->with( $this->callback( function ( $subject ) {
+				return isset( $subject['post_category'] ) &&
+					3 === count( $subject['post_category'] ) &&
+					1 === $subject['post_category'][0] &&
+					2 === $subject['post_category'][1] &&
+					3=== $subject['post_category'][2];
+			}));
+
+		// @exercise
+		$dao = new BcBlastDao( $m_helper, $formatter );
+		$dao->create_post( $blast );
+	}
 }

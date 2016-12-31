@@ -66,7 +66,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 			// TODO: Need to be able to return errors with codes and args
 			if ( isset( $data['image'] ) ) {
 				$image_data = $this->media_loader->load_media( $data['image'] );
-				if ( isset( $image_data['error'] ) ) {
+				if ( $this->wph->is_wp_error( $image_data )
+					|| isset( $image_data['error'] ) ) {
 					return BcStrings::ABF_BUILD_ACTION_DATA_FAILED;
 				}
 			}

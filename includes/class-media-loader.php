@@ -29,31 +29,32 @@ if ( ! interface_exists( __NAMESPACE__ . '\BcMediaLoader' ) ) {
 			$this->action = $action;
 		}
 
-		function sideload_media( $url ) {
+		private function sideload_media( $url ) {
 			// Download file to temp dir
 			$temp_file = $this->wph->download_url( $url, 5 );
 
-			if ( ! $this->wph->is_wp_error( $temp_file ) ) {
-
-				// Array based on $_FILE as seen in PHP file uploads
-				$file = array(
-					'name' => basename( $url ),
-					'tmp_name' => $temp_file,
-					'error' => 0,
-					'size' => filesize( $temp_file ),
-				);
-
-				$overrides = array(
-					'test_form' => false,
-					'test_size' => true,
-				);
-
-				// Move the temporary file into the uploads directory
-				return $this->wph->wp_handle_sideload( $file, $overrides );
+			if ( $this->wph->is_wp_error( $temp_file ) ) {
+				return $temp_file;
 			}
+
+			// Array based on $_FILE as seen in PHP file uploads
+			$file = array(
+				'name' => basename( $url ),
+				'tmp_name' => $temp_file,
+				'error' => 0,
+				'size' => filesize( $temp_file ),
+			);
+
+			$overrides = array(
+				'test_form' => false,
+				'test_size' => true,
+			);
+
+			// Move the temporary file into the uploads directory
+			return $this->wph->wp_handle_sideload( $file, $overrides );
 		}
 
-		function upload_media( $file ) {
+		private function upload_media( $file ) {
 			// Move the temporary file into the uploads directory
 			return $this->wph->wp_handle_upload(
 				$file,

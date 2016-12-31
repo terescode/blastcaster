@@ -133,6 +133,7 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 	 */
 	function test_handle_returns_error_given_media_loader_returns_error() {
 		// @setup
+		$m_error = $this->mock( 'WP_Error' );
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
@@ -141,16 +142,28 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
 		$m_loader->method( 'load_media' )
-			->willReturn(
+			->will(	$this->onConsecutiveCalls(
 				[
 					'error' => 'Could not load image!',
-				]
-			);
+				],
+				$m_error
+			));
+		$m_wph->method( 'is_wp_error' )
+			->will( $this->onConsecutiveCalls(
+				false,
+				true
+			));
 		$m_dao->expects( $this->never() )
 			->method( 'create_post' );
 
 		// @exercise
 		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$ret = $controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+		] );
+		$this->assertEquals( \Terescode\BlastCaster\BcStrings::ABF_BUILD_ACTION_DATA_FAILED, $ret );
 		$ret = $controller->handle( [
 			'bc-add-title' => 'An Article Title',
 			'bc-add-desc' => 'This is some description of the article.',

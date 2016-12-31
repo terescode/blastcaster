@@ -83,7 +83,6 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-url' );
-			$this->blast_form_helper->forward_param( $extra_data, 'mode' );
 
 			$bc_data_js = $this->blast_form_helper->build_action_data(
 				self::BC_ADD_BLAST_POST_ACTION,

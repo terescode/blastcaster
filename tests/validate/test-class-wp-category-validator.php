@@ -16,7 +16,7 @@ use Terescode\BlastCaster\BcStrings;
  * @package Blastcaster
  */
 
-class TcCapabilityValidatorTest extends \BcPhpUnitTestCase {
+class TcWpCategoryValidatorTest extends \BcPhpUnitTestCase {
 	function test_validate_should_return_null_given_empty_param() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
