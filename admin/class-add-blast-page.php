@@ -79,6 +79,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 
 			$extra_data['page_data'] = ( $this->page_data ? $this->page_data : new \stdClass() );
 			$extra_data['categories'] = $this->wph->get_categories( [ 'hide_empty' => false ] );
+			$extra_data['tags'] = $this->wph->get_tags( [ 'hide_empty' => false, 'fields' => 'id=>name' ] );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-title' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
@@ -102,8 +103,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 					$this->page_data = $this->decode_page_data( $post_data );
 				}
 			}
-			// TODO: need to add CSS to webpack optimization and reference bundle here
-			$this->wph->wp_enqueue_style( 'bc-styles', BC_PLUGIN_URL . 'admin/css/app.css' );
+			$this->wph->wp_enqueue_style( 'bc-styles', BC_PLUGIN_URL . 'admin/css/bundle.css' );
 			$this->wph->wp_enqueue_script( 'bc-scripts', BC_PLUGIN_URL . 'admin/js/bundle.js', [ 'jquery' ], false, true );
 			$this->wph->add_action( 'admin_print_scripts-' . $this->get_hook_suffix(), array( $this, 'print_scripts' ) );
 		}

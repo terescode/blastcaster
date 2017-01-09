@@ -9,14 +9,23 @@
             "linting.enabled": true,
             "linting.collapsed": false,
             "fonts.fontSize": "12px",
-            "mikaeljorhult.bracketsPHPLintTools.php-available": true,
-            "themes.theme": "dark-theme"
+            "mikaeljorhult.bracketsPHPLintTools.php-available": true
+        },
+        "**.jsx": {
+            "useTabChar": false,
+            "spaceUnits": 2,
+            "linting.enabled": true,
+            "linting.collapsed": false,
+            "fonts.fontSize": "12px",
+            "mikaeljorhult.bracketsPHPLintTools.php-available": true
         },
         "**.json": {
             "useTabChar": false,
             "spaceUnits": 2,
             "linting.enabled": true,
-            "fonts.fontSize": "12px"
+            "linting.collapsed": false,
+            "fonts.fontSize": "12px",
+            "mikaeljorhult.bracketsPHPLintTools.php-available": true
         }
     },
     "dimitrk.exclude-indexing-filetree.excludeList": [
@@ -24,5 +33,14 @@
         "build",
         "vendor",
         "node_modules"
-    ]
+    ],
+    "language": {
+        "javascript": {
+            "linting.prefer": [
+                "ESLint"
+            ],
+            "linting.usePreferredOnly": true
+        }
+    },
+    "themes.theme": "dark-theme"
 }

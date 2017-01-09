@@ -11,6 +11,8 @@ node_modules/*
 # Build time assets
 build/*
 reports/*
+admin/js/bundle.*
+admin/css/bundle.*
 
 # Logs
 *.log

@@ -129,7 +129,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 			->method( 'wp_enqueue_style' )
 			->with(
 				$this->equalTo( 'bc-styles' ),
-				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/bundle.css' ),
 				$this->equalTo( [] ),
 				$this->equalTo( false ),
 				$this->equalTo( 'all' )
@@ -177,7 +177,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 			->method( 'wp_enqueue_style' )
 			->with(
 				$this->equalTo( 'bc-styles' ),
-				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/bundle.css' ),
 				$this->equalTo( [] ),
 				$this->equalTo( false ),
 				$this->equalTo( 'all' )
@@ -225,7 +225,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 			->method( 'wp_enqueue_style' )
 			->with(
 				$this->equalTo( 'bc-styles' ),
-				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/bundle.css' ),
 				$this->equalTo( [] ),
 				$this->equalTo( false ),
 				$this->equalTo( 'all' )
@@ -274,7 +274,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 			->method( 'wp_enqueue_style' )
 			->with(
 				$this->equalTo( 'bc-styles' ),
-				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/bundle.css' ),
 				$this->equalTo( [] ),
 				$this->equalTo( false ),
 				$this->equalTo( 'all' )
@@ -332,7 +332,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 			->method( 'wp_enqueue_style' )
 			->with(
 				$this->equalTo( 'bc-styles' ),
-				$this->equalTo( BC_PLUGIN_URL . 'admin/css/app.css' ),
+				$this->equalTo( BC_PLUGIN_URL . 'admin/css/bundle.css' ),
 				$this->equalTo( [] ),
 				$this->equalTo( false ),
 				$this->equalTo( 'all' )

@@ -1,0 +1,25 @@
+.wrapper {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-around !important;
+}
+.grid-list {
+	display: flex !important;
+	flex-wrap: nowrap !important;
+	overflow-x: auto !important;
+}
+.grid-tile {
+	background-color: transparent !important;
+	width: 212px !important;
+	padding: 0px 4px !important;
+}
+.grid-tile-selected {
+	width: 212px !important;
+	padding: 0px 4px !important;
+}
+.grid-tile-image {
+	transform: translateX(-50%) translateY(-50%) !important;
+	top: 50% !important;
+	width: 100% !important;
+	height: auto !important;
+}

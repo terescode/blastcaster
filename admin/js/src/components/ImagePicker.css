@@ -1,0 +1,27 @@
+.wrapper {
+	margin-top: 10px !important;
+},
+.img-toggle {
+	margin-top: 16px !important;
+}
+.no-image {
+	text-align: center !important;
+	height: 180px !important;
+}
+.no-image h2 {
+	margin: 0px;
+	padding-top: 60px;
+	font-weight: normal;
+	font-size: 2em;
+	letter-spacing: -1px;
+}
+.no-image h3 {
+	font-weight: normal;
+	font-size: 1em;
+	letter-spacing: 0px;
+}
+.upload-link {
+}
+.no-image input[type="file"] {
+	display: none;
+}

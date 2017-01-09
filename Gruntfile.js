@@ -1,4 +1,4 @@
-/*global module, require */
+/* eslint-env node */
 /**
  * Grunt wrapper
  */
@@ -12,12 +12,10 @@ module.exports = function (grunt) {
   var fs = require('fs'),
     util = require('util'),
     _ = require('lodash'),
-    chalk = require('chalk'),
     multitasker = require('grunt-multitasker')(grunt),
     xml2js = require('xml2js'),
     webpack = require('webpack'),
-    webpackConfig = require("./webpack.config.js"),
-    phpXdebug = '/usr/bin/php -d zend_extension=/usr/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so';
+    webpackConfig = require("./webpack.config.js");
 
   function runFn(callback) {
     return function () {
@@ -62,7 +60,7 @@ module.exports = function (grunt) {
           grunt.file.write(tmpPath, zendExtension);
         } else {
           grunt.file.copy(iniPath, tmpPath, {
-            process: function (contents, srcPath, destPath) {
+            process: function (contents) {
               return contents + zendExtension;
             }
           });
@@ -200,13 +198,17 @@ module.exports = function (grunt) {
     clean: {
       build: {
         src: [
-          'composer-setup.php',
+          'admin/js/bundle.js',
+          'admin/js/bundle.js.map',
+          'admin/css/bundle.css',
+          'admin/css/bundle.css.map',
           'build/',
           'reports/'
         ]
       },
       all: {
         src: [
+          'composer-setup.php',
           'composer.phar',
           'vendor/',
           'node_modules/'
@@ -382,7 +384,10 @@ module.exports = function (grunt) {
           archive: 'build/blastcaster.zip'
         },
         src: [
-          'admin/**',
+          'admin/**/*.php',
+          'admin/js/*.js',
+          'admin/css/*.css',
+          'admin/images/**',
           'includes/**',
           'languages/**',
           'blastcaster.php',

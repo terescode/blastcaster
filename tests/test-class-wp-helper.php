@@ -1379,4 +1379,46 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$this->assertInternalType( 'array', $ret );
 		$this->assertEquals( 1, count( $ret ) );
 	}
+
+	/**
+	 * Test get_tags
+	 */
+	function test_get_tags_should_call_get_tags_with_required_args_and_return_its_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_tags', array(
+			'times' => 1,
+			'args' => array(
+				''
+			),
+			'return' => [],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_tags();
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 0, count( $ret ) );
+	}
+
+	/**
+	 * Test get_categories
+	 */
+	function test_get_tags_should_call_get_tags_with_optional_args_and_return_its_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_tags', array(
+			'times' => 1,
+			'args' => array(
+				[
+					'hide_empty' => false
+				]
+			),
+			'return' => [ 'foo' => 'bar' ],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_tags( [ 'hide_empty' => false ] );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 1, count( $ret ) );
+	}
 }

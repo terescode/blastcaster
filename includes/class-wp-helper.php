@@ -189,5 +189,9 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		function get_categories( $args = '' ) {
 			return get_categories( $args );
 		}
+
+		function get_tags( $args = '' ) {
+			return get_tags( $args );
+		}
 	}
 }

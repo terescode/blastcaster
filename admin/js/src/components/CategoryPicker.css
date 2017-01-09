@@ -1,0 +1,10 @@
+  .wrapper {
+    width: 40% !important;
+  }
+  .row {
+    height: 32px !important;
+  }
+  .cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
