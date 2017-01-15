@@ -53,6 +53,16 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 			$this->blast_dao = $blast_dao;
 		}
 
+		private function create_blast( $data, $image_data ) {
+			return new BcBlast(
+				$data['bc-add-title'],
+				$data['bc-add-desc'],
+				$image_data,
+				isset( $data['bc-add-cat'] ) ? $data['bc-add-cat'] : array(),
+				isset( $data['bc-add-tax'] ) ? $data['bc-add-tax'] : array()
+			);
+		}
+
 		function handle_error( $err ) {
 			$this->plugin_helper->add_admin_notice(
 				$this->plugin_helper->string( $err )
@@ -72,14 +82,9 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 				}
 			}
 
-			$blast = new BcBlast(
-				$data['bc-add-title'],
-				$data['bc-add-desc'],
-				$image_data,
-				isset( $data['bc-add-cat'] ) ? $data['bc-add-cat'] : array()
+			$result = $this->blast_dao->create_post(
+				$this->create_blast( $data, $image_data )
 			);
-
-			$result = $this->blast_dao->create_post( $blast );
 			if ( $this->wph->is_wp_error( $result ) ) {
 				return BcStrings::ABF_INSERT_POST_FAILED;
 			}

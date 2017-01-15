@@ -14,11 +14,13 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpCategoryValidator' ) ) {
 		private $plugin_helper;
 		private $name;
 		private $code;
+		private $tax_type;
 
-		function __construct( $plugin_helper, $name, $code = null ) {
+		function __construct( $plugin_helper, $name, $code = null, $tax_type = 'category' ) {
 			$this->plugin_helper = $plugin_helper;
 			$this->name = $name;
 			$this->code = $code;
+			$this->tax_type = $tax_type;
 		}
 
 		function validate( &$map ) {
@@ -31,11 +33,14 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpCategoryValidator' ) ) {
 				return BcStrings::ABF_INVALID_CATEGORY_TYPE;
 			}
 
-			foreach ( $categories as $catid ) {
-				if ( ! is_numeric( $catid ) ) {
-					return BcStrings::ABF_INVALID_CATEGORY;
+			if ( 'post_tag' !== $this->tax_type ) {
+				foreach ( $categories as $catid ) {
+					if ( ! is_numeric( $catid ) ) {
+						return BcStrings::ABF_INVALID_CATEGORY;
+					}
 				}
 			}
+
 			$map[ $this->name ] = $categories;
 			return null;
 		}

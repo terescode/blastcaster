@@ -39,7 +39,7 @@ export default class BlastForm extends Component {
           <h1>Add a blast</h1>
           <Paper className={styles.wrapper} zDepth={2}>
             <p>Create a new blast using the fields below.</p>
-            <form name="blastcaster-form" id="blastcaster-form" method="post" type="multipart/form-data">
+            <form name="blastcaster-form" id="blastcaster-form" method="post" encType="multipart/form-data">
               <input type="hidden" name="action" value={this.action} />
               <input type="hidden" name={this.action + '_nonce'} value={this.actionNonce} />
               <input type="hidden" name="pageData" value={JSON.stringify(this.props.data.page_data)} />
@@ -55,7 +55,7 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.title}
               />
-              <CategoryPicker data={this.props.data} />
+              <CategoryPicker categories={this.props.data.categories} />
               <ImagePicker data={this.props.data} />
               <TextField
                 hintText="Enter a description for the blast"
@@ -69,7 +69,7 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.description}
               />
-              <TagPicker data={this.props.data} />
+              <TagPicker tags={this.props.data.tags} />
               <RaisedButton
                 label="Add blast"
                 primary={true}

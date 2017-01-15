@@ -98,6 +98,11 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlastDao' ) ) {
 				$postarr['post_category'] = $categories;
 			}
 
+			$tags = $blast->get_tags();
+			if ( 0 < count( $tags ) ) {
+				$postarr['tags_input'] = $tags;
+			}
+
 			$post_id = $this->wph->wp_insert_post( $postarr, true );
 			if ( $this->wph->is_wp_error( $post_id ) ) {
 				return $post_id;

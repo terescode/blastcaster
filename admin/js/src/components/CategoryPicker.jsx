@@ -47,7 +47,7 @@ export default class CategoryPicker extends React.Component {
             displayRowCheckbox={true}
             deselectOnClickaway={false}
           >
-            {this.props.data.categories.map( (row, index) => {
+            {this.props.categories.map( (row, index) => {
               return (<CategoryPickerRow className={styles.row} key={index} name={row.name} term={row.term_id} />);}
             )}
           </TableBody>
@@ -58,5 +58,5 @@ export default class CategoryPicker extends React.Component {
 }
 
 CategoryPicker.propTypes = {
-    data: PropTypes.object.isRequired,
+    categories: PropTypes.array.isRequired,
 };

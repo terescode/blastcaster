@@ -56,9 +56,16 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			->method( 'create_post' )
 			->with(
 				$this->callback( function ( $subject ) {
+					$cats = $subject->get_categories();
+					$tags = $subject->get_tags();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						'An Article Title' === $subject->get_title() &&
-						'This is some description of the article.' === $subject->get_description();
+						'This is some description of the article.' === $subject->get_description() &&
+						null === $subject->get_image_data() &&
+						is_array( $cats ) &&
+						0 === count( $cats ) &&
+						is_array( $tags ) &&
+						0 === count( $tags );
 				} )
 			);
 		$m_helper->expects( $this->once() )
@@ -102,13 +109,21 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			->with(
 				$this->callback( function ( $subject ) {
 					$image_data = $subject->get_image_data();
+					$cats = $subject->get_categories();
+					$tags = $subject->get_tags();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						'An Article Title' === $subject->get_title() &&
 						'This is some description of the article.' === $subject->get_description() && null !== $image_data &&
 						3 === count( $image_data ) &&
 						'image.png' === $image_data['file'] &&
 						'http://www.terescode.com/path/to/image.png' === $image_data['url'] &&
-						'image/png' === $image_data['type'];
+						'image/png' === $image_data['type'] &&
+						is_array( $cats ) &&
+						2 === count( $cats ) &&
+						1 === $cats[0] && 26 === $cats[1] &&
+						is_array( $tags ) &&
+						3 === count( $tags ) &&
+						23 === $tags[0] && 'bar' === $tags[1] && 123 === $tags[2];
 				} )
 			);
 		$m_helper->expects( $this->once() )
@@ -125,6 +140,8 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'bc-add-title' => 'An Article Title',
 			'bc-add-desc' => 'This is some description of the article.',
 			'image' => 'yada yada',
+			'bc-add-cat' => [ 1, 26 ],
+			'bc-add-tax' => [ 23, 'bar', 123 ],
 		] );
 	}
 
