@@ -18,7 +18,7 @@
 	padding: 0px 4px !important;
 }
 .grid-tile-image {
-	transform: translateX(-50%) translateY(-50%) !important;
+	transform: translateY(-50%) !important;
 	top: 50% !important;
 	width: 100% !important;
 	height: auto !important;

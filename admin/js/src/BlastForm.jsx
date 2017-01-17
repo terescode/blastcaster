@@ -44,6 +44,9 @@ export default class BlastForm extends Component {
     }
     if (this.props.data['bc-add-tax']) {
       state.tags = this.props.data['bc-add-tax'];
+    } else if (this.props.data.page_data.tags &&
+        0 < this.props.data.page_data.tags.length) {
+      state.tags = this.props.data.page_data.tags;
     }
     if (this.props.data['bc-add-prompt']) {
       state.prompt = this.props.data['bc-add-prompt'];
