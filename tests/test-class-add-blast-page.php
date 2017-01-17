@@ -105,7 +105,7 @@ class BcAddBlastPageTest extends \BcPhpUnitTestCase {
 		$m_page_helper->method( 'build_action_data' )
 			->willReturn( '{"action":"awesome_action","foo":"bar"}' );
 		$this->expectOutputString(
-			'<script type="text/javascript">var terescode={"bc_data":'
+			'<script type="text/javascript">var terescode={bc_data:'
 			. '{"action":"awesome_action","foo":"bar"}};</script>'
 		);
 

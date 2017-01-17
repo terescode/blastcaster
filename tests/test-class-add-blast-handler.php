@@ -87,7 +87,7 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test handle
 	 */
-	function test_handle_calls_create_post_with_optional_data_given_optional_data() {
+	function test_handle_calls_create_post_with_image_data_given_image_data() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -109,18 +109,91 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			->with(
 				$this->callback( function ( $subject ) {
 					$image_data = $subject->get_image_data();
-					$cats = $subject->get_categories();
-					$tags = $subject->get_tags();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
-						'An Article Title' === $subject->get_title() &&
-						'This is some description of the article.' === $subject->get_description() && null !== $image_data &&
+						null !== $image_data &&
 						3 === count( $image_data ) &&
 						'image.png' === $image_data['file'] &&
 						'http://www.terescode.com/path/to/image.png' === $image_data['url'] &&
-						'image/png' === $image_data['type'] &&
+						'image/png' === $image_data['type'];
+				} )
+			);
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				'Blast added!',
+				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
+				true
+			);
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+		] );
+	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_calls_create_post_with_categories_given_categories() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_dao->expects( $this->once() )
+			->method( 'create_post' )
+			->with(
+				$this->callback( function ( $subject ) {
+					$cats = $subject->get_categories();
+					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						is_array( $cats ) &&
 						2 === count( $cats ) &&
-						1 === $cats[0] && 26 === $cats[1] &&
+						1 === $cats[0] && 26 === $cats[1];
+				} )
+			);
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				'Blast added!',
+				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
+				true
+			);
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+			'bc-add-cat' => [ 1, 26 ],
+			'bc-add-tax' => [ 23, 'bar', 123 ],
+		] );
+	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_calls_create_post_with_tags_given_tags() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_dao->expects( $this->once() )
+			->method( 'create_post' )
+			->with(
+				$this->callback( function ( $subject ) {
+					$tags = $subject->get_tags();
+					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						is_array( $tags ) &&
 						3 === count( $tags ) &&
 						23 === $tags[0] && 'bar' === $tags[1] && 123 === $tags[2];
@@ -142,6 +215,91 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'image' => 'yada yada',
 			'bc-add-cat' => [ 1, 26 ],
 			'bc-add-tax' => [ 23, 'bar', 123 ],
+		] );
+	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_calls_create_post_with_url_given_url() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_dao->expects( $this->once() )
+			->method( 'create_post' )
+			->with(
+				$this->callback( function ( $subject ) {
+					$url = $subject->get_url();
+					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
+						null !== $url &&
+						'http://www.terescode.com/about' === $url;
+				} )
+			);
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				'Blast added!',
+				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
+				true
+			);
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+			'bc-add-cat' => [ 1, 26 ],
+			'bc-add-tax' => [ 23, 'bar', 123 ],
+			'bc-add-url' => 'http://www.terescode.com/about',
+		] );
+	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_calls_create_post_with_prompt_given_prompt() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_dao->expects( $this->once() )
+			->method( 'create_post' )
+			->with(
+				$this->callback( function ( $subject ) {
+					$prompt = $subject->get_prompt();
+					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
+						null !== $prompt &&
+						'Read this awesome article here' === $prompt;
+				} )
+			);
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				'Blast added!',
+				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
+				true
+			);
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+			'bc-add-cat' => [ 1, 26 ],
+			'bc-add-tax' => [ 23, 'bar', 123 ],
+			'bc-add-url' => 'http://www.terescode.com/about',
+			'bc-add-prompt' => 'Read this awesome article here',
 		] );
 	}
 

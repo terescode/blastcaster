@@ -7,11 +7,31 @@ const dataSourceConfig = {
   value: 'term_id'
 };
 
+function isNumeric(val) {
+  return !isNaN(parseFloat(val)) && isFinite(val);
+}
+
+function resolveSlug(idOrSlug, tags) {
+  if (!isNumeric(idOrSlug)) {
+    return { term_id: idOrSlug, name: idOrSlug };
+  }
+  for (var i = 0; i < tags.length; i += 1) {
+    if (tags[i].term_id === Number(idOrSlug)) {
+      return tags[i];
+    }
+  }
+  return { term_id: idOrSlug, name: idOrSlug };
+}
+
 export default class TagPicker extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tags: []
+      tags: (
+        this.props.defaultValue ?
+        this.props.defaultValue.map( (idOrSlug) => resolveSlug(idOrSlug, this.props.tags) ) :
+        []
+      )
     };
   }
 
@@ -32,7 +52,7 @@ export default class TagPicker extends Component {
     return (
       <div className={styles.wrapper}>
         {this.state.tags.map( (tag) => {
-          return (<input type="hidden" name="bc-add-tax[]" value={tag.term_id} />);
+          return (<input type="hidden" name="bc-add-tax[]" key={tag.term_id} value={tag.term_id} />);
         })}
         <ChipInput
           id="tag-chip-input"
@@ -53,5 +73,6 @@ export default class TagPicker extends Component {
 }
 
 TagPicker.propTypes = {
-  tags: PropTypes.array.isRequired
+  tags: PropTypes.array.isRequired,
+  defaultValue: PropTypes.array
 };

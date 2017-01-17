@@ -390,6 +390,26 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( 'bar', $val );
 	}
 
+	function test_param_should_call_esc_url_raw_given_url_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo'] = 'http://www.terescode.com/I am a parameter';
+
+		$m_wph->expects( $this->once() )
+			->method( 'esc_url_raw' )
+			->with( $this->equalTo( 'http://www.terescode.com/I am a parameter' ) )
+			->willReturn( 'http://www.terescode.com/I%20am%20a%20parameter' );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo', 'url' );
+
+		// @verify
+		$this->assertEquals( 'http://www.terescode.com/I%20am%20a%20parameter', $val );
+	}
+
 	function test_string_should_call_string_with_required_args_and_return_value() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );

@@ -40,7 +40,9 @@ class TcStringValidatorTest extends \BcPhpUnitTestCase {
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
 		$data_map = [];
 
-		$m_helper->method( 'param' )
+		$m_helper->expects( $this->once() )
+			->method( 'param' )
+			->with( 'foo', 'text' )
 			->willReturn( 'bar' );
 
 		// @exercise
@@ -49,5 +51,23 @@ class TcStringValidatorTest extends \BcPhpUnitTestCase {
 		$this->assertNull( $ret );
 		$this->assertTrue( isset( $data_map['foo'] ) );
 		$this->assertEquals( 'bar', $data_map['foo'] );
+	}
+
+	function test_validate_should_call_param_with_url_type_given_type_url() {
+		// @setup
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$data_map = [];
+
+		$m_helper->expects( $this->once() )
+			->method( 'param' )
+			->with( 'foo', 'url' )
+			->willReturn( 'http://www.terescode.com/I%20am%20a%20parameter' );
+
+		// @exercise
+		$validator = new TcStringValidator( $m_helper, 'foo', -1, 'url' );
+		$ret = $validator->validate( $data_map );
+		$this->assertNull( $ret );
+		$this->assertTrue( isset( $data_map['foo'] ) );
+		$this->assertEquals( 'http://www.terescode.com/I%20am%20a%20parameter', $data_map['foo'] );
 	}
 }

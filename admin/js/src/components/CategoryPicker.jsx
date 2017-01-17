@@ -29,6 +29,15 @@ CategoryPickerRow.propTypes = {
     selected: PropTypes.bool
 };
 
+function isSelected(term, terms) {
+  for (var i = 0; i < terms.length; i += 1) {
+    if (term.term_id === Number(terms[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export default class CategoryPicker extends React.Component {
   constructor(props) {
     super(props);
@@ -48,7 +57,8 @@ export default class CategoryPicker extends React.Component {
             deselectOnClickaway={false}
           >
             {this.props.categories.map( (row, index) => {
-              return (<CategoryPickerRow className={styles.row} key={index} name={row.name} term={row.term_id} />);}
+              var selected = (this.props.defaultValue ? isSelected(row, this.props.defaultValue) : false);
+              return (<CategoryPickerRow className={styles.row} key={index} name={row.name} term={row.term_id} selected={selected} />);}
             )}
           </TableBody>
         </Table>
@@ -58,5 +68,6 @@ export default class CategoryPicker extends React.Component {
 }
 
 CategoryPicker.propTypes = {
-    categories: PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
+  defaultValue: PropTypes.array
 };

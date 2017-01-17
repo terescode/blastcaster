@@ -26,6 +26,7 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 			$this->strings = $strings;
 			$this->sanitizers = [
 				'text' => array( $wph, 'sanitize_text_field' ),
+				'url' => array( $wph, 'esc_url_raw' ),
 			];
 		}
 

@@ -23,6 +23,7 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		$this->assertNull( $blast->get_image_data() );
 		$this->assertCount( 0, $blast->get_categories() );
 		$this->assertCount( 0, $blast->get_tags() );
+		$this->assertNull( $blast->get_url() );
 	}
 
 	function test_construct_should_set_properties_given_optional_arguments() {
@@ -35,8 +36,10 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 				'url' => 'http://www.terescode.com/path/to/image.png',
 				'type' => 'image/png',
 			],
-			[ 'Software Development' ],
-			[ 'TDD', 'test', 'development', 'agile' ]
+			[ 567 ],
+			[ 'TDD', 'test', 4, 'agile' ],
+			'http://www.terescode.com',
+			'Checkout this totally whacky article, here!'
 		);
 
 		// @verify
@@ -50,10 +53,14 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( 'image/png', $image_data['type'] );
 		$categories = $blast->get_categories();
 		$this->assertCount( 1, $categories );
-		$this->assertEquals( [ 'Software Development' ], $categories );
+		$this->assertEquals( [ 567 ], $categories );
 		$tags = $blast->get_tags();
 		$this->assertCount( 4, $tags );
-		$this->assertEquals( [ 'TDD', 'test', 'development', 'agile' ], $tags );
+		$this->assertEquals( [ 'TDD', 'test', 4, 'agile' ], $tags );
+		$url = $blast->get_url();
+		$this->assertEquals( 'http://www.terescode.com', $url );
+		$prompt = $blast->get_prompt();
+		$this->assertEquals( 'Checkout this totally whacky article, here!', $prompt );
 	}
 
 	function test_set_title_should_set_title_given_argument() {
@@ -124,5 +131,29 @@ class BcBlastTest extends \BcPhpUnitTestCase {
 		$tags = $blast->get_tags();
 		$this->assertCount( 4, $tags );
 		$this->assertEquals( [ 'TDD', 'test', 'development', 'agile' ], $tags );
+	}
+
+	function test_set_url_should_set_url_given_argument() {
+		// @setup
+		$blast = new BcBlast( 'TDD is fun', 'Article excerpt about TDD' );
+
+		// @exercise
+		$blast->set_url( 'http://www.terescode.com/about' );
+
+		// @verify
+		$url = $blast->get_url();
+		$this->assertEquals( 'http://www.terescode.com/about', $url );
+	}
+
+	function test_set_prompt_should_set_prompt_given_argument() {
+		// @setup
+		$blast = new BcBlast( 'TDD is fun', 'Article excerpt about TDD' );
+
+		// @exercise
+		$blast->set_prompt( 'Read the article here now' );
+
+		// @verify
+		$prompt = $blast->get_prompt();
+		$this->assertEquals( 'Read the article here now', $prompt );
 	}
 }

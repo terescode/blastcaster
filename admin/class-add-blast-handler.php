@@ -59,7 +59,9 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 				$data['bc-add-desc'],
 				$image_data,
 				isset( $data['bc-add-cat'] ) ? $data['bc-add-cat'] : array(),
-				isset( $data['bc-add-tax'] ) ? $data['bc-add-tax'] : array()
+				isset( $data['bc-add-tax'] ) ? $data['bc-add-tax'] : array(),
+				isset( $data['bc-add-url'] ) ? $data['bc-add-url'] : null,
+				isset( $data['bc-add-prompt'] ) ? $data['bc-add-prompt'] : null
 			);
 		}
 

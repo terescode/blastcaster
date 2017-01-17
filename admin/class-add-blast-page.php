@@ -84,7 +84,12 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-url' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-cat' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-tax' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-url' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-prompt' );
 
+			// TODO: Need to sanitize output
 			$bc_data_js = $this->blast_form_helper->build_action_data(
 				self::BC_ADD_BLAST_POST_ACTION,
 				$extra_data
@@ -93,7 +98,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 				$this->plugin_helper->add_admin_notice( BcStrings::ABF_BUILD_ACTION_DATA_FAILED );
 				return;
 			}
-			echo '<script type="text/javascript">var terescode={"bc_data":' . $bc_data_js . '};</script>';
+			echo '<script type="text/javascript">var terescode={bc_data:' . $bc_data_js . '};</script>';
 		}
 
 		public function load_pagenow() {

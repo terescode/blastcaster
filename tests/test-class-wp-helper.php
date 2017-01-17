@@ -375,6 +375,48 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 	}
 
 	/**
+	 * Test esc_url_raw
+	 */
+	function test_esc_url_raw_should_call_esc_url_and_return_result_given_required_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'esc_url_raw', array(
+			'times' => 1,
+			'args' => array(
+				'http://www.google.com?test=I am a parameter',
+				null,
+			),
+			'return' => 'http://www.google.com?test=I%20am%20a%20parameter',
+		) );
+
+		// @exercise
+		$esc = $wph->esc_url_raw( 'http://www.google.com?test=I am a parameter' );
+		$this->assertEquals( 'http://www.google.com?test=I%20am%20a%20parameter', $esc );
+	}
+
+	/**
+	 * Test esc_url_raw
+	 */
+	function test_esc_url_raw_should_call_esc_url_raw_and_return_result_given_optional_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+		\WP_Mock::wpFunction( 'esc_url_raw', array(
+			'times' => 1,
+			'args' => array(
+				'http://www.google.com?test=I am a parameter',
+				[ 'http', 'https' ],
+			),
+			'return' => 'http://www.google.com?test=I%20am%20a%20parameter',
+		) );
+
+		// @exercise
+		$esc = $wph->esc_url_raw( 'http://www.google.com?test=I am a parameter', [ 'http', 'https' ] );
+		$this->assertEquals( 'http://www.google.com?test=I%20am%20a%20parameter', $esc );
+	}
+
+	/**
 	 * Test do_action
 	 */
 	function test_do_action_should_call_do_action_with_required_args() {

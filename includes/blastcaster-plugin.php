@@ -59,6 +59,8 @@ if ( ! function_exists( __NAMESPACE__ . '\create_plugin' ) ) {
 								new BcBlastImageValidator( $plugin_helper ),
 								new TcWpCategoryValidator( $plugin_helper, 'bc-add-cat' ),
 								new TcWpCategoryValidator( $plugin_helper, 'bc-add-tax', null, 'post_tag' ),
+								new TcStringValidator( $plugin_helper, 'bc-add-url', null, 'url' ),
+								new TcStringValidator( $plugin_helper, 'bc-add-prompt' ),
 							],
 							new BcAddBlastHandler(
 								$plugin_helper,

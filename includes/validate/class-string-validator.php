@@ -12,15 +12,17 @@ if ( ! class_exists( __NAMESPACE__ . '\TcStringValidator' ) ) {
 		private $plugin_helper;
 		private $name;
 		private $code;
+		private $type;
 
-		function __construct( $plugin_helper, $name, $code = null ) {
+		function __construct( $plugin_helper, $name, $code = null, $type = 'text' ) {
 			$this->plugin_helper = $plugin_helper;
 			$this->name = $name;
 			$this->code = $code;
+			$this->type = $type;
 		}
 
 		function validate( &$map ) {
-			$string = $this->plugin_helper->param( $this->name );
+			$string = $this->plugin_helper->param( $this->name, $this->type );
 			if ( empty( $string ) ) {
 				return ( $this->code ? $this->code : null );
 			}

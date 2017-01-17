@@ -58,6 +58,10 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 			return esc_url( $url, $protocols, $_context );
 		}
 
+		function esc_url_raw( $url, $protocols = null ) {
+			return esc_url_raw( $url, $protocols );
+		}
+
 		function do_action( $tag, $arg = '' ) {
 			$count = func_num_args();
 			if ( 1 === $count ) {

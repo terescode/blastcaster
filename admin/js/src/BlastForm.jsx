@@ -13,7 +13,11 @@ export default class BlastForm extends Component {
     super(props);
     var state = {
       title: '',
-      description: ''
+      description: '',
+      url: '',
+      prompt: '',
+      categories: [],
+      tags: []
     };
     this.action = this.props.data.action;
     this.actionNonce = this.props.data.action_nonce;
@@ -28,6 +32,21 @@ export default class BlastForm extends Component {
     } else if (this.props.data.page_data.descriptions &&
         0 < this.props.data.page_data.descriptions.length) {
       state.description = this.props.data.page_data.descriptions[0];
+    }
+    if (this.props.data['bc-add-url']) {
+      state.url = this.props.data['bc-add-url'];
+    } else if (this.props.data.page_data.urls &&
+        0 < this.props.data.page_data.urls.length) {
+      state.url = this.props.data.page_data.urls[0];
+    }
+    if (this.props.data['bc-add-cat']) {
+      state.categories = this.props.data['bc-add-cat'];
+    }
+    if (this.props.data['bc-add-tax']) {
+      state.tags = this.props.data['bc-add-tax'];
+    }
+    if (this.props.data['bc-add-prompt']) {
+      state.prompt = this.props.data['bc-add-prompt'];
     }
     this.state = state;
   }
@@ -55,7 +74,7 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.title}
               />
-              <CategoryPicker categories={this.props.data.categories} />
+              <CategoryPicker categories={this.props.data.categories} defaultValue={this.state.categories} />
               <ImagePicker data={this.props.data} />
               <TextField
                 hintText="Enter a description for the blast"
@@ -69,7 +88,29 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.description}
               />
-              <TagPicker tags={this.props.data.tags} />
+              <TagPicker tags={this.props.data.tags} defaultValue={this.state.tags} />
+              <TextField
+                hintText="Enter the URL for the link to the original article"
+                floatingLabelText="Link URL"
+                floatingLabelFixed={true}
+                multiLine={false}
+                rows={1}
+                id="bc-add-url"
+                name="bc-add-url"
+                fullWidth={true}
+                defaultValue={this.state.url}
+              />
+              <TextField
+                hintText="Enter the text for the link to the original article"
+                floatingLabelText="Link text"
+                floatingLabelFixed={true}
+                multiLine={false}
+                rows={1}
+                id="bc-add-prompt"
+                name="bc-add-prompt"
+                fullWidth={true}
+                defaultValue={this.state.prompt}
+              />
               <RaisedButton
                 label="Add blast"
                 primary={true}
