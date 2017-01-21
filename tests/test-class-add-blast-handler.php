@@ -58,6 +58,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				$this->callback( function ( $subject ) {
 					$cats = $subject->get_categories();
 					$tags = $subject->get_tags();
+					$link = $subject->get_link();
+					$link_text = $subject->get_link_text();
+					$link_intro = $subject->get_link_intro();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						'An Article Title' === $subject->get_title() &&
 						'This is some description of the article.' === $subject->get_description() &&
@@ -65,7 +68,10 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 						is_array( $cats ) &&
 						0 === count( $cats ) &&
 						is_array( $tags ) &&
-						0 === count( $tags );
+						0 === count( $tags ) &&
+						null === $link &&
+						null === $link_text &&
+						null === $link_intro;
 				} )
 			);
 		$m_helper->expects( $this->once() )
@@ -172,7 +178,6 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'bc-add-desc' => 'This is some description of the article.',
 			'image' => 'yada yada',
 			'bc-add-cat' => [ 1, 26 ],
-			'bc-add-tax' => [ 23, 'bar', 123 ],
 		] );
 	}
 
@@ -214,14 +219,14 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'bc-add-desc' => 'This is some description of the article.',
 			'image' => 'yada yada',
 			'bc-add-cat' => [ 1, 26 ],
-			'bc-add-tax' => [ 23, 'bar', 123 ],
+			'bc-add-tag' => [ 23, 'bar', 123 ],
 		] );
 	}
 
 	/**
 	 * Test handle
 	 */
-	function test_handle_calls_create_post_with_url_given_url() {
+	function test_handle_calls_create_post_with_link_given_link() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -234,7 +239,7 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			->method( 'create_post' )
 			->with(
 				$this->callback( function ( $subject ) {
-					$url = $subject->get_url();
+					$url = $subject->get_link();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
 						null !== $url &&
 						'http://www.terescode.com/about' === $url;
@@ -255,15 +260,15 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'bc-add-desc' => 'This is some description of the article.',
 			'image' => 'yada yada',
 			'bc-add-cat' => [ 1, 26 ],
-			'bc-add-tax' => [ 23, 'bar', 123 ],
-			'bc-add-url' => 'http://www.terescode.com/about',
+			'bc-add-tag' => [ 23, 'bar', 123 ],
+			'bc-add-link' => 'http://www.terescode.com/about',
 		] );
 	}
 
 	/**
 	 * Test handle
 	 */
-	function test_handle_calls_create_post_with_prompt_given_prompt() {
+	function test_handle_calls_create_post_with_link_text_given_link_text() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -276,10 +281,10 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			->method( 'create_post' )
 			->with(
 				$this->callback( function ( $subject ) {
-					$prompt = $subject->get_prompt();
+					$link_text = $subject->get_link_text();
 					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
-						null !== $prompt &&
-						'Read this awesome article here' === $prompt;
+						null !== $link_text &&
+						'Click here' === $link_text;
 				} )
 			);
 		$m_helper->expects( $this->once() )
@@ -297,9 +302,53 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 			'bc-add-desc' => 'This is some description of the article.',
 			'image' => 'yada yada',
 			'bc-add-cat' => [ 1, 26 ],
-			'bc-add-tax' => [ 23, 'bar', 123 ],
-			'bc-add-url' => 'http://www.terescode.com/about',
-			'bc-add-prompt' => 'Read this awesome article here',
+			'bc-add-tag' => [ 23, 'bar', 123 ],
+			'bc-add-link' => 'http://www.terescode.com/about',
+			'bc-add-link-text' => 'Click here',
+		] );
+	}
+
+	/**
+	 * Test handle
+	 */
+	function test_handle_calls_create_post_with_link_intro_given_link_intro() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+		$m_loader = $this->mock( 'Terescode\BlastCaster\BcMediaLoader' );
+		$m_dao = $this->mock( 'Terescode\BlastCaster\BcBlastDao' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_dao->expects( $this->once() )
+			->method( 'create_post' )
+			->with(
+				$this->callback( function ( $subject ) {
+					$link_intro = $subject->get_link_intro();
+					return $subject instanceof \Terescode\BlastCaster\BcBlast &&
+						null !== $link_intro &&
+						'Read this awesome article here' === $link_intro;
+				} )
+			);
+		$m_helper->expects( $this->once() )
+			->method( 'add_admin_notice' )
+			->with(
+				'Blast added!',
+				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
+				true
+			);
+
+		// @exercise
+		$controller = new BcAddBlastHandler( $m_helper, $m_loader, $m_dao );
+		$controller->handle( [
+			'bc-add-title' => 'An Article Title',
+			'bc-add-desc' => 'This is some description of the article.',
+			'image' => 'yada yada',
+			'bc-add-cat' => [ 1, 26 ],
+			'bc-add-tag' => [ 23, 'bar', 123 ],
+			'bc-add-link' => 'http://www.terescode.com/about',
+			'bc-add-link-text' => 'Click here',
+			'bc-add-link-intro' => 'Read this awesome article here',
 		] );
 	}
 

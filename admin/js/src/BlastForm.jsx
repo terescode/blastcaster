@@ -14,8 +14,9 @@ export default class BlastForm extends Component {
     var state = {
       title: '',
       description: '',
-      url: '',
-      prompt: '',
+      link: '',
+      linkText: '',
+      linkIntro: '',
       categories: [],
       tags: []
     };
@@ -33,23 +34,26 @@ export default class BlastForm extends Component {
         0 < this.props.data.page_data.descriptions.length) {
       state.description = this.props.data.page_data.descriptions[0];
     }
-    if (this.props.data['bc-add-url']) {
-      state.url = this.props.data['bc-add-url'];
+    if (this.props.data['bc-add-link']) {
+      state.link = this.props.data['bc-add-link'];
     } else if (this.props.data.page_data.urls &&
         0 < this.props.data.page_data.urls.length) {
-      state.url = this.props.data.page_data.urls[0];
+      state.link = this.props.data.page_data.urls[0];
     }
     if (this.props.data['bc-add-cat']) {
       state.categories = this.props.data['bc-add-cat'];
     }
-    if (this.props.data['bc-add-tax']) {
-      state.tags = this.props.data['bc-add-tax'];
+    if (this.props.data['bc-add-tag']) {
+      state.tags = this.props.data['bc-add-tag'];
     } else if (this.props.data.page_data.tags &&
         0 < this.props.data.page_data.tags.length) {
       state.tags = this.props.data.page_data.tags;
     }
-    if (this.props.data['bc-add-prompt']) {
-      state.prompt = this.props.data['bc-add-prompt'];
+    if (this.props.data['bc-add-link-text']) {
+      state.linkText = this.props.data['bc-add-link-text'];
+    }
+    if (this.props.data['bc-add-link-intro']) {
+      state.linkIntro = this.props.data['bc-add-link-intro'];
     }
     this.state = state;
   }
@@ -77,7 +81,11 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.title}
               />
-              <CategoryPicker categories={this.props.data.categories} defaultValue={this.state.categories} />
+              <CategoryPicker
+                categories={this.props.data.categories}
+                defaultValue={this.state.categories}
+                fieldName="bc-add-cat[]"
+              />
               <ImagePicker data={this.props.data} />
               <TextField
                 hintText="Enter a description for the blast"
@@ -91,17 +99,21 @@ export default class BlastForm extends Component {
                 fullWidth={true}
                 defaultValue={this.state.description}
               />
-              <TagPicker tags={this.props.data.tags} defaultValue={this.state.tags} />
+              <TagPicker
+                tags={this.props.data.tags}
+                defaultValue={this.state.tags}
+                fieldName="bc-add-tag[]"
+              />
               <TextField
                 hintText="Enter the URL for the link to the original article"
                 floatingLabelText="Link URL"
                 floatingLabelFixed={true}
                 multiLine={false}
                 rows={1}
-                id="bc-add-url"
-                name="bc-add-url"
+                id="bc-add-link"
+                name="bc-add-link"
                 fullWidth={true}
-                defaultValue={this.state.url}
+                defaultValue={this.state.link}
               />
               <TextField
                 hintText="Enter the text for the link to the original article"
@@ -109,10 +121,21 @@ export default class BlastForm extends Component {
                 floatingLabelFixed={true}
                 multiLine={false}
                 rows={1}
-                id="bc-add-prompt"
-                name="bc-add-prompt"
+                id="bc-add-link-text"
+                name="bc-add-link-text"
                 fullWidth={true}
-                defaultValue={this.state.prompt}
+                defaultValue={this.state.linkText}
+              />
+              <TextField
+                hintText="Enter the introductory text to appear before the link to the original article"
+                floatingLabelText="Link introduction text"
+                floatingLabelFixed={true}
+                multiLine={false}
+                rows={1}
+                id="bc-add-link-intro"
+                name="bc-add-link-intro"
+                fullWidth={true}
+                defaultValue={this.state.linkIntro}
               />
               <RaisedButton
                 label="Add blast"

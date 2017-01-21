@@ -9,17 +9,19 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 		private $image_data;
 		private $categories;
 		private $tags;
-		private $url;
-		private $prompt;
+		private $link;
+		private $link_text;
+		private $link_intro;
 
-		function __construct( $title, $description, $image_data = null, $categories = array(), $tags = array(), $url = null, $prompt = null ) {
+		function __construct( $title, $description, $image_data = null, $categories = array(), $tags = array(), $link = null, $link_text = null, $link_intro = null ) {
 			$this->title = $title;
 			$this->description = $description;
 			$this->image_data = $image_data;
 			$this->categories = $categories;
 			$this->tags = $tags;
-			$this->url = $url;
-			$this->prompt = $prompt;
+			$this->link = $link;
+			$this->link_text = $link_text;
+			$this->link_intro = $link_intro;
 		}
 
 		function get_title() {
@@ -42,12 +44,16 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 			return $this->tags;
 		}
 
-		function get_url() {
-			return $this->url;
+		function get_link() {
+			return $this->link;
 		}
 
-		function get_prompt() {
-			return $this->prompt;
+		function get_link_text() {
+			return $this->link_text;
+		}
+
+		function get_link_intro() {
+			return $this->link_intro;
 		}
 
 		function set_title( $title ) {
@@ -70,12 +76,16 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlast' ) ) {
 			$this->tags = $tags;
 		}
 
-		function set_url( $url ) {
-			$this->url = $url;
+		function set_link( $link ) {
+			$this->link = $link;
 		}
 
-		function set_prompt( $prompt ) {
-			$this->prompt = $prompt;
+		function set_link_text( $link_text ) {
+			$this->link_text = $link_text;
+		}
+
+		function set_link_intro( $link_intro ) {
+			$this->link_intro = $link_intro;
 		}
 	}
 }

@@ -7,6 +7,7 @@
 *.php text
 *.css text
 *.js text
+*.jsx text
 *.htm text
 *.html text
 *.xml text

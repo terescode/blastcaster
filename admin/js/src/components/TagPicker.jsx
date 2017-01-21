@@ -52,7 +52,7 @@ export default class TagPicker extends Component {
     return (
       <div className={styles.wrapper}>
         {this.state.tags.map( (tag) => {
-          return (<input type="hidden" name="bc-add-tax[]" key={tag.term_id} value={tag.term_id} />);
+          return (<input type="hidden" name={this.props.fieldName} key={tag.term_id} value={tag.term_id} />);
         })}
         <ChipInput
           id="tag-chip-input"
@@ -74,5 +74,6 @@ export default class TagPicker extends Component {
 
 TagPicker.propTypes = {
   tags: PropTypes.array.isRequired,
-  defaultValue: PropTypes.array
+  defaultValue: PropTypes.array,
+  fieldName: PropTypes.string.isRequired
 };

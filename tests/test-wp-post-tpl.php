@@ -16,7 +16,7 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test the default template
 	 */
-	public function test_default_template_outputs_description_no_image_description_no_url_given_blast() {
+	public function test_default_template_outputs_description_no_image_description_no_link_given_blast() {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!' );
 
@@ -29,7 +29,7 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test the default template
 	 */
-	public function test_default_template_outputs_image_description_no_url_given_blast() {
+	public function test_default_template_outputs_image_description_no_link_given_blast() {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ] );
 
@@ -42,11 +42,37 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 	/**
 	 * Test the default template
 	 */
-	public function test_default_template_outputs_image_description_url_no_prompt_given_blast() {
+	public function test_default_template_outputs_image_description_link_no_link_text_given_blast() {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com' );
 
 		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><a href="http:\/\/www.terescode.com">http:\/\/www.terescode.com<\/a>/s' );
+
+		// @exercise
+		include( 'admin/templates/wp-post-tpl.php' );
+	}
+
+	/**
+	 * Test the default template
+	 */
+	public function test_default_template_outputs_image_description_link_link_text_given_blast() {
+		// @setup
+		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com', 'Click here' );
+
+		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
+
+		// @exercise
+		include( 'admin/templates/wp-post-tpl.php' );
+	}
+
+	/**
+	 * Test the default template
+	 */
+	public function test_default_template_outputs_image_description_link_link_text_link_intro_given_blast() {
+		// @setup
+		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com', 'Click here', 'Read more at...' );
+
+		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><span>Read more at...<\/span><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
 
 		// @exercise
 		include( 'admin/templates/wp-post-tpl.php' );

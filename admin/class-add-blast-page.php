@@ -85,9 +85,10 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-url' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-cat' );
-			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-tax' );
-			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-url' );
-			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-prompt' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-tag' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-link' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-link-text' );
+			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-link-intro' );
 
 			// TODO: Need to sanitize output
 			$bc_data_js = $this->blast_form_helper->build_action_data(

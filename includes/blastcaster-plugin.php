@@ -58,9 +58,10 @@ if ( ! function_exists( __NAMESPACE__ . '\create_plugin' ) ) {
 								new TcStringValidator( $plugin_helper, 'bc-add-desc', BcStrings::ABF_MISSING_BLAST_DESCRIPTION ),
 								new BcBlastImageValidator( $plugin_helper ),
 								new TcWpCategoryValidator( $plugin_helper, 'bc-add-cat' ),
-								new TcWpCategoryValidator( $plugin_helper, 'bc-add-tax', null, 'post_tag' ),
-								new TcStringValidator( $plugin_helper, 'bc-add-url', null, 'url' ),
-								new TcStringValidator( $plugin_helper, 'bc-add-prompt' ),
+								new TcWpCategoryValidator( $plugin_helper, 'bc-add-tag', null, 'post_tag' ),
+								new TcStringValidator( $plugin_helper, 'bc-add-link', null, 'url' ),
+								new TcStringValidator( $plugin_helper, 'bc-add-link-text' ),
+								new TcStringValidator( $plugin_helper, 'bc-add-link-intro' ),
 							],
 							new BcAddBlastHandler(
 								$plugin_helper,
