@@ -197,5 +197,9 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		function get_tags( $args = '' ) {
 			return get_tags( $args );
 		}
+
+		function absint( $maybeint ) {
+			return absint( $maybeint );
+		}
 	}
 }

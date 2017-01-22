@@ -24,7 +24,7 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpCategoryValidator' ) ) {
 		}
 
 		function validate( &$map ) {
-			$categories = $this->plugin_helper->param( $this->name, 'text' );
+			$categories = $this->plugin_helper->param( $this->name, 'term' );
 			if ( null === $categories ) {
 				return ( $this->code ? $this->code : null );
 			}

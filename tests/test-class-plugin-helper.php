@@ -410,6 +410,26 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( 'http://www.terescode.com/I%20am%20a%20parameter', $val );
 	}
 
+	function test_param_should_sanitize_term_given_term_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$_POST['foo'] = '12345';
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+		$m_wph->method( 'absint' )
+			->willReturn( 12345 );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$val = $helper->param( 'foo', 'term' );
+
+		// @verify
+		$this->assertInternalType( 'int', $val );
+		$this->assertEquals( 12345, $val );
+	}
+
 	function test_string_should_call_string_with_required_args_and_return_value() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
@@ -440,5 +460,35 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$helper = new TcPluginHelper( $m_wph, $m_strings );
 		$str = $helper->string( 'bc.a.code', array( 'foo' ) );
 		$this->assertEquals( 'a string', $str );
+	}
+
+	function test_sanitize_term__should_return_string__given_string() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->sanitize_term( 'a string' );
+		$this->assertEquals( 'a string', $str );
+	}
+
+	function test_sanitize_term__should_return_int__given_numeric_string() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'sanitize_text_field' )
+			->will( $this->returnArgument( 0 ) );
+		$m_wph->method( 'absint' )
+			->willReturn( 12345 );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->sanitize_term( '12345' );
+		$this->assertEquals( 12345, $str );
 	}
 }

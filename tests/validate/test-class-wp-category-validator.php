@@ -35,7 +35,7 @@ class TcWpCategoryValidatorTest extends \BcPhpUnitTestCase {
 		$this->assertFalse( isset( $data_map['foo'] ) );
 	}
 
-	function test_vaildate_should_return_code_given_empty_param_and_code() {
+	function test_validate_should_return_code_given_empty_param_and_code() {
 		// @setup
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
 		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
@@ -97,8 +97,10 @@ class TcWpCategoryValidatorTest extends \BcPhpUnitTestCase {
 
 		$m_helper->method( 'get_wp_helper' )
 			->willReturn( $m_wph );
-		$m_helper->method( 'param' )
-			->willReturn( [ 'han solo', 'c-3po' ] );
+		$m_helper->expects( $this->once() )
+			->method( 'param' )
+			->with( 'foo', 'term' )
+			->willReturn( [ 'han solo', 'c-3po', 12345, 'r2-d2' ] );
 
 		// @exercise
 		$validator = new TcWpCategoryValidator( $m_helper, 'foo', null, 'post_tag' );
@@ -106,9 +108,11 @@ class TcWpCategoryValidatorTest extends \BcPhpUnitTestCase {
 		$this->assertNull( $ret );
 		$this->assertTrue( isset( $data_map['foo'] ) );
 		$foo = $data_map['foo'];
-		$this->assertEquals( 2, count( $foo ) );
+		$this->assertEquals( 4, count( $foo ) );
 		$this->assertEquals( 'han solo', $foo[0] );
 		$this->assertEquals( 'c-3po', $foo[1] );
+		$this->assertEquals( 12345, $foo[2] );
+		$this->assertEquals( 'r2-d2', $foo[3] );
 	}
 
 	function test_validate_should_set_value_and_return_null_given_param_is_valid() {

@@ -27,6 +27,7 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 			$this->sanitizers = [
 				'text' => array( $wph, 'sanitize_text_field' ),
 				'url' => array( $wph, 'esc_url_raw' ),
+				'term' => array( $this, 'sanitize_term' ),
 			];
 		}
 
@@ -119,6 +120,14 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 
 		function string( $code, $args = array() ) {
 			return $this->strings->get_string( $code, $args );
+		}
+
+		function sanitize_term( $val ) {
+			$text = $this->wph->sanitize_text_field( $val );
+			if ( is_numeric( $text ) ) {
+				return $this->wph->absint( $text );
+			}
+			return $text;
 		}
 	}
 }

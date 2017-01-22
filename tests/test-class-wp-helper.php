@@ -1409,8 +1409,8 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 			'times' => 1,
 			'args' => array(
 				[
-					'hide_empty' => false
-				]
+					'hide_empty' => false,
+				],
 			),
 			'return' => [ 'foo' => 'bar' ],
 		) );
@@ -1451,8 +1451,8 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 			'times' => 1,
 			'args' => array(
 				[
-					'hide_empty' => false
-				]
+					'hide_empty' => false,
+				],
 			),
 			'return' => [ 'foo' => 'bar' ],
 		) );
@@ -1462,5 +1462,26 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$ret = $wph->get_tags( [ 'hide_empty' => false ] );
 		$this->assertInternalType( 'array', $ret );
 		$this->assertEquals( 1, count( $ret ) );
+	}
+
+	/**
+	 * Test absint
+	 */
+
+	function test_absint__should_call_absint_and_return_its_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'absint', array(
+			'times' => 1,
+			'args' => array(
+				-12345,
+			),
+			'return' => 12345
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->absint( -12345 );
+		$this->assertInternalType( 'int', $ret );
+		$this->assertEquals( 12345, $ret );
 	}
 }
