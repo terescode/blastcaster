@@ -46,7 +46,7 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com' );
 
-		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><a href="http:\/\/www.terescode.com">http:\/\/www.terescode.com<\/a>/s' );
+		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><span[^>]*>Continue reading at:<\/span><a href="http:\/\/www.terescode.com">Trump wins big<\/a>/s' );
 
 		// @exercise
 		include( 'admin/templates/wp-post-tpl.php' );
@@ -59,7 +59,7 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com', 'Click here' );
 
-		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
+		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><span[^>]*>Continue reading at:<\/span><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
 
 		// @exercise
 		include( 'admin/templates/wp-post-tpl.php' );
@@ -72,7 +72,7 @@ class WpPostTplTest extends \BcPhpUnitTestCase {
 		// @setup
 		$blast = new BcBlast( 'Trump wins big', 'In a stunning upset today, Trump will be the next president and will Make America Great Again!', [ 'url' => 'http://www.terescode.com/favico.ico' ], [], [], 'http://www.terescode.com', 'Click here', 'Read more at...' );
 
-		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><span>Read more at...<\/span><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
+		$this->expectOutputRegex( '/<img src="http:\/\/www\.terescode\.com\/favico\.ico" width="100%" \/><p>In a stunning.+Again[!]<\/p><span[^>]*>Read more at...<\/span><a href="http:\/\/www.terescode.com">Click here<\/a>/s' );
 
 		// @exercise
 		include( 'admin/templates/wp-post-tpl.php' );
