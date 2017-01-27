@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BlastCaster 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/blastcaster\n"
-"POT-Creation-Date: 2017-01-24 02:05:00+00:00\n"
+"POT-Creation-Date: 2017-01-27 01:24:42+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,76 +24,80 @@ msgstr ""
 "X-Poedit-Bookmarks: \n"
 "X-Textdomain-Support: yes\n"
 
-#: includes/class-blastcaster-strings.php:38
-#: includes/class-blastcaster-strings.php:40
-#: includes/class-blastcaster-strings.php:42
-#: includes/class-blastcaster-strings.php:44
+#: includes/class-blastcaster-strings.php:39
+#: includes/class-blastcaster-strings.php:41
+#: includes/class-blastcaster-strings.php:43
+#: includes/class-blastcaster-strings.php:45
 msgid "Add a blast"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:46
+#: includes/class-blastcaster-strings.php:47
 msgid "Title"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:48
+#: includes/class-blastcaster-strings.php:49
 msgid "Categories"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:50
+#: includes/class-blastcaster-strings.php:51
 msgid "Image"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:52
+#: includes/class-blastcaster-strings.php:53
 msgid "Description"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:54
+#: includes/class-blastcaster-strings.php:55
 msgid "Tags"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:56
+#: includes/class-blastcaster-strings.php:57
 msgid ""
 "The page data received from the original source could not be decoded. (%1$d "
 "- %2$s)"
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:58
+#: includes/class-blastcaster-strings.php:59
 msgid "You do not have access to add blasts."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:60
+#: includes/class-blastcaster-strings.php:61
 msgid "Please provide a title for the blast."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:62
+#: includes/class-blastcaster-strings.php:63
 msgid "Please provide a description for the blast."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:64
+#: includes/class-blastcaster-strings.php:65
 msgid ""
 "Oops! The image type was missing. Try submitting your request again. If "
 "that does not help, head to the nearest administrator."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:66
+#: includes/class-blastcaster-strings.php:67
 msgid "Please select an image for the blast."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:68
+#: includes/class-blastcaster-strings.php:69
 msgid "Please choose an image for the blast."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:70
+#: includes/class-blastcaster-strings.php:71
 msgid ""
 "Oops! The action data could not be generated. Try submitting your request "
 "again. If that does not help, head to the nearest administrator."
 msgstr ""
 
-#: includes/class-blastcaster-strings.php:72
+#: includes/class-blastcaster-strings.php:73
 msgid ""
 "Oops! The image could not be loaded into the media gallery. Try submitting "
 "your request again. If that does not help, head to the nearest "
 "administrator."
+msgstr ""
+
+#: includes/class-blastcaster-strings.php:75
+msgid "The URL %1$s is not a valid URL."
 msgstr ""
 
 #. Plugin Name of the plugin/theme

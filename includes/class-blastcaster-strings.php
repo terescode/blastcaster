@@ -29,6 +29,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_BUILD_ACTION_DATA_FAILED = 'bc.abf.build-action-data-failed';
 		const ABF_LOAD_MEDIA_FAILED = 'bc.abf.load-media-failed';
 		const ABF_INSERT_POST_FAILED = 'bc.abf.insert-post-failed';
+		const ABF_INVALID_URL = 'bc.abf.invalid-url';
 
 		private $bundle;
 
@@ -70,6 +71,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 					__( 'Oops! The action data could not be generated. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
 				self::ABF_LOAD_MEDIA_FAILED =>
 					__( 'Oops! The image could not be loaded into the media gallery. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
+				self::ABF_INVALID_URL =>
+					__( 'The URL %1$s is not a valid URL.' ),
 			);
 		}
 

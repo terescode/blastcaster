@@ -2,6 +2,8 @@
 
 namespace Terescode\BlastCaster;
 
+require_once BC_PLUGIN_DIR . 'includes/class-blastcaster-strings.php';
+
 if ( ! interface_exists( __NAMESPACE__ . '\BcMediaLoader' ) ) {
 
 	class BcMediaLoader {
@@ -37,9 +39,19 @@ if ( ! interface_exists( __NAMESPACE__ . '\BcMediaLoader' ) ) {
 				return $temp_file;
 			}
 
+			$url_path = $this->wph->wp_parse_url( $url, PHP_URL_PATH );
+			if ( ! $url_path ) {
+				return [
+					'error' => $this->plugin_helper->string(
+						BcStrings::ABF_INVALID_URL,
+						[ $url ]
+					),
+				];
+			}
+
 			// Array based on $_FILE as seen in PHP file uploads
 			$file = array(
-				'name' => basename( $url ),
+				'name' => basename( $url_path ),
 				'tmp_name' => $temp_file,
 				'error' => 0,
 				'size' => filesize( $temp_file ),

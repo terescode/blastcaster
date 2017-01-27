@@ -63,7 +63,7 @@ class BcMediaLoaderTest extends \BcPhpUnitTestCase {
 	 * @should return a wp_error
 	 */
 
-	public function test_load_media_should_return_wp_error_given_string_and_download_url_returns_error() {
+	public function test_load_media_should_call_wp_handle_sidload_and_return_wp_error_given_string_and_download_url_returns_error() {
 		// @setup
 		$m_error = $this->mock( 'WP_Error' );
 		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
@@ -84,6 +84,37 @@ class BcMediaLoaderTest extends \BcPhpUnitTestCase {
 	}
 
 	/**
+	 * @given an invalid URL string as input and download_url returns a filename
+	 * @method load_media
+	 * @should return an array with 'error' key
+	 */
+
+	public function test_load_media_should_call_wp_handle_sidload_and_return_array_with_error_key_given_wp_parse_url_returns_false() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_helper = $this->mock( 'Terescode\WordPress\TcPluginHelper' );
+
+		$m_helper->method( 'get_wp_helper' )
+			->willReturn( $m_wph );
+		$m_wph->method( 'is_wp_error' )
+			->willReturn( false );
+		$m_wph->method( 'download_url' )
+			->willReturn( 'tests/fixtures/sample.json' );
+		$m_wph->method( 'wp_parse_url' )
+			->willReturn( false );
+		$m_helper->method( 'string' )
+			->willReturn( 'The error string' );
+		$url = 'http333:/i.do.not.parse^:30';
+
+		// @exercise
+		$loader = new BcMediaLoader( $m_helper, 'test_action' );
+		$ret = $loader->load_media( $url );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertTrue( isset( $ret['error'] ) );
+		$this->assertEquals( 'The error string', $ret['error'] );
+	}
+
+	/**
 	 * @given a URL string as input and download_url returns a filename
 	 * @method load_media
 	 * @should call wp_handle_sideload and return its result
@@ -100,6 +131,8 @@ class BcMediaLoaderTest extends \BcPhpUnitTestCase {
 			->willReturn( false );
 		$m_wph->method( 'download_url' )
 			->willReturn( 'tests/fixtures/sample.json' );
+		$m_wph->method( 'wp_parse_url' )
+			->willReturn( '/favico.ico' );
 		$url = 'http://www.terescode.com/favico.ico';
 		$return_1 = [ 'file' => '/path/to/uploaded/file.png' ];
 		$return_2 = -1;

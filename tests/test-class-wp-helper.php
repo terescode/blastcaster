@@ -1484,4 +1484,51 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$this->assertInternalType( 'int', $ret );
 		$this->assertEquals( 12345, $ret );
 	}
+
+	/**
+	 * Test wp_parse_url
+	 */
+	function test_wp_parse_url__should_call_wp_parse_url_with_required_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_parse_url', array(
+			'times' => 1,
+			'args' => array(
+				'https://cdn2.hubspot.net/hubfs/242200/1MARCOMM/Blog/2017/1.25.17/Apprenticeships.png#keepProtocol',
+				-1
+			),
+			'return' => [
+				'scheme' => 'https',
+				'host' => 'cdn2.hubspot.net',
+			],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_parse_url( 'https://cdn2.hubspot.net/hubfs/242200/1MARCOMM/Blog/2017/1.25.17/Apprenticeships.png#keepProtocol' );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 2, count( $ret ) );
+		$this->assertEquals( 'https', $ret['scheme'] );
+		$this->assertEquals( 'cdn2.hubspot.net', $ret['host'] );
+	}
+
+	/**
+	 * Test wp_parse_url
+	 */
+	function test_wp_parse_url__should_call_wp_parse_url_with_optional_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_parse_url', array(
+			'times' => 1,
+			'args' => array(
+				'https://cdn2.hubspot.net/hubfs/242200/1MARCOMM/Blog/2017/1.25.17/Apprenticeships.png#keepProtocol',
+				PHP_URL_SCHEME
+			),
+			'return' => 'https',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_parse_url( 'https://cdn2.hubspot.net/hubfs/242200/1MARCOMM/Blog/2017/1.25.17/Apprenticeships.png#keepProtocol', PHP_URL_SCHEME );
+		$this->assertInternalType( 'string', $ret );
+		$this->assertEquals( 'https', $ret );
+	}
 }

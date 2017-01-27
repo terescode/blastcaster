@@ -201,5 +201,9 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		function absint( $maybeint ) {
 			return absint( $maybeint );
 		}
+
+		function wp_parse_url( $url, $component = -1 ) {
+			return wp_parse_url( $url, $component );
+		}
 	}
 }
