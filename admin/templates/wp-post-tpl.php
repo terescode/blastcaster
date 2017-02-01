@@ -9,8 +9,8 @@ if ( ! $link_intro ) {
 	$link_intro = 'Continue reading at:';
 }
 if ( null !== $image_data ) {
-?><img src="<?php echo $image_data['url']; ?>" width="100%" /><?php
+?><img src="<?php echo $image_data['url']; ?>" width="100%" class="aligncenter" /><?php
 }?><p><?php echo $description; ?></p><?php
 if ( null !== $link ) {
-	?><span style="margin-right:4px;"><?php echo $link_intro ?></span><a href="<?php echo $link ?>"><?php echo null !== $link_text ? $link_text : $title ?></a><?php
+	?><span style="margin-right:4px;"><?php echo $link_intro ?></span><strong><a href="<?php echo $link ?>"><?php echo null !== $link_text ? $link_text : $title ?></a></strong><?php
 }?>
