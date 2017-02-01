@@ -27,7 +27,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlastImageValidator' ) ) {
 			}
 
 			if ( $image_type->equals( BcImageType::BC_IMAGE_TYPE_URL ) ) {
-				$image = $this->plugin_helper->param( 'bc-add-image-url' );
+				$image = $this->plugin_helper->param( 'bc-add-image-url', 'url' );
 				if ( empty( $image ) ) {
 					return BcStrings::ABF_MISSING_BLAST_IMAGE_URL;
 				}

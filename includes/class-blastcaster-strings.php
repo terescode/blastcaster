@@ -30,6 +30,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_LOAD_MEDIA_FAILED = 'bc.abf.load-media-failed';
 		const ABF_INSERT_POST_FAILED = 'bc.abf.insert-post-failed';
 		const ABF_INVALID_URL = 'bc.abf.invalid-url';
+		const ABF_UNKNOWN_IMAGE_TYPE = 'bc.abf.unknown-img-type';
 
 		private $bundle;
 
@@ -73,6 +74,8 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 					__( 'Oops! The image could not be loaded into the media gallery. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
 				self::ABF_INVALID_URL =>
 					__( 'The URL %1$s is not a valid URL.' ),
+				self::ABF_UNKNOWN_IMAGE_TYPE =>
+					__( 'The image at URL %1$s is not a supported image type.' ),
 			);
 		}
 

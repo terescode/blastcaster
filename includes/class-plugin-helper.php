@@ -129,7 +129,65 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 			}
 			return $text;
 		}
+
+		/**
+		 * Examine $filename and return $filename, a corrected filename or false,
+		 * as appropriate.
+		 *
+		 * Check the passed in $filename has a valid extension matching the actual
+		 * image type. If $filename passes the check, return $filename. If not
+		 * and a correct extension can be determined using $file and *getimagesize*,
+		 * return a corrected $filename. Otherwise return **false**.
+		 *
+		 * @param string $file absolute path to a file.
+		 * @param string $filename filename to examine.
+		 * @return $filename, a corrected filename, or **false** as described
+		 * above.
+		 */
+
+		function check_image_filename( $file, $filename ) {
+			// First check if wp_check_filetype_and_ext returns an ext/type
+			// If it returned a valid ext/type, return $filename
+			$ext_type = $this->wph->wp_check_filetype_and_ext( $file, $filename );
+			if ( $ext_type['ext'] && $ext_type['type'] ) {
+				return $filename;
+			}
+
+			// If the file does not exist or getimagesize fn does not exist, return false.
+			if ( ! file_exists( $file ) || ! function_exists( 'getimagesize' ) ) {
+				return false;
+			}
+
+			// If the function exists, call it.
+			// If it does not identify a mime type return, return false
+			// @codingStandardsIgnoreLine
+			$image_info = @getimagesize( $file );
+			if ( ! $image_info ) {
+				return false;
+			}
+
+			// If it does define a type, map it to an extension and generate
+			// a corrected image filename like _wp_handle_upload does
+			// If getimagesize() knows what kind of image it really is and if the real MIME doesn't match the claimed MIME
+			// Following loosely based on https://core.trac.wordpress.org/browser/tags/4.7/src/wp-includes/functions.php#L2268
+
+			if ( empty( $image_info['mime'] ) ) {
+				return false;
+			}
+
+			$mime_to_ext = $this->wph->apply_filters( 'getimagesize_mimes_to_exts', array(
+				'image/jpeg' => 'jpg',
+				'image/png'  => 'png',
+				'image/gif'  => 'gif',
+				'image/bmp'  => 'bmp',
+				'image/tiff' => 'tif',
+			) );
+
+			if ( empty( $mime_to_ext[ $image_info['mime'] ] ) ) {
+				return false;
+			}
+
+			return preg_replace( '/^([^\.]+)(\..+)?$/', '$1.' . $mime_to_ext[ $image_info['mime'] ], $filename );
+		}
 	}
 }
-
-

@@ -491,4 +491,160 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$str = $helper->sanitize_term( '12345' );
 		$this->assertEquals( 12345, $str );
 	}
+
+	function test_check_image_filename__should_return_filename__given_valid_filename_with_ext() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => 'png', 'type' => 'image/png' ] );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/noImage.tmp', 'noImage.png' );
+		$this->assertEquals( 'noImage.png', $str );
+	}
+
+	function test_check_image_filename__should_return_false__given_invalid_ext_or_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->will( $this->onConsecutiveCalls(
+				[ 'ext' => 'png', 'type' => false ],
+				[ 'ext' => false, 'type' => 'image/png' ],
+				[ 'ext' => false, 'type' => false ]
+			));
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/i-do-not-exist.tmp', 'noImage' );
+		$this->assertFalse( $str );
+		$str = $helper->check_image_filename( 'tests/fixtures/i-do-not-exist.tmp', 'noImage' );
+		$this->assertFalse( $str );
+		$str = $helper->check_image_filename( 'tests/fixtures/i-do-not-exist.tmp', 'noImage' );
+		$this->assertFalse( $str );
+	}
+
+	function test_check_image_filename__should_return_false__given_invalid_filename_and_missing_path() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/i-do-not-exist.tmp', 'noImage' );
+		$this->assertFalse( $str );
+	}
+
+	/**
+	 * Test check_image_filename
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	function test_check_image_filename__should_return_false__given_invalid_filename_and_getimagesize_does_not_exist() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+
+		global $function_exists_called;
+		$function_exists_called = false;
+
+		function function_exists( $function_name ) {
+			global $function_exists_called;
+			$function_exists_called = true;
+			return false;
+		}
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$this->assertFalse( $function_exists_called );
+		$str = $helper->check_image_filename( 'tests/fixtures/noImage.tmp', 'noImage' );
+		$this->assertFalse( $str );
+		$this->assertTrue( $function_exists_called );
+	}
+
+	function test_check_image_filename__should_return_false__given_invalid_filename_and_getimagesize_fails() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/sample.json', 'sample' );
+		$this->assertFalse( $str );
+	}
+
+	/**
+	 * Test check_image_filename
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	function test_check_image_filename__should_return_false__given_invalid_filename_and_getimagesize_returns_no_mime_type() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+
+		global $getimagesize_called;
+		$getimagesize_called = false;
+
+		function getimagesize( $file ) {
+			global $getimagesize_called;
+			$getimagesize_called = true;
+			return [ 100, 100, IMG_PNG, 'width="100" height="100"' ];
+		}
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$this->assertFalse( $getimagesize_called );
+		$str = $helper->check_image_filename( 'tests/fixtures/noImage.tmp', 'noImage' );
+		$this->assertFalse( $str );
+		$this->assertTrue( $getimagesize_called );
+	}
+
+	function test_check_image_filename__should_return_false__given_invalid_filename_and_mime_type_has_no_mapping() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+		$m_wph->method( 'apply_filters' )
+			->willReturn( [] );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/noImage.tmp', 'noImage' );
+		$this->assertFalse( $str );
+	}
+
+	function test_check_image_filename__should_return_filename__given_invalid_filename_and_mime_type_has_mapping() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->method( 'wp_check_filetype_and_ext' )
+			->willReturn( [ 'ext' => false, 'type' => false] );
+		$m_wph->method( 'apply_filters' )
+				->will( $this->returnArgument( 1 ) );
+
+		// @exercise
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$str = $helper->check_image_filename( 'tests/fixtures/noImage.tmp', 'noImage' );
+		$this->assertEquals( 'noImage.png', $str );
+	}
 }

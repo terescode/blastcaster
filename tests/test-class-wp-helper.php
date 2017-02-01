@@ -469,6 +469,38 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 	}
 
 	/**
+	 * Test apply_filters
+	 */
+	function test_apply_filters__should_call_apply_filters__given_required_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+  	\WP_Mock::onFilter( 'mr_coffee' )
+      ->with( 'water' )
+      ->reply( 'coffee' );
+
+		// @exercise
+		$ret = $wph->apply_filters( 'mr_coffee', 'water' );
+		$this->assertEquals( 'coffee', $ret );
+	}
+
+	/**
+	 * Test apply_filters
+	 */
+	function test_apply_filters__should_call_apply_filters__given_optional_args() {
+		// @setup
+		$wph = new TcWpHelper();
+
+  	\WP_Mock::onFilter( 'mr_coffee' )
+      ->with( 'water', 'whiskey' )
+      ->reply( 'strong coffee' );
+
+		// @exercise
+		$ret = $wph->apply_filters( 'mr_coffee', 'water', 'whiskey' );
+		$this->assertEquals( 'strong coffee', $ret );
+	}
+
+	/**
 	 * Test add_posts_page
 	 */
 	function test_add_posts_page_should_call_add_posts_page_given_required_args() {
@@ -1530,5 +1562,63 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$ret = $wph->wp_parse_url( 'https://cdn2.hubspot.net/hubfs/242200/1MARCOMM/Blog/2017/1.25.17/Apprenticeships.png#keepProtocol', PHP_URL_SCHEME );
 		$this->assertInternalType( 'string', $ret );
 		$this->assertEquals( 'https', $ret );
+	}
+
+	/**
+	 * Test wp_check_filetype_and_ext
+	 */
+	function test_wp_check_filetype_and_ext__should_call_wp_check_filetype_and_ext_with_required_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_check_filetype_and_ext', array(
+			'times' => 1,
+			'args' => array(
+				'/tmp/path/to/file.png',
+				'file.png',
+				null,
+			),
+			'return' => [
+				'ext' => 'png',
+				'type' => 'image/png',
+				'proper_filename' => false,
+			],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_check_filetype_and_ext( '/tmp/path/to/file.png', 'file.png' );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 3, count( $ret ) );
+		$this->assertEquals( 'png', $ret['ext'] );
+		$this->assertEquals( 'image/png', $ret['type'] );
+		$this->assertFalse( $ret['proper_filename'] );
+	}
+
+	/**
+	 * Test wp_check_filetype_and_ext
+	 */
+	function test_wp_check_filetype_and_ext__should_call_wp_check_filetype_and_ext_with_optional_args_and_return_result() {
+		// @setup
+		\WP_Mock::wpFunction( 'wp_check_filetype_and_ext', array(
+			'times' => 1,
+			'args' => array(
+				'/tmp/path/to/file.png',
+				'file.png',
+				[ 'png' => 'image/png' ],
+			),
+			'return' => [
+				'ext' => 'png',
+				'type' => 'image/png',
+				'proper_filename' => 'file.png',
+			],
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->wp_check_filetype_and_ext( '/tmp/path/to/file.png', 'file.png', [ 'png' => 'image/png' ] );
+		$this->assertInternalType( 'array', $ret );
+		$this->assertEquals( 3, count( $ret ) );
+		$this->assertEquals( 'png', $ret['ext'] );
+		$this->assertEquals( 'image/png', $ret['type'] );
+		$this->assertEquals( 'file.png', $ret['proper_filename'] );
 	}
 }

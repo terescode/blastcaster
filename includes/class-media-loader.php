@@ -34,7 +34,6 @@ if ( ! interface_exists( __NAMESPACE__ . '\BcMediaLoader' ) ) {
 		private function sideload_media( $url ) {
 			// Download file to temp dir
 			$temp_file = $this->wph->download_url( $url, 5 );
-
 			if ( $this->wph->is_wp_error( $temp_file ) ) {
 				return $temp_file;
 			}
@@ -49,9 +48,23 @@ if ( ! interface_exists( __NAMESPACE__ . '\BcMediaLoader' ) ) {
 				];
 			}
 
+			// Fixup the filename if necessary
+			$filename = $this->plugin_helper->check_image_filename(
+				$temp_file,
+				basename( $url_path )
+			);
+			if ( ! $filename ) {
+				return [
+					'error' => $this->plugin_helper->string(
+						BcStrings::ABF_UNKNOWN_IMAGE_TYPE,
+						[ $url ]
+					),
+				];
+			}
+
 			// Array based on $_FILE as seen in PHP file uploads
 			$file = array(
-				'name' => basename( $url_path ),
+				'name' => $filename,
 				'tmp_name' => $temp_file,
 				'error' => 0,
 				'size' => filesize( $temp_file ),

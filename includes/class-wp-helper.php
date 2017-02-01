@@ -75,6 +75,14 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 			call_user_func_array( 'do_action', func_get_args() );
 		}
 
+		function apply_filters( $tag, $value ) {
+			$count = func_num_args();
+			if ( 2 === $count ) {
+				return apply_filters( $tag, $value );
+			}
+			return call_user_func_array( 'apply_filters', func_get_args() );
+		}
+
 		function add_posts_page( $page_title, $menu_title, $capability, $menu_slug, $function = '' ) {
 			return add_posts_page( $page_title, $menu_title, $capability, $menu_slug, $function );
 		}
@@ -204,6 +212,10 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 
 		function wp_parse_url( $url, $component = -1 ) {
 			return wp_parse_url( $url, $component );
+		}
+
+		function wp_check_filetype_and_ext( $file, $filename, $mimes = null ) {
+			return wp_check_filetype_and_ext( $file, $filename, $mimes );
 		}
 	}
 }
