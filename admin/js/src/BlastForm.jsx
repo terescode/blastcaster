@@ -47,7 +47,10 @@ export default class BlastForm extends Component {
       state.tags = this.props.data['bc-add-tag'];
     } else if (this.props.data.page_data.tags &&
         0 < this.props.data.page_data.tags.length) {
-      state.tags = this.props.data.page_data.tags;
+      state.tags =
+        this.props.data.page_data.tags.slice(0,
+          Math.min(this.props.data.page_data.tags.length, 5)
+        );
     }
     if (this.props.data['bc-add-link-text']) {
       state.linkText = this.props.data['bc-add-link-text'];
