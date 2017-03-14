@@ -79,7 +79,10 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastPage' ) ) {
 
 			$extra_data['page_data'] = ( $this->page_data ? $this->page_data : new \stdClass() );
 			$extra_data['categories'] = $this->wph->get_categories( [ 'hide_empty' => false ] );
-			$extra_data['tags'] = $this->wph->get_tags( [ 'hide_empty' => false ] );
+			$extra_data['ajax_tag_search'] =
+				$this->wph->admin_url(
+					'admin-ajax.php?action=ajax-tag-search&tax=post_tag&q=${searchText}'
+				);
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-title' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-desc' );
 			$this->blast_form_helper->forward_param( $extra_data, 'bc-add-image-type' );

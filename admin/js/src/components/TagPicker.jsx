@@ -1,38 +1,55 @@
+/* eslint-env browser, es6 */
 import React, {Component, PropTypes} from 'react';
 import ChipInput from 'material-ui-chip-input';
 import styles from './TagPicker.css';
 
-const dataSourceConfig = {
-  text: 'name',
-  value: 'term_id'
-};
-
-function isNumeric(val) {
-  return !isNaN(parseFloat(val)) && isFinite(val);
-}
-
-function resolveSlug(idOrSlug, tags) {
-  if (!isNumeric(idOrSlug)) {
-    return { term_id: idOrSlug, name: idOrSlug };
-  }
-  for (var i = 0; i < tags.length; i += 1) {
-    if (tags[i].term_id === Number(idOrSlug)) {
-      return tags[i];
-    }
-  }
-  return { term_id: idOrSlug, name: idOrSlug };
-}
-
 export default class TagPicker extends Component {
   constructor(props) {
     super(props);
+    this.autoCompleteMin = props.autoCompleteMin || 2;
+    this.autoCompleteDelay = props.autoCompleteDelay || 300;
     this.state = {
-      tags: (
-        this.props.defaultValue ?
-        this.props.defaultValue.map( (idOrSlug) => resolveSlug(idOrSlug, this.props.tags) ) :
-        []
-      )
+      tags: this.props.defaultValue || [],
+      menuOpen: false,
+      suggestions: []
     };
+  }
+
+  suggestionComplete(err, response) {
+    if (err) {
+      // TODO: ?
+      return;
+    }
+
+    if (!response.ok) {
+      // TODO: ?
+      return;
+    }
+
+    response.text().then((text) => {
+      var sugg = text.split(/[\r\n]/).map(function (string) {
+        return string.trim();
+      });
+      this.setState( {
+        menuOpen: 0 < sugg.length,
+        suggestions: sugg
+      });
+    });
+  }
+
+  fetchSuggestions(searchText) {
+    this.suggestResponse =
+      fetch(
+        this.props.autoCompleteUrl.replace(/[$][{]searchText[}]/g, searchText),
+        {
+          method: 'GET',
+          redirect: 'follow',
+          credentials: 'same-origin'
+        }
+      ).then(
+        (response) => this.suggestionComplete(null, response),
+        (error) => this.suggestionComplete(error)
+      );
   }
 
   handleAddChip(chip) {
@@ -48,17 +65,33 @@ export default class TagPicker extends Component {
     });
   }
 
+  handleUpdateInput(searchText, dataSource, params) {
+      if ('change' === params.source && this.props.autoCompleteUrl) {
+        if (this.timeoutId) {
+          clearTimeout(this.timeoutId);
+        }
+        if (this.autoCompleteMin <= searchText.length) {
+          this.timeoutId = setTimeout(
+            () => this.fetchSuggestions(searchText),
+            this.autoCompleteDelay
+          );
+        } else {
+          this.setState({ menuOpen: false, suggestions: [] });
+        }
+      }
+  }
+
   render() {
     return (
       <div className={styles.wrapper}>
-        {this.state.tags.map( (tag) => {
-          return (<input type="hidden" name={this.props.fieldName} key={tag.term_id} value={tag.term_id} />);
+        {this.state.tags.map( (tag, index) => {
+          return (<input type="hidden" name={this.props.fieldName} key={index} value={tag} />);
         })}
         <ChipInput
           id="tag-chip-input"
           value={this.state.tags}
-          dataSource={this.props.tags}
-          dataSourceConfig={dataSourceConfig}
+          open={this.state.menuOpen}
+          dataSource={this.state.suggestions}
           hintText="Start typing to enter tags. The enter key completes a tag."
           floatingLabelText="Tags"
           floatingLabelFixed={true}
@@ -66,6 +99,7 @@ export default class TagPicker extends Component {
           fullWidthInput={true}
           onRequestAdd={(chip) => this.handleAddChip(chip)}
           onRequestDelete={(chip, index) => this.handleDeleteChip(chip, index)}
+          onUpdateInput={(searchText, dataSource, params) => this.handleUpdateInput(searchText, dataSource, params)}
         />
       </div>
     );
@@ -73,7 +107,9 @@ export default class TagPicker extends Component {
 }
 
 TagPicker.propTypes = {
-  tags: PropTypes.array.isRequired,
   defaultValue: PropTypes.array,
-  fieldName: PropTypes.string.isRequired
+  fieldName: PropTypes.string.isRequired,
+  autoCompleteUrl: PropTypes.string,
+  autoCompleteMin: PropTypes.number,
+  autoCompleteDelay: PropTypes.number
 };

@@ -103,9 +103,9 @@ export default class BlastForm extends Component {
                 defaultValue={this.state.description}
               />
               <TagPicker
-                tags={this.props.data.tags}
                 defaultValue={this.state.tags}
                 fieldName="bc-add-tag[]"
+                autoCompleteUrl={this.props.data.ajax_tag_search}
               />
               <TextField
                 hintText="Enter the URL for the link to the original article"
