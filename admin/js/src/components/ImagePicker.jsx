@@ -93,7 +93,7 @@ export default class ImagePicker extends Component {
     }
     return (
       <div className={styles.wrapper}>
-        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="3145728" />
         <input type="hidden" name="bc-add-image-type" value={value} />
         <input type="hidden" name="bc-add-image-url" value={this.state.url || ''} />
         <FloatingLabel label="Image" />
