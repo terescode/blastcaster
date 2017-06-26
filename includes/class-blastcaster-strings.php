@@ -24,6 +24,7 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_INVALID_BLAST_IMAGE_TYPE = 'bc.abf.invalid-image-type';
 		const ABF_MISSING_BLAST_IMAGE_URL = 'bc.abf.missing-image-url';
 		const ABF_MISSING_BLAST_IMAGE_FILE = 'bc.abf.missing-image-file';
+		const ABF_UPLOAD_IMAGE_FAILED = 'bc.abf.upload-image-failed';
 		const ABF_INVALID_CATEGORY_TYPE = 'bc.abf.invalid-cat-type';
 		const ABF_INVALID_CATEGORY = 'bc.abf.invalid-cat';
 		const ABF_BUILD_ACTION_DATA_FAILED = 'bc.abf.build-action-data-failed';
@@ -76,6 +77,20 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 					__( 'The URL %1$s is not a valid URL.' ),
 				self::ABF_UNKNOWN_IMAGE_TYPE =>
 					__( 'The image at URL %1$s is not a supported image type.' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_1' =>
+				 	__( 'The specified image could not be uploaded because it is too large. Use a different image.', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_2' =>
+				 	__( 'The specified image could not be uploaded because it is too large. Use a different image.', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_3' =>
+				 	__( 'The specified image was only partially uploaded. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_4' =>
+				 	__( 'No file was uploaded. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_6' =>
+				 	__( 'An internal error has occurred. Please contact an administrator. (6)', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_7' =>
+				 	__( 'An error occurred saving the image. Try submitting your request again. If that does not help, head to the nearest administrator.', 'blastcaster' ),
+				self::ABF_UPLOAD_IMAGE_FAILED . '_8' =>
+				 	__( 'An internal error has occurred. Please contact an administrator. (8)', 'blastcaster' ),
 			);
 		}
 

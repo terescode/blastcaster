@@ -231,8 +231,7 @@ module.exports = function (grunt) {
         src: ['*.php', 'includes/*.php', 'admin/*.php', 'public/*.php']
       },
       options: {
-        bin: 'vendor/bin/phpcs',
-        standard: 'WordPress-Core'
+        bin: 'vendor/bin/phpcs'
       }
     },
 

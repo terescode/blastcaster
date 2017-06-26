@@ -17,6 +17,31 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlastImageValidator' ) ) {
 			$this->plugin_helper = $plugin_helper;
 		}
 
+		private function validate_image_url( &$map ) {
+			$image = $this->plugin_helper->param( 'bc-add-image-url', 'url' );
+			if ( empty( $image ) ) {
+				return BcStrings::ABF_MISSING_BLAST_IMAGE_URL;
+			}
+			$map['image'] = $image;
+			return null;
+		}
+
+		private function validate_upload( &$map ) {
+			if ( ! isset( $_FILES['bc-add-image-file'] ) ) {
+				return BcStrings::ABF_MISSING_BLAST_IMAGE_FILE;
+			}
+
+			$image = $_FILES['bc-add-image-file'];
+			if ( is_uploaded_file( $image['tmp_name'] ) ) {
+				$map['image'] = $image;
+				return null;
+			}
+
+			return ! isset( $image['error'] )
+				? BcStrings::ABF_MISSING_BLAST_IMAGE_FILE
+				: BcStrings::ABF_UPLOAD_IMAGE_FAILED . '_' . $image['error'];
+		}
+
 		/**
 		 * @SuppressWarnings(PHPMD.StaticAccess)
 		 */
@@ -27,18 +52,13 @@ if ( ! class_exists( __NAMESPACE__ . '\BcBlastImageValidator' ) ) {
 			}
 
 			if ( $image_type->equals( BcImageType::BC_IMAGE_TYPE_URL ) ) {
-				$image = $this->plugin_helper->param( 'bc-add-image-url', 'url' );
-				if ( empty( $image ) ) {
-					return BcStrings::ABF_MISSING_BLAST_IMAGE_URL;
-				}
-				$map['image'] = $image;
-			} elseif ( $image_type->equals( BcImageType::BC_IMAGE_TYPE_FILE ) ) {
-				$image = isset( $_FILES['bc-add-image-file'] ) ? $_FILES['bc-add-image-file'] : null;
-				if ( null === $image || ! is_uploaded_file( $image['tmp_name'] ) ) {
-					return BcStrings::ABF_MISSING_BLAST_IMAGE_FILE;
-				}
-				$map['image'] = $image;
+				return $this->validate_image_url( $map );
 			}
+
+			if ( $image_type->equals( BcImageType::BC_IMAGE_TYPE_FILE ) ) {
+				return $this->validate_upload( $map );
+			}
+
 			return null;
 		}
 	}
