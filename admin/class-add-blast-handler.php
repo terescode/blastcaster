@@ -92,8 +92,18 @@ if ( ! class_exists( __NAMESPACE__ . '\BcAddBlastHandler' ) ) {
 				return BcStrings::ABF_INSERT_POST_FAILED;
 			}
 
-			$this->plugin_helper->add_admin_notice(
-				'Blast added!',
+			$edit_link = '/wp-admin/post.php?post=' . $result . '&action=edit';
+			$view_link = $this->wph->get_permalink( $result );
+
+			$this->plugin_helper->add_admin_notice_raw(
+				sprintf(
+					'<span style="margin-right:16px;">%s</span><a href="%s">%s</a>&nbsp;|&nbsp;<a href="%s">%s</a>',
+					$this->plugin_helper->string( BcStrings::ABF_BLAST_ADDED ),
+					$view_link,
+					$this->plugin_helper->string( BcStrings::ABF_VIEW_POST ),
+					$edit_link,
+					$this->plugin_helper->string( BcStrings::ABF_EDIT_POST )
+				),
 				TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
