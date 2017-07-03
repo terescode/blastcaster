@@ -1621,4 +1621,38 @@ class TcWpHelperTest extends \BcPhpUnitTestCase {
 		$this->assertEquals( 'image/png', $ret['type'] );
 		$this->assertEquals( 'file.png', $ret['proper_filename'] );
 	}
+
+	/**
+	 * Test get_permalink
+	 */
+	function test_get_permalink_should_call_get_permalink_and_return_value_with_required_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_permalink', array(
+			'times' => 1,
+			'args' => array( 12345, false ),
+			'return' => '/1/2/3/link',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_permalink( 12345 );
+		$this->assertEquals( '/1/2/3/link', $ret );
+	}
+
+	/**
+	 * Test status_header
+	 */
+	function test_get_permalink_should_call_get_permalink_and_return_value_with_optional_args() {
+		// @setup
+		\WP_Mock::wpFunction( 'get_permalink', array(
+			'times' => 1,
+			'args' => array( 54678, true ),
+			'return' => '/1/2/3/link2',
+		) );
+
+		// @exercise
+		$wph = new TcWpHelper();
+		$ret = $wph->get_permalink( 54678, true );
+		$this->assertEquals( '/1/2/3/link2', $ret );
+	}
 }

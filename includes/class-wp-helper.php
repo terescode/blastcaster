@@ -217,5 +217,12 @@ if ( ! class_exists( __NAMESPACE__ . '\TcWpHelper' ) ) {
 		function wp_check_filetype_and_ext( $file, $filename, $mimes = null ) {
 			return wp_check_filetype_and_ext( $file, $filename, $mimes );
 		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function get_permalink( $post, $leavename = false ) {
+			return get_permalink( $post, $leavename );
+		}
 	}
 }

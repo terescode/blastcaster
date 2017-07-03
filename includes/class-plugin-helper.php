@@ -61,7 +61,7 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 
 		function admin_notices( $notice, $type, $dismissable ) {
 			echo '<div class="' . $this->wph->esc_attr( $type ) . ' notice' . ( $dismissable ? ' is-dismissable' : '' ) . '"><p>';
-			echo $this->wph->esc_html( $notice );
+			echo $notice;
 			echo '</p></div>';
 		}
 
@@ -69,6 +69,19 @@ if ( ! class_exists( __NAMESPACE__ . '\TcPluginHelper' ) ) {
 		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
 		 */
 		function add_admin_notice( $notice, $type = self::NOTICE_TYPE_ERROR, $dismissable = true ) {
+			$delegate = new TcCallbackWrapper(
+				array( $this, 'admin_notices' ),
+				$this->wph->esc_html( $notice ),
+				$type,
+				$dismissable
+			);
+			$this->wph->add_action( 'admin_notices', array( $delegate, 'call' ) );
+		}
+
+		/**
+		 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+		 */
+		function add_admin_notice_raw( $notice, $type = self::NOTICE_TYPE_ERROR, $dismissable = true ) {
 			$delegate = new TcCallbackWrapper( array( $this, 'admin_notices' ), $notice, $type, $dismissable );
 			$this->wph->add_action( 'admin_notices', array( $delegate, 'call' ) );
 		}

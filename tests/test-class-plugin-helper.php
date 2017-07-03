@@ -151,11 +151,6 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
 
 		$m_wph->expects( $this->exactly( 4 ) )
-			->method( 'esc_html' )
-			->with( $this->equalTo( 'That is mangatsika cool' ) )
-			->will( $this->returnArgument( 0 ) );
-
-		$m_wph->expects( $this->exactly( 4 ) )
 			->method( 'esc_attr' )
 			->withConsecutive(
 				[ TcPluginHelper::NOTICE_TYPE_ERROR ],
@@ -193,6 +188,11 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
 
 		$m_wph->expects( $this->once() )
+			->method( 'esc_html' )
+			->with( $this->equalTo( 'That is mangatsika cool' ) )
+			->will( $this->returnArgument( 0 ) );
+
+		$m_wph->expects( $this->once() )
 			->method( 'add_action' )
 			->with(
 				$this->equalTo( 'admin_notices' ),
@@ -219,6 +219,46 @@ class TcPluginHelperTest extends \BcPhpUnitTestCase {
 		// @test
 		$helper = new TcPluginHelper( $m_wph, $m_strings );
 		$helper->add_admin_notice( 'That is mangatsika cool', TcPluginHelper::NOTICE_TYPE_ERROR, true );
+	}
+
+	/**
+	 * Test add_admin_notice
+	 */
+	function test_add_admin_notice_should_add_admin_notices_raw_action() {
+		// @setup
+		$m_wph = $this->mock( 'Terescode\WordPress\TcWpHelper' );
+		$m_strings = $this->mock( 'Terescode\WordPress\TcStrings' );
+
+		$m_wph->expects( $this->never() )
+			->method( 'esc_html' );
+
+		$m_wph->expects( $this->once() )
+			->method( 'add_action' )
+			->with(
+				$this->equalTo( 'admin_notices' ),
+				$this->callback( function( $subject ) {
+				  	if ( is_callable( $subject ) &&
+						$subject[0] instanceof TcCallbackWrapper ) {
+						$wrapper = $subject[0];
+						$callable = $wrapper->get_callable();
+						$args = $wrapper->get_args();
+						return is_array( $callable ) &&
+							$callable[0] instanceof TcPluginHelper &&
+							'admin_notices' === $callable[1] &&
+							is_array( $args ) &&
+							3 === count( $args ) &&
+							'<p>That is mangatsika cool</p>' === $args[0] &&
+							TcPluginHelper::NOTICE_TYPE_ERROR === $args[1] &&
+							true === $args[2];
+					} else {
+						return false;
+					}
+				})
+			);
+
+		// @test
+		$helper = new TcPluginHelper( $m_wph, $m_strings );
+		$helper->add_admin_notice_raw( '<p>That is mangatsika cool</p>', TcPluginHelper::NOTICE_TYPE_ERROR, true );
 	}
 
 	function test_get_wp_helper_should_return_helper_given_in_constructor() {

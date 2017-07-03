@@ -75,9 +75,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -124,9 +124,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -164,9 +164,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -205,9 +205,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -246,9 +246,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -288,9 +288,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);
@@ -331,9 +331,9 @@ class BcAddBlastHandlerTest extends \BcPhpUnitTestCase {
 				} )
 			);
 		$m_helper->expects( $this->once() )
-			->method( 'add_admin_notice' )
+			->method( 'add_admin_notice_raw' )
 			->with(
-				'Blast added!',
+				$this->isType( 'string' ),
 				\Terescode\WordPress\TcPluginHelper::NOTICE_TYPE_UPDATED,
 				true
 			);

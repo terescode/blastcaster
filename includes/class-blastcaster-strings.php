@@ -17,6 +17,9 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 		const ABF_DESCRIPTION_LABEL = 'bc.abf.desc-label';
 		const ABF_TAGS_LABEL = 'bc.abf.tags-label';
 		// add blast form messages
+		const ABF_BLAST_ADDED = 'bc.abf.blast-added';
+		const ABF_VIEW_POST = 'bc.abf.view-post';
+		const ABF_EDIT_POST = 'bc.abf.edit-post';
 		const ABF_INVALID_PAGE_DATA = 'bc.abf.inv-page-data';
 		const ABF_NO_ACCESS = 'bc.abf.no-access';
 		const ABF_MISSING_BLAST_TITLE = 'bc.abf.missing-title';
@@ -55,6 +58,12 @@ if ( ! class_exists( __NAMESPACE__ . '\BcStrings' ) ) {
 					__( 'Description', 'blastcaster' ),
 				self::ABF_TAGS_LABEL =>
 					__( 'Tags', 'blastcaster' ),
+				self::ABF_BLAST_ADDED =>
+					__( 'Blast added!' ),
+				self::ABF_VIEW_POST =>
+					__( 'View post' ),
+				self::ABF_EDIT_POST =>
+					__( 'Edit post' ),
 				self::ABF_INVALID_PAGE_DATA =>
 					__( 'The page data received from the original source could not be decoded. (%1$d - %2$s)', 'blastcaster' ),
 				self::ABF_NO_ACCESS =>
